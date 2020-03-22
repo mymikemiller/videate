@@ -1,0 +1,2436 @@
+{
+    "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/GYpIRr6IulS6oa-M3i5Axy402gI\"",
+    "items": [
+        {
+            "contentDetails": {
+                "videoId": "OfBKbSG1qFk",
+                "videoPublishedAt": "2020-03-20T21:00:05.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/PCOEGOYeO1tvFr8Cs2B5afqNpRM\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLk9mQktiU0cxcUZr",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "We're all stuck at home. What better time to reminisce about games from a bygone era?? \n\nREAD GHOST HUNTERS ADVENTURE CLUB ►► http://ghosthuntersadventureclub.com/ \n►► https://www.amazon.com/Hunters-Adventure-Secret-Grande-Chateau/dp/1682618927\n\nEdited by ► Sbassbear\nSubscribe to Sbassbear ► https://www.youtube.com/user/Sbassbear\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations #RetroGames",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 0,
+                "publishedAt": "2020-03-20T21:00:05.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "OfBKbSG1qFk"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/OfBKbSG1qFk/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/OfBKbSG1qFk/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/OfBKbSG1qFk/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/OfBKbSG1qFk/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/OfBKbSG1qFk/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Best RETRO GAMES Moments! (Part 2) - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "LgXpRXri2W8",
+                "videoPublishedAt": "2020-03-18T21:00:03.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/JzLV4GMzcylRU1VRxyYDVbWFGw4\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkxnWHBSWHJpMlc4",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "The things we do for the pantsu... \n\nOriginal Episode ► https://www.youtube.com/watch?v=OH5o10ALnGg\nAnimated by ► Joltzen\nSubscribe to Animator ►https://www.youtube.com/joltzen\nJoltzen Twitter ► https://twitter.com/Joltzen\n\nMERCH ►► http://gamegrumps.com/merch\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gamegrumps #animation #gamegrumpsanimated",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 1,
+                "publishedAt": "2020-03-18T21:00:03.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "LgXpRXri2W8"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/LgXpRXri2W8/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/LgXpRXri2W8/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/LgXpRXri2W8/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/LgXpRXri2W8/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/LgXpRXri2W8/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Pantsu Problems (by Joltzen) - Game Grumps Animated"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "JNQ2vGCPZtY",
+                "videoPublishedAt": "2020-03-18T17:00:09.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/XWvLVn3dIS-SxRUBoadZ5SLBDpI\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkpOUTJ2R0NQWnRZ",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Look out Fortnite - Kuukiyomi: Consider it is about to be the HOTTEST NEW GAMING CRAZE AROUND!!!!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twtitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #extremelylitgames #highintensitygaming",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 2,
+                "publishedAt": "2020-03-18T17:00:09.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "JNQ2vGCPZtY"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/JNQ2vGCPZtY/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/JNQ2vGCPZtY/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/JNQ2vGCPZtY/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/JNQ2vGCPZtY/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/JNQ2vGCPZtY/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "How to be Considerate - Kuukiyomi: Consider It"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "JpEdtsuBg5A",
+                "videoPublishedAt": "2020-03-13T22:15:00.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/r6F0NMqNV6cX3PY32Aos2YSvuXg\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkpwRWR0c3VCZzVB",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "EDIT: WE ACCIDENTALLY UPLOADED PART 3 INSTEAD OF PART 2 OOPS. How's it goin' doods?\nREAD GHOST HUNTERS ADVENTURE CLUB  ►► http://ghosthuntersadventureclub.com/ \n►► https://www.amazon.com/Hunters-Adventure-Secret-Grande-Chateau/dp/1682618927\n\nEdited by ► Rebug \nFollow Rebug ► https://twitter.com/rebugmp4\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations #HouseParty",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 3,
+                "publishedAt": "2020-03-13T22:15:00.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "JpEdtsuBg5A"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/JpEdtsuBg5A/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/JpEdtsuBg5A/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/JpEdtsuBg5A/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/JpEdtsuBg5A/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/JpEdtsuBg5A/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Best of House Party (Part 2) - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "teQ1ZHe0iN4",
+                "videoPublishedAt": "2020-03-17T17:00:17.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/XG4C8pM7WN1qD-UolC98lQVEpIw\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnRlUTFaSGUwaU40",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Arin and Dan willingly put themselves in harm's way by entering an industrial complex in Hell filled with extremely dangerous demons. \nREAD GHOST HUNTERS ADVENTURE CLUB ►► http://ghosthuntersadventureclub.com/ \nPURCHASE ON AMAZON ►► https://www.amazon.com/Hunters-Adventure-Secret-Grande-Chateau/dp/1682618927/\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twtitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #doom #demonsarereallymean",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 4,
+                "publishedAt": "2020-03-17T17:00:17.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "teQ1ZHe0iN4"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/teQ1ZHe0iN4/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/teQ1ZHe0iN4/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/teQ1ZHe0iN4/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/teQ1ZHe0iN4/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/teQ1ZHe0iN4/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Arin ACTUALLY got better!! - Doom II: PART 2"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "o4EV3uDx0wU",
+                "videoPublishedAt": "2020-03-14T20:59:08.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/btCRoUBvWrY0xjmnGrw0eGBySVA\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLm80RVYzdUR4MHdV",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Content Warning: Do NOT watch this video if you're a member of any sort of Fish's Rights organization or are sensitive to fish-related issues. \n\nHuge thank you to:\nPlayItWithHeart ► https://www.youtube.com/channel/UChR9MDSK2sfJ0EtekuROoxQ\nIBadDriverI ► https://www.youtube.com/channel/UCTcVQmY-NSuZ2YyRZgda0qg\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twtitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #scarlettmysteries #fishcancelled",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 5,
+                "publishedAt": "2020-03-14T20:59:08.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "o4EV3uDx0wU"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/o4EV3uDx0wU/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/o4EV3uDx0wU/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/o4EV3uDx0wU/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/o4EV3uDx0wU/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/o4EV3uDx0wU/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Reciting the Ending from Memory - Scarlett Mysteries: Cursed Child - PART 4"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "H--HZVqtfgk",
+                "videoPublishedAt": "2020-03-11T17:00:02.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/_ma4v2RmKIZwbyQjMDcQcV3XBQs\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkgtLUhaVnF0Zmdr",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "If you have to solve a number of spooky, cryptic puzzles in order to find your dad, it might be time to call Child Protective Services.\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #scarlettmysteries #badparenting",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 6,
+                "publishedAt": "2020-03-11T17:00:02.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "H--HZVqtfgk"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/H--HZVqtfgk/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/H--HZVqtfgk/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/H--HZVqtfgk/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/H--HZVqtfgk/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/H--HZVqtfgk/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "The game gets WEIRDER - Scarlett Mysteries: Cursed Child - PART 3"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "T7Pps0leyso",
+                "videoPublishedAt": "2020-03-11T21:00:03.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/1SQXZOG_sxvY8EvHi3-JskoSGNI\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLlQ3UHBzMGxleXNv",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "WEARING SPIKED COLLARS ISN'T A CHOICE MOM, IT'S WHO I AM\n\nOriginal Episode ► https://youtu.be/0sYkG3CoNco\nAnimated by ► Fantishow\nSubscribe to Fantishow ► https://www.youtube.com/user/FANTASHOW100\nFantishow Twitter ► https://twitter.com/Fantishow\n\nMERCH ►► http://gamegrumps.com/merch\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gamegrumps #animation #gamegrumpsanimated",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 7,
+                "publishedAt": "2020-03-11T21:00:03.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "T7Pps0leyso"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/T7Pps0leyso/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/T7Pps0leyso/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/T7Pps0leyso/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/T7Pps0leyso/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/T7Pps0leyso/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Born This Way (by Fantishow) - Game Grumps Animated"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "DbZfd1InBHo",
+                "videoPublishedAt": "2020-03-07T00:42:29.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/ro6oWw7G8HEOKZPTpTPjQA_v7nQ\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkRiWmZkMUluQkhv",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Click to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every FRIDAY! \n\nVisit our WEBSITE every FRIDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 8,
+                "publishedAt": "2020-03-07T00:42:29.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "DbZfd1InBHo"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/DbZfd1InBHo/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/DbZfd1InBHo/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/DbZfd1InBHo/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/DbZfd1InBHo/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/DbZfd1InBHo/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Testing tournaments...?! - Soviet Jump Game"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "IiI_U1nRCqY",
+                "videoPublishedAt": "2020-03-15T17:00:04.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/pv5aplzI37sFtKDXG_XcdqgTuFI\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLklpSV9VMW5SQ3FZ",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Does is Game Grumps... GOD GAMERS!?!?!?!?!?!?\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twitter.com/PENISBAILEY\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #rocketleague #godgamers",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 9,
+                "publishedAt": "2020-03-15T17:00:04.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "IiI_U1nRCqY"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/IiI_U1nRCqY/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/IiI_U1nRCqY/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/IiI_U1nRCqY/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/IiI_U1nRCqY/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/IiI_U1nRCqY/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "The PROUDEST GAMING MOMENT of our lives! - Rocket League"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "b5WzzNBE9sI",
+                "videoPublishedAt": "2020-03-08T18:00:11.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/RsvSrCRSP8oW6xNAwyIjcoVWp3w\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLmI1V3p6TkJFOXNJ",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Go see Scribble Showdown! Tickets and 2020 dates ►► http://scribbleshowdown.com/\nIn which Dan is forced to whip out his deadliest Rocket League maneuver yet... the PARALLEL PARK!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben AKA Dr. Popcorn ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #rocketleague #beeeeee",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 10,
+                "publishedAt": "2020-03-08T18:00:11.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "b5WzzNBE9sI"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/b5WzzNBE9sI/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/b5WzzNBE9sI/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/b5WzzNBE9sI/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/b5WzzNBE9sI/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/b5WzzNBE9sI/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "The most fun we've EVER had - Rocket League"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "21LiqJ5SzCg",
+                "videoPublishedAt": "2020-03-07T18:00:00.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/0rqCAWWnCoz8fE7kTNHWHBA9zA4\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLjIxTGlxSjVTekNn",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Strap in, gamers: in this riveting, high octane visual novel, the only thing to expect is the unexpected, and new surprises lie behind every turn....\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twitter.com/PENISBAILEY\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #clannad #realhiphop",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 11,
+                "publishedAt": "2020-03-07T18:00:00.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "21LiqJ5SzCg"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/21LiqJ5SzCg/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/21LiqJ5SzCg/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/21LiqJ5SzCg/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/21LiqJ5SzCg/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/21LiqJ5SzCg/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Being mean to Anime Girls - Clannad"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "NqOUd48FEoM",
+                "videoPublishedAt": "2020-03-06T22:35:57.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/X1WN2NnrcqHEYFoujFpqWhfhES8\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLk5xT1VkNDhGRW9N",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "On this month's Best of Game Grumps...... Link presents: an anime girl! \n\nEdited by ► Drej9 \nSubscribe to Drej9 ► https://www.youtube.com/channel/UCEbisIt0xerTpQ4iC8GF7sQ\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations #BestOf",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 12,
+                "publishedAt": "2020-03-06T22:35:57.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "NqOUd48FEoM"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/NqOUd48FEoM/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/NqOUd48FEoM/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/NqOUd48FEoM/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/NqOUd48FEoM/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/NqOUd48FEoM/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Best of Game Grumps January 2020 - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "rPwHrJgIiG4",
+                "videoPublishedAt": "2020-03-04T22:00:08.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/LCocpY0EH-mCTLnOtUoG8kxrUco\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnJQd0hySmdJaUc0",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "A young Dan Avidan actually did grab the moon out of the sky in 1986. What you see at night is simply a projection replica placed there by the government to maintain the peace. If you see it during the day, they forgot to turn it off. \n\nOriginal Episode ► https://www.youtube.com/watch?v=fRwYZosiD2s&list=PLRQGRBgN_EnrnYydSvpPry\nAnimated by ► Boz\nSubscribe to Boz ► https://www.youtube.com/user/Ryslife98\nBoz Twitter ► https://twitter.com/Ryslife98\n\nMERCH ►► http://gamegrumps.com/merch\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gamegrumps #animation #gamegrumpsanimated",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 13,
+                "publishedAt": "2020-03-04T22:00:08.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "rPwHrJgIiG4"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/rPwHrJgIiG4/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/rPwHrJgIiG4/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/rPwHrJgIiG4/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/rPwHrJgIiG4/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/rPwHrJgIiG4/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Grabbing the Moon (by Boz) - Game Grumps Animated"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "KnDDRB54Lmc",
+                "videoPublishedAt": "2020-03-10T17:00:04.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/2GSbKYQZUuEZIbyzJdwU6wu3004\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLktuRERSQjU0TG1j",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Have you ever wanted to time travel to the distant future (1999) so you can watch the Matrix? WELL NOW YOU CAN! Join Farts and friends as they do just this!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twitter.com/PENISBAILEY\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #chronotrigger #prince",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 14,
+                "publishedAt": "2020-03-10T17:00:04.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "KnDDRB54Lmc"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/KnDDRB54Lmc/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/KnDDRB54Lmc/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/KnDDRB54Lmc/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/KnDDRB54Lmc/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/KnDDRB54Lmc/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "PARTYING like it's 1999 - Chrono Trigger: PART 6"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "QCVysdE3A5Q",
+                "videoPublishedAt": "2020-03-03T18:00:03.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/ru1P4TiQCaYmzQUIEteoVFn6Zbw\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLlFDVnlzZEUzQTVR",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Go see Scribble Showdown! Tickets and 2020 dates ►► http://scribbleshowdown.com/\n\nIn which Arin makes a surprising revelation that begs the question... would you purchase a d*ldo molded from Arin's schween?\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben! ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #chronotrigger #arinschween",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 15,
+                "publishedAt": "2020-03-03T18:00:03.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "QCVysdE3A5Q"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/QCVysdE3A5Q/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/QCVysdE3A5Q/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/QCVysdE3A5Q/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/QCVysdE3A5Q/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/QCVysdE3A5Q/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "The kind of diarrhea that can KILL US ALL - Chrono Trigger: PART 5"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "Zq4XY6MYEFs",
+                "videoPublishedAt": "2020-02-28T22:00:03.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/8r0uN89cOT2FrLhqvs2P9ttZT64\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLlpxNFhZNk1ZRUZz",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "What does it all mean?? Is there a point to everything??? The answer is yes and the point is to watch Game Grumps Compilations\n\nEdited by ► FilmTyrant\nSubscribe to FilmTyrant ► https://www.youtube.com/channel/UCGd6Hso_76mDwj5a1yyA0IQ/videos\n\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 16,
+                "publishedAt": "2020-02-28T22:00:03.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "Zq4XY6MYEFs"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/Zq4XY6MYEFs/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/Zq4XY6MYEFs/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/Zq4XY6MYEFs/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/Zq4XY6MYEFs/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/Zq4XY6MYEFs/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Deep Conversations Compilation - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "-sBhxbu55tg",
+                "videoPublishedAt": "2020-03-01T18:00:01.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/UlULtecboTeCMT8H7k4lhRyia7U\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLi1zQmh4YnU1NXRn",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Watch in delight as the great DAN mans the joycons (jizzle conizzles) for some classic DOUBLE DRAGON ACTION!\n\nNot one, but TWO DRAGONS for the price of one! I'm gonna pre!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by BEN  ► http://twitter.com/PENISBAILEY\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #doubledragon #jimmyandbimmy",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 17,
+                "publishedAt": "2020-03-01T18:00:01.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "-sBhxbu55tg"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/-sBhxbu55tg/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/-sBhxbu55tg/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/-sBhxbu55tg/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/-sBhxbu55tg/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/-sBhxbu55tg/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Game Grumps play DOUBLE DRAGON"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "vCG_Ekp4MLQ",
+                "videoPublishedAt": "2020-02-29T04:35:11.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/jC4NWLxh3YqLrcCKaNZWDwJk9cw\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnZDR19Fa3A0TUxR",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Go to http://ghosthuntersadventureclub.com/ to read the first chapter and preorder the book!\n► https://www.amazon.com/Hunters-Adventure-Secret-Grande-Chateau/dp/1682618927\n\nTo those of you who don't know, Ghost Hunters Adventure Club is a novel written by Arin's Uncle, Dr. Cecil H.H. Mills. Arin is promoting it on the channel at the behest of his mother even though he really doesn't want to (isn't he nice?). We all felt bad for him for a while, but honestly, after hearing THIS jam? His uncle might be cooler than him! Jury's still out on the book though. I mean, none of us even know how to read.\n\n► SPECIAL THANKS to... \"Daddy Cecil's Cupcake Puzzle Sluts\" (NOT OUR IDEA) for unlocking Cecil's website and recovering the theme song from those jerks at Bradford and Bradford:\nAzuraRose\nEnkogneato\ngds15\nGracie\nIprovidethepaint\nJadeE\nJee_W\nKaleb Love\nKuro Yamigetsu\nLeDomingo\nMercury Drive\nMisterBlister\npkaz\nRyanks\nryantherobot\nScoot\nStalemovesmcgee\nWatt\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#CecilHHMillsFanSociety #GhostHuntersAdventureClub",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 18,
+                "publishedAt": "2020-02-29T04:35:11.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "vCG_Ekp4MLQ"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/vCG_Ekp4MLQ/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/vCG_Ekp4MLQ/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/vCG_Ekp4MLQ/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/vCG_Ekp4MLQ/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/vCG_Ekp4MLQ/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Ghost Hunters Adventure Club (Theme Song) by The Dr. Cecil H.H. Mills Fan Society"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "zFM9YtFmZ1U",
+                "videoPublishedAt": "2020-02-29T18:00:13.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/1VsgEkCta93T0D2xPOwJu9BdYhE\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnpGTTlZdEZtWjFV",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "NEEDS DESCRIPTION. It should be an unbelievably fantastic description, quick, lighthearted, yet needs to convey to viewers that they are about to watch the final installment of the Chrono Trigger streamisodes by the best damn Lets Players on Planet Freakin' Earth, before they FINISH the GAME and BOY are they gonna PRE when it happens. And don't forget to do the tags.\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #chronotrigger #crapiforgotthetags",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 19,
+                "publishedAt": "2020-02-29T18:00:13.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "zFM9YtFmZ1U"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/zFM9YtFmZ1U/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/zFM9YtFmZ1U/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/zFM9YtFmZ1U/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/zFM9YtFmZ1U/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/zFM9YtFmZ1U/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Is Magus hard? - Chrono Trigger: PART 4"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "g7qU7tGOja8",
+                "videoPublishedAt": "2020-03-04T18:00:06.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/3yWMDDKO5KNC6FAYeN9efGQSdCc\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLmc3cVU3dEdPamE4",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "In a game in which one must blast demons throughout the depths of Hell, who would have thought the most dangerous threat would be Arin's delicious kisses? \n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by BEn ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #DOOM2",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 20,
+                "publishedAt": "2020-03-04T18:00:06.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "g7qU7tGOja8"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/g7qU7tGOja8/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/g7qU7tGOja8/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/g7qU7tGOja8/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/g7qU7tGOja8/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/g7qU7tGOja8/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Am I the Worst Doom 2 player? - Doom 2: PART 1"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "xDyfVq7BaZQ",
+                "videoPublishedAt": "2020-02-21T22:00:06.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/tly7jMZTmJxV9AuEr7gTZawnmy8\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnhEeWZWcTdCYVpR",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Some of these games work GREAT, but some work so bad they're BETTER THAN GREAT!\n\nEdited by ► Sbassbear\nSubscribe to Sbassbear ► https://www.youtube.com/user/Sbassbear\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 21,
+                "publishedAt": "2020-02-21T22:00:06.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "xDyfVq7BaZQ"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/xDyfVq7BaZQ/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/xDyfVq7BaZQ/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/xDyfVq7BaZQ/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/xDyfVq7BaZQ/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/xDyfVq7BaZQ/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Best RETRO GAMES Moments! (Part 1) - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "tuHe9lm5vUE",
+                "videoPublishedAt": "2020-02-27T18:00:14.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/NIkfL0dlvkzPI2y0wQ8HkmatB2w\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnR1SGU5bG01dlVF",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "From the album \"Thunderbird” available at http://fanlink.to/Thunderbird\nFollow Night Runner on Instagram ► http://instagram.com/nightrunnermusic84\n\nVideo by Knights of the Light Table  ► http://knightsofthelighttable.com/\n\nSong by Night Runner  ► http://nightrunnermusic.bandcamp.com/\n\nVocals/lyrics & video concept ► Dan Avidan\n\nLYRICS\n\nA dark and moonless night\nHas never felt so right\nAn empty mirror only shows what's left inside\nLost in the city street \nElectric tapestry \nThe neon beckons me beyond its ghostly light \n\nNo longer I pretend \nThe staircase I descend \nWill lead me anywhere but my unscripted end \nMy heart and hands collide \nThe gun lays at my side \nToo late to turn back, only fate’s left to decide\n \nMagnum bullets \nSettling a score \nMagnum bullets \nKicking down the door \n\nBack up the stairs again \nI am a different man \nA broken mirror only shows as best it can \nRunning in shoes that shine \nWith blood that isn't mine \nA staining trophy of the battles I've survived \n\nNo longer I defend \nThe choices I pretend \nCould make amends that heal the loss of precious time \nMy conscience paralyzed \nAgainst the rising tide \nOf haunting memories that drown a wasted life \n\nMagnum bullets \nAlways wanting more \nMagnum bullets \nClosing every door\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#NightRunner",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 22,
+                "publishedAt": "2020-02-27T18:00:14.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "tuHe9lm5vUE"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/tuHe9lm5vUE/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/tuHe9lm5vUE/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/tuHe9lm5vUE/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/tuHe9lm5vUE/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/tuHe9lm5vUE/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Night Runner - Magnum Bullets (feat. Dan Avidan) [Official video]"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "Ntos6hVK9Bk",
+                "videoPublishedAt": "2020-02-19T01:52:32.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/tAvqSVswNgLWx5x5c_vpRV1k1ck\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLk50b3M2aFZLOUJr",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Click to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 23,
+                "publishedAt": "2020-02-19T01:52:32.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "Ntos6hVK9Bk"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/Ntos6hVK9Bk/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/Ntos6hVK9Bk/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/Ntos6hVK9Bk/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/Ntos6hVK9Bk/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/Ntos6hVK9Bk/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Playing SOVIET JUMP GAME with Arin!"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "ETOM4rcBuaI",
+                "videoPublishedAt": "2020-02-26T18:00:02.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/4zIA7cVANAau_yQW-xxHFtx_45Q\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkVUT000cmNCdWFJ",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Can Arin and Dan use their magical grumpy knowledge powers to defeat DAVID, who sucks? Find out inside! You won't find spoilers here.\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdoted bu Bme! ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #jeopardy #knowledgebaps",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 24,
+                "publishedAt": "2020-02-26T18:00:02.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "ETOM4rcBuaI"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/ETOM4rcBuaI/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/ETOM4rcBuaI/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/ETOM4rcBuaI/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/ETOM4rcBuaI/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/ETOM4rcBuaI/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Who is THE VIDEO GAME BOY? - Jeopardy"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "vdGySc7cGKQ",
+                "videoPublishedAt": "2020-02-25T18:00:14.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/n_sPszll4KyQzB5HCS4lUonXHTw\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnZkR3lTYzdjR0tR",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "The third installment of the Great Grumpy Chrono Trigger Stream of 2019. While you can't give donations here on this video, my personal Venmo is always open! \n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #chronotrigger #streamisode",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 25,
+                "publishedAt": "2020-02-25T18:00:14.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "vdGySc7cGKQ"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/vdGySc7cGKQ/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/vdGySc7cGKQ/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/vdGySc7cGKQ/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/vdGySc7cGKQ/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/vdGySc7cGKQ/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "A whole lot of JUDGEMENT going on - Chrono Trigger: PART 3"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "K7ZGqlVfGBA",
+                "videoPublishedAt": "2020-02-23T18:00:04.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/Xie_8eYDU0ZzUnfoLXJxwSLHizw\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLks3WkdxbFZmR0JB",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Arin and Dan play this game \"Rocket League,\" which is really irresponsible because kids at home might see it and think it's cool to play soccer with cars and giant balls, and some really bad accidents might occur. It is truly reprehensible of us to publish this video, knowing full well that someone might take their car and try to play competitive sports with it in a gigantic arena, which may have harmful implications. We encourage you to sue us if any damage or loss of life occurs as a result of this video, and are setting aside a large sum of money to pay out to potential victims. We sincerely apologize to all the families that will go on to be involved in what is sure to be a huge scandal for us.  Please talk to your children about the dangers of watching Game Grumps. \n\nEdited by Ben  ► http://twitter.com/PenisBailey\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #rocketleague #werecancelled",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 26,
+                "publishedAt": "2020-02-23T18:00:04.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "K7ZGqlVfGBA"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/K7ZGqlVfGBA/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/K7ZGqlVfGBA/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/K7ZGqlVfGBA/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/K7ZGqlVfGBA/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/K7ZGqlVfGBA/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Game Grumps play ROCKET LEAGUE"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "56q7Ztrlb_M",
+                "videoPublishedAt": "2020-02-22T20:42:25.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/u-crQYi0caMga2vB8KmRkSaW3Q0\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLjU2cTdadHJsYl9N",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Recapture the magic as Air Enhancin', Dana Vidan and some grumpy buddies tackle the back half of the FIRST 5 hour Chrono Trigger stream.\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\r\nMERCH!! ► http://gamegrumps.com/merch\r\nOur email list! ► http://eepurl.com/cN7syX\r\n\nEdited by Ben ► http://twitter.com/PenisBailey\n\r\n*********************************************\r\n\r\nWe have NEW MERCH every FRIDAY! \r\n\r\nVisit our WEBSITE every FRIDAY to check out the NEW items!\r\n\r\n►►► http://gamegrumps.com/merch\r\n\r\n*********************************************\r\n\r\nFACEBOOK ► https://www.facebook.com/GameGrumps\r\nTWITTER ► https://www.twitter.com/gamegrumps\r\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\r\nWEBSITE ► http://gamegrumps.com\r\n\r\n*********************************************\r\n\r\nGame Grumps are:\r\nArin ► http://www.youtube.com/Egoraptor\r\nDanny ► http://www.youtube.com/NinjaSexParty\r\n\r\n#gaming #chronotrigger #streamisode",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 27,
+                "publishedAt": "2020-02-22T20:42:25.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "56q7Ztrlb_M"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/56q7Ztrlb_M/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/56q7Ztrlb_M/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/56q7Ztrlb_M/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/56q7Ztrlb_M/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/56q7Ztrlb_M/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Arin's Third Favorite Game - Chrono Trigger: PART 2"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "9JqxUTYorzI",
+                "videoPublishedAt": "2020-02-19T18:00:04.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/MbyGtyJUeguI2VlGk-xIcFsbRRo\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLjlKcXhVVFlvcnpJ",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Are we putting these streams up as episodes because we're finally finishing Chrono Trigger???\n\nWHO'S TO SAY!?!??!!?\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\r\nMERCH!! ► http://gamegrumps.com/merch\r\nOur email list! ► http://eepurl.com/cN7syX\r\n\nEdited by Ben ► http://twitter.com/PenisBailey\n\r\n*********************************************\r\n\r\nWe have NEW MERCH every FRIDAY! \r\n\r\nVisit our WEBSITE every FRIDAY to check out the NEW items!\r\n\r\n►►► http://gamegrumps.com/merch\r\n\r\n*********************************************\r\n\r\nFACEBOOK ► https://www.facebook.com/GameGrumps\r\nTWITTER ► https://www.twitter.com/gamegrumps\r\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\r\nWEBSITE ► http://gamegrumps.com\r\n\r\n*********************************************\r\n\r\nGame Grumps are:\r\nArin ► http://www.youtube.com/Egoraptor\r\nDanny ► http://www.youtube.com/NinjaSexParty\r\n\r\n#gaming #chronotrigger #streamisode",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 28,
+                "publishedAt": "2020-02-19T18:00:04.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "9JqxUTYorzI"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/9JqxUTYorzI/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/9JqxUTYorzI/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/9JqxUTYorzI/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/9JqxUTYorzI/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/9JqxUTYorzI/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "We name our character FARTS - Chrono Trigger: PART 1"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "eR_DjFSzzJo",
+                "videoPublishedAt": "2020-02-14T22:00:13.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/nd1BGLEZgdKFuqr7vr3nb2-DSg4\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLmVSX0RqRlN6ekpv",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Soon Arin and Dan will be actual characters in House Party... so what better time to go on a trip down memory lane??\n\nEdited by ► Rebug \nFollow Rebug ► https://twitter.com/rebugmp4\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 29,
+                "publishedAt": "2020-02-14T22:00:13.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "eR_DjFSzzJo"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/eR_DjFSzzJo/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/eR_DjFSzzJo/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/eR_DjFSzzJo/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/eR_DjFSzzJo/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/eR_DjFSzzJo/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Best of HOUSE PARTY! (Part 1) - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "Bi68et2UuCs",
+                "videoPublishedAt": "2020-02-19T22:00:01.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/2M_dQ3daBpCaC7G1R8KL5wKcdGg\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkJpNjhldDJVdUNz",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "This GGA is 100% accurate to real life, in that Arin wears this EXACT outfit when recording episodes without Dan\n\nOriginal Episode ► https://www.youtube.com/watch?v=0TdN0cW2ALQ\nAnimated by ► Jey Pawlik\nSubscribe to Jey Pawlik ► https://youtube.com/c/jeypawlik/\nJey Pawlik Twitter ► https://twitter.com/jeypawlik\n\nMERCH ►► http://gamegrumps.com/merch\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gamegrumps #animation #gamegrumpsanimated",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 30,
+                "publishedAt": "2020-02-19T22:00:01.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "Bi68et2UuCs"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/Bi68et2UuCs/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/Bi68et2UuCs/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/Bi68et2UuCs/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/Bi68et2UuCs/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/Bi68et2UuCs/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "The Daggure (by Jey Pawlik) - Game Grumps Animated"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "F2EkQlE1o8c",
+                "videoPublishedAt": "2020-02-12T22:00:02.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/J6C5JW8exM91lfLyfB0xl9kD6Qk\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkYyRWtRbEUxbzhj",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "...Sometimes there is ONLY time to waste. \n\nOriginal Episode ► https://www.youtube.com/watch?v=SovUuhOB9-I\nAnimated by ► FancyPantsBionicle\nSubscribe to FancyPantsBionicle ► https://www.youtube.com/channel/UCA3TFeROQlvaYODWPsGXR5Q\nFancyPantsBionicle Twitter ► https://twitter.com/FancyPantsBioni\n\nMERCH ►► http://gamegrumps.com/merch\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gamegrumps #animation #gamegrumpsanimated",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 31,
+                "publishedAt": "2020-02-12T22:00:02.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "F2EkQlE1o8c"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/F2EkQlE1o8c/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/F2EkQlE1o8c/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/F2EkQlE1o8c/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/F2EkQlE1o8c/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/F2EkQlE1o8c/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "No Time to Waste! (by FancyPantsBionicle) - Game Grumps Animated"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "J_ymf0u-mQE",
+                "videoPublishedAt": "2020-02-18T18:00:03.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/3PgAwuIGpoPUX6Vf-AyH2fcuyYs\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkpfeW1mMHUtbVFF",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Anyone with this many father traces around needs to hire a cleaner! And go to church!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben \"SexyBuns\" Perry ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #cursedchild #wheresmydad",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 32,
+                "publishedAt": "2020-02-18T18:00:03.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "J_ymf0u-mQE"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/J_ymf0u-mQE/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/J_ymf0u-mQE/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/J_ymf0u-mQE/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/J_ymf0u-mQE/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Big DAD Energy - Scarlett Mysteries: Cursed Child - PART 2"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "4MDdbvmtiFM",
+                "videoPublishedAt": "2020-02-10T21:48:03.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/ej3GIbd1327aHmAWXhuyIyGxfrs\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLjRNRGRidm10aUZN",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "In our second Soviet Jump Game stream, Arin is joined by Sonic the Hedgehog and obtains ONE VICTORY ROYALE! Play Soviet Jump Game now for free on Steam!! https://store.steampowered.com/app/1072710/Soviet_Jump_Game/\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\r\nMERCH!! ► http://gamegrumps.com/merch\r\nOur email list! ► http://eepurl.com/cN7syX\r\n\r\n*********************************************\r\n\r\nWe have NEW MERCH every FRIDAY! \r\n\r\nVisit our WEBSITE every FRIDAY to check out the NEW items!\r\n\r\n►►► http://gamegrumps.com/merch\r\n\r\n*********************************************\r\n\r\nFACEBOOK ► https://www.facebook.com/GameGrumps\r\nTWITTER ► https://www.twitter.com/gamegrumps\r\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\r\nWEBSITE ► http://gamegrumps.com\r\n\r\n*********************************************\r\n\r\nGame Grumps are:\r\nArin ► http://www.youtube.com/Egoraptor\r\nDanny ► http://www.youtube.com/NinjaSexParty\r\n\r\n#gaming #sovietjumpgame",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 33,
+                "publishedAt": "2020-02-10T21:48:03.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "4MDdbvmtiFM"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/4MDdbvmtiFM/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/4MDdbvmtiFM/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/4MDdbvmtiFM/mqdefault.jpg",
+                        "width": 320
+                    }
+                },
+                "title": "Soviet Lunch Game Stream with Arin!"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "W_EXA4ZdKto",
+                "videoPublishedAt": "2020-02-16T18:00:07.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/GQ3eqcfP5P7_o_1fyUJQe1NfWaE\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLldfRVhBNFpkS3Rv",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Can Arin and Dan outsmart another douchey AI player, who this time is 50% stupider? FIND OUT INSIDE\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by BEN  ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #wheeloffortune #doucheyai",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 34,
+                "publishedAt": "2020-02-16T18:00:07.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "W_EXA4ZdKto"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/W_EXA4ZdKto/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/W_EXA4ZdKto/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/W_EXA4ZdKto/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/W_EXA4ZdKto/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/W_EXA4ZdKto/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Friendship is VICTORY! - Wheel of Fortune"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "bzEYgFCqpjI",
+                "videoPublishedAt": "2020-02-07T22:05:02.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/H46Nuqolz_hBZVJ8T5ug132SErc\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLmJ6RVlnRkNxcGpJ",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "This compilation is SO last year!!!!\n\nHA!!!!!!!!!!!!!!!!!\n\nEdited by ► Drej9 \nSubscribe to Drej9 ► https://www.youtube.com/channel/UCEbisIt0xerTpQ4iC8GF7sQ\n\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 35,
+                "publishedAt": "2020-02-07T22:05:02.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "bzEYgFCqpjI"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/bzEYgFCqpjI/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/bzEYgFCqpjI/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/bzEYgFCqpjI/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/bzEYgFCqpjI/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/bzEYgFCqpjI/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Best of Game Grumps December 2019 - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "seazz6lYYIo",
+                "videoPublishedAt": "2020-02-15T18:00:07.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/9X98JOCDx_CF4kPNkHXv1V7OEBs\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnNlYXp6NmxZWUlv",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Sometimes, you have to solve a series of creepy puzzles in order to find your missing dad. For Arin Hanson and Dan Avidan, that day is today. That day..... is today........\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Begn ► http://http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #cursedchild #whereismydad",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 36,
+                "publishedAt": "2020-02-15T18:00:07.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "seazz6lYYIo"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/seazz6lYYIo/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/seazz6lYYIo/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/seazz6lYYIo/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/seazz6lYYIo/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/seazz6lYYIo/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Where is my FREAKIN' DAD?!?!? - Scarlett Mysteries: Cursed Child: PART 1"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "Bvc38EfOhqM",
+                "videoPublishedAt": "2020-02-12T18:00:02.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/sb_QXu3_XC5stN_W5dKcsZCUjjk\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkJ2YzM4RWZPaHFN",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Dan and Arin are BACK to finish off this game of the friendship tester... does their relationship hold up??\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdduhtid by Ben ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #monopoly #friendshiptester",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 37,
+                "publishedAt": "2020-02-12T18:00:02.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "Bvc38EfOhqM"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/Bvc38EfOhqM/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/Bvc38EfOhqM/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/Bvc38EfOhqM/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/Bvc38EfOhqM/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/Bvc38EfOhqM/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Send that dang turtle to JAIL! - Monopoly: FINALE"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "C1hAE9vZvCc",
+                "videoPublishedAt": "2020-02-11T18:00:02.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/jRJYDRuxm3EhT-QADHyZOEXDBAs\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkMxaEFFOXZadkNj",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Arin and Dan duke it out for second place behind a really hot A.I. player who honestly seems like a pretty big @$$hoal. He doesn't even deserve to be playing with our boys.\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben \"Butt Flap\" Perry ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #wheeloffortune #doucheyai",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 38,
+                "publishedAt": "2020-02-11T18:00:02.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "C1hAE9vZvCc"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/C1hAE9vZvCc/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/C1hAE9vZvCc/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/C1hAE9vZvCc/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/C1hAE9vZvCc/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/C1hAE9vZvCc/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Can we beat the douchey AI player? - Wheel Of Fortune"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "vlQ1Sa4yOAA",
+                "videoPublishedAt": "2020-02-05T22:00:08.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/kPaFNKwE-dyBpnUTb_qhFzxI838\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnZsUTFTYTR5T0FB",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Adopt a Fursona today!\n\nOriginal Episode ► https://www.youtube.com/watch?v=T-LD2n_ZObs\nAnimated by ► Fable Siegel\nSubscribe to Fable Siegel ►https://www.youtube.com/c/fablepaint\nFable Siegel Twitter ► https://twitter.com/fablepaint\n\nMERCH ►► http://gamegrumps.com/merch\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gamegrumps #animation #gamegrumpsanimated",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 39,
+                "publishedAt": "2020-02-05T22:00:08.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "vlQ1Sa4yOAA"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/vlQ1Sa4yOAA/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/vlQ1Sa4yOAA/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/vlQ1Sa4yOAA/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/vlQ1Sa4yOAA/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/vlQ1Sa4yOAA/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Fursona Shelter (by Fable Siegel) - Game Grumps Animated"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "pAdjrYtARYI",
+                "videoPublishedAt": "2020-02-09T18:00:05.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/qRqtX4ELH2YCGlHzIqo5b_kWsk0\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnBBZGpyWXRBUllJ",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "I'd let these boys mortgage my property any day of the week... know what I mean? 😉\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Benn ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #monopoly #laffytaffy",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 40,
+                "publishedAt": "2020-02-09T18:00:05.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "pAdjrYtARYI"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/pAdjrYtARYI/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/pAdjrYtARYI/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/pAdjrYtARYI/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/pAdjrYtARYI/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/pAdjrYtARYI/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Land on DEEZ NUTTS! - Monopoly: PART 1"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "0Jgfm6Dq44o",
+                "videoPublishedAt": "2020-02-03T22:09:43.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/Oo8wuysLEM-T8GTMKQ9bHQ6bk7c\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLjBKZ2ZtNkRxNDRv",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "In our second Soviet Jump Game stream, Arin is joined by Sonic the Hedgehog and obtains ONE VICTORY ROYALE! Play Soviet Jump Game now for free on Steam!! https://store.steampowered.com/app/1072710/Soviet_Jump_Game/\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\r\nMERCH!! ► http://gamegrumps.com/merch\r\nOur email list! ► http://eepurl.com/cN7syX\r\n\r\n*********************************************\r\n\r\nWe have NEW MERCH every FRIDAY! \r\n\r\nVisit our WEBSITE every FRIDAY to check out the NEW items!\r\n\r\n►►► http://gamegrumps.com/merch\r\n\r\n*********************************************\r\n\r\nFACEBOOK ► https://www.facebook.com/GameGrumps\r\nTWITTER ► https://www.twitter.com/gamegrumps\r\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\r\nWEBSITE ► http://gamegrumps.com\r\n\r\n*********************************************\r\n\r\nGame Grumps are:\r\nArin ► http://www.youtube.com/Egoraptor\r\nDanny ► http://www.youtube.com/NinjaSexParty\r\n\r\n#gaming #sovietjumpgame",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 41,
+                "publishedAt": "2020-02-03T22:09:43.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "0Jgfm6Dq44o"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/0Jgfm6Dq44o/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/0Jgfm6Dq44o/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/0Jgfm6Dq44o/mqdefault.jpg",
+                        "width": 320
+                    }
+                },
+                "title": "Soviet Lunch Game Stream with Arin!"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "1FvqZM86oe8",
+                "videoPublishedAt": "2020-02-08T18:00:01.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/VPFE9ngkim-z1oiPa1vy-zD8Xx4\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLjFGdnFaTTg2b2U4",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Ladies and gentlemen.... WE GOT HIM!!!!!!!!!!!!!!!\n\nSpantzz saves Hyrule and all that, but most importantly.... MIDNA IS HOT!!!!!!!!!!!!!!!\n\nTIME TO PARTY!!!!!!!!!!!!!!!!!!!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben, who was the one who added the fart noises, not Matt and Ryan lololololol ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming # #",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 42,
+                "publishedAt": "2020-02-08T18:00:01.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "1FvqZM86oe8"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/1FvqZM86oe8/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/1FvqZM86oe8/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/1FvqZM86oe8/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/1FvqZM86oe8/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/1FvqZM86oe8/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "The Toilet Flushed Once And For All - Zelda Twilight Princess: PART 76 **FINALE**"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "jSTt5ODaLic",
+                "videoPublishedAt": "2020-01-31T22:00:07.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/GTe3zEB0p3Vbn3P8d2CsHkQm8Tc\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLmpTVHQ1T0RhTGlj",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "We tried to have a death counter against Sans... but Arin just died.... SO MUCH..... \n\nBut he does it!! HE WINS!!\n\nEdited by ► Rebug \nFollow Rebug ► https://twitter.com/rebugmp4\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://eepurl.com/cN7syX\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #GameGrumpsCompilations",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 43,
+                "publishedAt": "2020-01-31T22:00:07.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "jSTt5ODaLic"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/jSTt5ODaLic/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/jSTt5ODaLic/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/jSTt5ODaLic/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/jSTt5ODaLic/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/jSTt5ODaLic/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Best of UNDERTALE (Part 3) - Game Grumps Compilations"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "1yy7oYRMPLo",
+                "videoPublishedAt": "2020-02-04T18:00:00.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/unaFnRNudEqwCyNs3dNVblNf4D8\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLjF5eTdvWVJNUExv",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "This video officially marks the 75th anniversary of the Twilight Princess playthrough! Happy 75th birthday SPANTZZZZ!!!!!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben! ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #zeldatwilightprincess #spantzzz",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 44,
+                "publishedAt": "2020-02-04T18:00:00.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "1yy7oYRMPLo"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/1yy7oYRMPLo/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/1yy7oYRMPLo/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/1yy7oYRMPLo/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/1yy7oYRMPLo/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/1yy7oYRMPLo/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Liar Liar SPANTZZ ON FIRE - Zelda Twilight Princess: PART 75"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "aiiBNgYJ1t4",
+                "videoPublishedAt": "2020-02-05T18:00:00.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/I1BUuyzJuKjYW_NGYkFXfnAX-j8\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLmFpaUJOZ1lKMXQ0",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Should Dan be required to come in to the meeting tomorrow (a month ago)? SOUND OFF IN THE COMMENTS BELOW!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by BEN ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #megaman #gamegrumpsthroatexperience",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 45,
+                "publishedAt": "2020-02-05T18:00:00.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "aiiBNgYJ1t4"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/aiiBNgYJ1t4/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/aiiBNgYJ1t4/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/aiiBNgYJ1t4/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/aiiBNgYJ1t4/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/aiiBNgYJ1t4/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "The Game Grumps THROAT EXPERIENCE - MegaMan V: PART 3 FINALE"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "ydFmcRfMsR0",
+                "videoPublishedAt": "2020-02-01T18:45:00.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/FlqdE1vVDELcOsdqFzgiL2Os_PU\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLnlkRm1jUmZNc1Iw",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "In which poor, sweet Danny momentarily thinks that Arin has beaten the game. Oh Danny, bless your heart. Bless your precious little heart. \n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by \"Ben\" ► http://twitter.com/PenisBailey\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #zeldatwilightprincess #spantzzzzzz",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 46,
+                "publishedAt": "2020-02-01T18:45:00.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "ydFmcRfMsR0"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/ydFmcRfMsR0/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/ydFmcRfMsR0/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/ydFmcRfMsR0/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/ydFmcRfMsR0/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/ydFmcRfMsR0/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Medieval elf-man FIGHTS metallic lizardy monster guy! - Zelda Twilight Princess: PART 74"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "jwHKuCWnE28",
+                "videoPublishedAt": "2020-01-29T22:00:10.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/zn0-Nor_uVp1Ik79vDP0HQUsnBk\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLmp3SEt1Q1duRTI4",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Content Warning: Tongues, Licking\n\nOriginal Episode ► https://www.youtube.com/watch?v=NwUlyzCWyPw\nAnimated by ► Jarrett Riley\nSubscribe to Jarrett Riley ► http://youtube.com/jae55555\nJarrett Riley Twitter ► http://twitter.com/jarrettriley\n\nMERCH ►► http://gamegrumps.com/merch\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gamegrumps #animation #gamegrumpsanimated",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 47,
+                "publishedAt": "2020-01-29T22:00:10.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "jwHKuCWnE28"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/jwHKuCWnE28/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/jwHKuCWnE28/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/jwHKuCWnE28/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/jwHKuCWnE28/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/jwHKuCWnE28/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Arcade Germs (by Jarrett Riley) - Game Grumps Animated"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "Hgd-g634AwM",
+                "videoPublishedAt": "2020-02-02T18:00:02.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/5fe9O_iZWO8yVGbJ7msQyydHqF0\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLkhnZC1nNjM0QXdN",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "Does Danny get a french fry stuck in his nasal passage during this episode? Why would I tell you? You have to watch to find out!\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben! ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #megaman #frenchfrynosestuck",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 48,
+                "publishedAt": "2020-02-02T18:00:02.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "Hgd-g634AwM"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/Hgd-g634AwM/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/Hgd-g634AwM/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/Hgd-g634AwM/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/Hgd-g634AwM/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/Hgd-g634AwM/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "GUILTY of being a Mega Man MASTER - Mega Man V : PART 2"
+            }
+        },
+        {
+            "contentDetails": {
+                "videoId": "RF2BssFvpEA",
+                "videoPublishedAt": "2020-01-29T18:00:09.000Z"
+            },
+            "etag": "\"ksCrgYQhtFrXgbHAhi9Fo5t0C2I/E1YhMx7ppWOUdJk9oVBt_Qio4k4\"",
+            "id": "VVU5Q3V2ZE9WZk1QdktDaXdkR0tMM2NRLlJGMkJzc0Z2cEVB",
+            "kind": "youtube#playlistItem",
+            "snippet": {
+                "channelId": "UC9CuvdOVfMPvKCiwdGKL3cQ",
+                "channelTitle": "GameGrumps",
+                "description": "The date is January 29, 2020. You wake up naked in a dumpster covered in dirt. You reach back behind you for your phone, which is lodged in your buttocks for some reason. You still have 69% battery life. The clock strikes 10 AM Pacific Time. You get that notification about a new Game Grumps video featuring a Mega Man V playthrough. You click it. You hear that intro that you've known and loved for so many years. \"Ah,\" you think. \"Everything is going to be okay.\"\n\nClick to SUBSCRIBE ► http://bit.ly/GrumpSubscribe\nMERCH!! ► http://gamegrumps.com/merch\nOur email list! ► http://bit.ly/GrumpsStuffEmail\n\nEdited by Ben! ► http://twitter.com/PenisBailey\n\n*********************************************\n\nWe have NEW MERCH every THURSDAY! \n\nVisit our WEBSITE every THURSDAY to check out the NEW items!\n\n►►► http://gamegrumps.com/merch\n\n*********************************************\n\nFACEBOOK ► https://www.facebook.com/GameGrumps\nTWITTER ► https://www.twitter.com/gamegrumps\nINSTAGRAM ► https://www.instagram.com/gamegrumps/\nWEBSITE ► http://gamegrumps.com\n\n*********************************************\n\nGame Grumps are:\nArin ► http://www.youtube.com/Egoraptor\nDanny ► http://www.youtube.com/NinjaSexParty\n\n#gaming #megamanv #peepeepart",
+                "playlistId": "UU9CuvdOVfMPvKCiwdGKL3cQ",
+                "position": 49,
+                "publishedAt": "2020-01-29T18:00:09.000Z",
+                "resourceId": {
+                    "kind": "youtube#video",
+                    "videoId": "RF2BssFvpEA"
+                },
+                "thumbnails": {
+                    "default": {
+                        "height": 90,
+                        "url": "https://i.ytimg.com/vi/RF2BssFvpEA/default.jpg",
+                        "width": 120
+                    },
+                    "high": {
+                        "height": 360,
+                        "url": "https://i.ytimg.com/vi/RF2BssFvpEA/hqdefault.jpg",
+                        "width": 480
+                    },
+                    "maxres": {
+                        "height": 720,
+                        "url": "https://i.ytimg.com/vi/RF2BssFvpEA/maxresdefault.jpg",
+                        "width": 1280
+                    },
+                    "medium": {
+                        "height": 180,
+                        "url": "https://i.ytimg.com/vi/RF2BssFvpEA/mqdefault.jpg",
+                        "width": 320
+                    },
+                    "standard": {
+                        "height": 480,
+                        "url": "https://i.ytimg.com/vi/RF2BssFvpEA/sddefault.jpg",
+                        "width": 640
+                    }
+                },
+                "title": "Playing ARIN'S CHILDHOOD! - MegaMan V : PART 1"
+            }
+        }
+    ],
+    "kind": "youtube#playlistItemListResponse",
+    "nextPageToken": "CDIQAA",
+    "pageInfo": {
+        "resultsPerPage": 50,
+        "totalResults": 7125
+    }
+}

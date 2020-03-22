@@ -1,0 +1,7 @@
+name: vidcast
+dependencies:
+  http_server:
+  xml:
+dev_dependencies:
+  build_web_compilers:
+  build_runner:

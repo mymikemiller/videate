@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "vidlib"
+		},
+		{
+			"path": "vidclone"
+		},
+		{
+			"path": "vidcast"
+		},
+		{
+			"path": "root_symlinks"
+		}
+	]
+}

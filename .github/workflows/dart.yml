@@ -15,10 +15,10 @@ jobs:
       image:  google/dart:latest
 
     steps:
-    # VidLib tests 
-    - working-directory: vidlib
     - uses: actions/checkout@v2
-    - name: Install dependencies
+      
+    - name: Install dependencies for VidLib
+      working-directory: docs
       run: pub get
     - name: Run tests
       run: pub run test

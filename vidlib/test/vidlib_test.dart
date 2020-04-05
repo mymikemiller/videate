@@ -1,6 +1,7 @@
+import 'dart:io';
+import 'dart:convert' show json;
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/vidlib.dart';
-import 'dart:convert' show json;
 import 'package:test/test.dart';
 
 void main() {
@@ -101,6 +102,25 @@ void main() {
       expect(decoded, serialized);
       final deserializedFromDecoded = jsonSerializers.deserialize(decoded);
       expect(deserializedFromDecoded, videos);
+    });
+  });
+
+  group('VidInfo', () {
+    test('parses duration', () async {
+      expect(
+          parseDuration('11:22:33.456789'),
+          Duration(
+              hours: 11,
+              minutes: 22,
+              seconds: 33,
+              milliseconds: 456,
+              microseconds: 789));
+    });
+    test('gets video duration', () async {
+      final videoFile = File('test/resources/six_second_video.mp4');
+      final duration = await getDuration(videoFile);
+      expect(duration,
+          Duration(hours: 0, minutes: 0, seconds: 6, milliseconds: 38));
     });
   });
 }

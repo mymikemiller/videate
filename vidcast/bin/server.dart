@@ -5,22 +5,22 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_server/http_server.dart';
 import 'package:xml/xml.dart';
-import 'feed_generator.dart';
 import 'localhost_exposer.dart' as LocalhostExposer;
-import 'metadata_generator.dart';
 import 'package:path/path.dart' as path;
+import 'feed_generator.dart';
+import 'metadata_generator.dart';
 
 XmlDocument demoFeed;
 
-// Set to true to expose the site on localhost.run,
-// false to make available at localhost:8080 and puffinlabs.me (the latter only
+// Set to true to expose the site on external service localhost.run,
+// false to make available at localhost:8080 and videate.org (the latter only
 // works when port forwarding is set up and dns points to correct IP)
 const expose = false;
 
 Future main() async {
   final hostname = expose
       ? (await LocalhostExposer.expose()).hostname
-      : 'http://puffinlabs.me';
+      : 'http://videate.org';
 
   // Find the home directory
   if (!Platform.isMacOS) {
@@ -74,8 +74,8 @@ Future main() async {
       final folderName = path.basenameWithoutExtension(request.uri.path);
       final directory = Directory(videosBaseDirectoryPath + folderName);
       if (directory.existsSync()) {
-        final feedData =
-            MetadataGenerator.fromFolder(directory, videosBaseDirectoryPath);
+        final feedData = await MetadataGenerator.fromFolder(
+            directory, videosBaseDirectoryPath);
         final feed =
             FeedGenerator.generate(hostname, feedData, videosBaseDirectoryPath);
         request.response.write(feed.toString());

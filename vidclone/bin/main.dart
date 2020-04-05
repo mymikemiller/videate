@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis/youtube/v3.dart' hide Video;
-
 import 'package:vidlib/vidlib.dart';
 
 // The API Key obtained from the Google Developers Console.

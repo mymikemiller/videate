@@ -5,7 +5,13 @@
             "name": "VidCast",
             "program": "bin/server.dart",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+        },
+        {
+            "name": "VidCast Tests",
+            "program": "test/",
+            "request": "launch",
+            "type": "dart",
         }
     ]
 }

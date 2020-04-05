@@ -1,0 +1,33 @@
+{
+    "title": "videos",
+    "subtitle": "Feed from 'videos' folder",
+    "link": "http://www.videate.org",
+    "author": "Mike Miller",
+    "email": "mike@videate.org",
+    "description": "Podcast feed of files in a hosted folder",
+    "image": "https://media.istockphoto.com/vectors/folder-icon-with-a-rss-feed-sign-vector-id483567250",
+    "episodes": [
+        {
+            "title": "nine_second_video.mp4",
+            "description": "nine_second_video",
+            "source_link": "http://www.videate.org",
+            "file_path": "test/resources/videos/nine_second_video.mp4",
+            "creators": [
+                "Mike Miller"
+            ],
+            "date": "Wed, 01 Jan 2020 00:00:00 +0000",
+            "duration": "0:00:09"
+        },
+        {
+            "title": "six_second_video.mp4",
+            "description": "six_second_video",
+            "source_link": "http://www.videate.org",
+            "file_path": "test/resources/videos/six_second_video.mp4",
+            "creators": [
+                "Mike Miller"
+            ],
+            "date": "Wed, 01 Jan 2020 00:00:00 +0000",
+            "duration": "0:00:06"
+        }
+    ]
+}

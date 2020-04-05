@@ -15,8 +15,8 @@ Future<ExposerProcess> expose() async {
       'ssh', ['-R', '80:localhost:8080', 'ssh.localhost.run']);
 
   // Get the resulting base url for this run (it changes every run).
-  // Output will be set to the first line of stdout output from the process,
-  // which continues to run.
+  // Output will be sent to the first line of stdout output from the process,
+  // which then continues to run.
   final output = await process.stdout.transform(utf8.decoder).first;
 
   // expected format for 'output':

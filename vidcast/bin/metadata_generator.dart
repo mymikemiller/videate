@@ -1,18 +1,20 @@
 // Generates metdata for the feed generator from sources such as the videos in a folder
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:mime/mime.dart';
+import 'package:vidlib/vidlib.dart';
 
 class MetadataGenerator {
   // hostedRootPath is the path to the root hosted folder, so urls will elide
   // this root path from the paths for the media files in the returned metadata
-  static Map fromFolder(Directory dir, String hostedRootPath) {
+  static Future<Map> fromFolder(Directory dir, String hostedRootPath) async {
     final folderName = basename(dir.uri.path);
     final Map metadata = {
       'title': folderName,
       'subtitle': 'Feed from \'$folderName\' folder',
-      'link': 'http://www.example.com',
+      'link': 'http://www.videate.org',
       'author': 'Mike Miller',
-      'email': 'mike@example.com',
+      'email': 'mike@videate.org',
       'description': 'Podcast feed of files in a hosted folder',
       'image':
           'https://media.istockphoto.com/vectors/folder-icon-with-a-rss-feed-sign-vector-id483567250',
@@ -26,16 +28,19 @@ class MetadataGenerator {
         .sort((a, b) => a.statSync().modified.compareTo(b.statSync().modified));
 
     for (FileSystemEntity file in files) {
-      // For now, only serve .mp4 files
-      if (file.path.endsWith('.mp4')) {
+      // Only serve video files
+      if (lookupMimeType(file.path).startsWith('video')) {
+        final duration = await getDuration(file);
+        final durationString = duration.toString();
+
         metadata['episodes'].add({
           'title': basename(file.path),
           'description': basenameWithoutExtension(file.path),
-          'source_link': 'http://www.example.com',
+          'source_link': 'http://www.videate.org',
           'file_path': file.path.replaceFirst(hostedRootPath, ''),
           'creators': ['Mike Miller'],
           'date': 'Wed, 01 Jan 2020 00:00:00 +0000',
-          'duration': '01:00:00',
+          'duration': durationString.substring(0, durationString.indexOf('.')),
         });
       }
     }

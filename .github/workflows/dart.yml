@@ -7,24 +7,26 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  Build VidLib:
     runs-on: ubuntu-latest
-
     container:
       image:  google/dart:latest
-
     steps:
-      
-    # VidLib tests 
     - uses: actions/checkout@v2
     - name: Install dependencies for VidLib
       working-directory: vidlib
       run: pub get
+      
+  Test VidLib:
+    needs: [Build VidLib]
+    runs-on: ubuntu-latest
+    container:
+      image:  google/dart:latest
+    steps:
     - name: Run tests
       working-directory: vidlib
       run: pub run test
-
+    
     # VidClone tests 
     - uses: actions/checkout@v2
     - name: Install dependencies for VidClone

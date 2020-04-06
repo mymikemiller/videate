@@ -7,34 +7,44 @@ on:
     branches: [ master ]
 
 jobs:
-  Test_VidLib:
+  test_VidLib:
     name: Test VidLib
     runs-on: ubuntu-latest
     container:
       image:  google/dart:latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies for VidLib
+    - name: Install dependencies
       working-directory: vidlib
       run: pub get
     - name: Run tests
       working-directory: vidlib
       run: pub run test
-    
-    # VidClone tests 
+      
+  test_VidClone:
+    name: Test VidClone
+    runs-on: ubuntu-latest
+    container:
+      image:  google/dart:latest
+    steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies for VidClone
+    - name: Install dependencies
       working-directory: vidclone
       run: pub get
     - name: Run tests
       working-directory: vidclone
       run: pub run test
 
-    # VidCast tests 
-#     - uses: actions/checkout@v2
-#     - name: Install dependencies for VidCast
-#       working-directory: vidcast
-#       run: pub get
-#     - name: Run tests
-#       working-directory: vidcast
-#       run: pub run test
+  test_VidCast:
+    name: Test VidCast
+    runs-on: ubuntu-latest
+    container:
+      image:  google/dart:latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      working-directory: vidcast
+      run: pub get
+    - name: Run tests
+      working-directory: vidcast
+      run: pub run test

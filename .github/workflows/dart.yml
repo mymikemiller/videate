@@ -14,9 +14,9 @@ jobs:
       image:  google/dart:latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install ffprobe
+    - name: Install ffmpeg
       working-directory: vidlib
-      run: brew install ffprobe
+      run: brew install ffmpeg
     - name: Install pub dependencies
       working-directory: vidlib
       run: pub get

@@ -9,7 +9,7 @@ on:
 jobs:
   test_VidLib:
     name: VidLib Tests
-    runs-on: [macos-latest]
+    runs-on: ubuntu-latest
     container:
       image:  google/dart:latest
     steps:

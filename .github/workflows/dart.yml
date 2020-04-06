@@ -19,11 +19,13 @@ jobs:
       run: pub get
       
   Test_VidLib:
+    name: Test VidLib
     needs: [Build_VidLib]
     runs-on: ubuntu-latest
     container:
       image:  google/dart:latest
     steps:
+    - uses: actions/checkout@v2
     - name: Run tests
       working-directory: vidlib
       run: pub run test

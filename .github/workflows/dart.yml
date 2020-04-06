@@ -35,16 +35,16 @@ jobs:
       working-directory: vidclone
       run: pub run test
 
-  test_VidCast:
-    name: Test VidCast
-    runs-on: ubuntu-latest
-    container:
-      image:  google/dart:latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      working-directory: vidcast
-      run: pub get
-    - name: Run tests
-      working-directory: vidcast
-      run: pub run test
+#   test_VidCast:
+#     name: Test VidCast
+#     runs-on: ubuntu-latest
+#     container:
+#       image:  google/dart:latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Install dependencies
+#       working-directory: vidcast
+#       run: pub get
+#     - name: Run tests
+#       working-directory: vidcast
+#       run: pub run test

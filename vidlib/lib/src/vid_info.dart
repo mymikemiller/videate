@@ -17,12 +17,15 @@ Duration parseDuration(String s) {
   return Duration(hours: hours, minutes: minutes, microseconds: micros);
 }
 
-Future<Duration> getDuration(File videoFile) async {
+// Gets the duration of the specified video. Specify a mock processRunner for
+// testing on machines that may not have ffprobe installed.
+Future<Duration> getDuration(File videoFile,
+    {processRunner = Process.run}) async {
   if (!lookupMimeType(videoFile.path).startsWith('video')) {
     throw ArgumentError(
         'Cannot get duration of non-video file ${videoFile.path}');
   }
-  final output = await Process.run('ffprobe', [
+  final output = await processRunner('ffprobe', [
     '-v',
     'error',
     '-show_entries',

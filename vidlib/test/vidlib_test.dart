@@ -33,7 +33,7 @@ void main() {
       expect(video1.date, DateTime.parse('1970-01-01T00:00:00.000Z'));
     });
 
-    test('throws error for non-UTC dates', () {
+    test('constructor throws error for non-UTC dates', () {
       expect(
           () => Video((b) => b
             ..title = 'Test Title 1'

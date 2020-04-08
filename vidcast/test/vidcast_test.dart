@@ -17,9 +17,20 @@ void expectXmlEqual(xml.XmlDocument observed, xml.XmlDocument expected) {
 void main() async {
   group('MetadataGenerator', () {
     test('generates json metadata from videos in a directory', () async {
+      // The test container won't have ffprobe installed, so we stub the results
+      final ffprobeStub = (String executable, List<String> arguments) =>
+          ProcessResult(
+              0,
+              0,
+              arguments.last.contains('six_second_video')
+                  ? '0:00:06.038000'
+                  : '0:00:09.038000',
+              '');
+
       final directory = Directory('test/resources/videos');
-      final feedData =
-          await MetadataGenerator.fromFolder(directory, 'test/www/videos');
+      final feedData = await MetadataGenerator.fromFolder(
+          directory, 'test/www/videos',
+          ffprobeRunner: ffprobeStub);
 
       final expectedMetadataFile =
           File('test/resources/expected_feed_metadata.json');

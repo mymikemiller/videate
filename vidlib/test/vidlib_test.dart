@@ -117,7 +117,7 @@ void main() {
               microseconds: 789));
     });
     test('gets mocked video duration', () async {
-      // The test container won't hvae ffprobe installed, so we mock the results
+      // The test container won't have ffprobe installed, so we stub the results
       final ffprobeStub = (String executable, List<String> arguments) =>
           ProcessResult(0, 0, '0:00:06.038000', '');
 

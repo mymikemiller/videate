@@ -1,0 +1,35 @@
+{
+    "title": "Test Feed",
+    "subtitle": "Test Subtitle",
+    "link": "https://example.com/",
+    "author": "Videate",
+    "email": "john.doe@example.com",
+    "description": "A feed to use for testing",
+    "image": "https://example.com/image.jpg",
+    "episodes": [
+        {
+            "title": "Six Second Video",
+            "description": "A six second video.",
+            "source_link": "https://example.com/sixsecond",
+            "file_path": "six_second_video.mp4",
+            "creators": [
+                "John Doe",
+                "Jane Doe"
+            ],
+            "date": "Wed, 01 Jan 2020 00:00:00 +0000",
+            "duration": "00:06:00"
+        },
+        {
+            "title": "Nine Second Video",
+            "description": "A nine second video.",
+            "source_link": "https://example.com/ninesecond",
+            "file_path": "nine_second_video.mp4",
+            "creators": [
+                "Joe Schmoe",
+                "Jane Q. Public"
+            ],
+            "date": "Wed, 01 Jan 2020 00:00:00 +0000",
+            "duration": "00:09:00"
+        }
+    ]
+}

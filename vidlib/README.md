@@ -13,6 +13,16 @@ main() {
 }
 ```
 
+## Prerequisites
+
+VidCast uses ffprobe to determine the duration of video media, which can be installed along with ffmpeg.
+
+Install ffmpeg (mac instructions below):
+
+```
+brew install ffmpeg
+```
+
 ## Development
 
 ### Models

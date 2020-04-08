@@ -8,13 +8,13 @@ on:
 
 jobs:
   test_VidLib:
-    name: Test VidLib
+    name: VidLib Tests
     runs-on: ubuntu-latest
     container:
       image:  google/dart:latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
+    - name: Install pub dependencies
       working-directory: vidlib
       run: pub get
     - name: Run tests
@@ -22,29 +22,29 @@ jobs:
       run: pub run test
       
   test_VidClone:
-    name: Test VidClone
+    name: VidClone Tests
     runs-on: ubuntu-latest
     container:
       image:  google/dart:latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
+    - name: Install pub dependencies
       working-directory: vidclone
       run: pub get
     - name: Run tests
       working-directory: vidclone
       run: pub run test
 
-#   test_VidCast:
-#     name: Test VidCast
-#     runs-on: ubuntu-latest
-#     container:
-#       image:  google/dart:latest
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Install dependencies
-#       working-directory: vidcast
-#       run: pub get
-#     - name: Run tests
-#       working-directory: vidcast
-#       run: pub run test
+  test_VidCast:
+    name: VidCast Tests
+    runs-on: ubuntu-latest
+    container:
+      image:  google/dart:latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install pub dependencies
+      working-directory: vidcast
+      run: pub get
+    - name: Run tests
+      working-directory: vidcast
+      run: pub run test

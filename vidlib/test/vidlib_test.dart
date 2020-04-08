@@ -1,6 +1,7 @@
+import 'dart:io';
+import 'dart:convert' show json;
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/vidlib.dart';
-import 'dart:convert' show json;
 import 'package:test/test.dart';
 
 void main() {
@@ -32,7 +33,7 @@ void main() {
       expect(video1.date, DateTime.parse('1970-01-01T00:00:00.000Z'));
     });
 
-    test('throws error for non-UTC dates', () {
+    test('constructor throws error for non-UTC dates', () {
       expect(
           () => Video((b) => b
             ..title = 'Test Title 1'
@@ -101,6 +102,29 @@ void main() {
       expect(decoded, serialized);
       final deserializedFromDecoded = jsonSerializers.deserialize(decoded);
       expect(deserializedFromDecoded, videos);
+    });
+  });
+
+  group('VidInfo', () {
+    test('parses duration', () async {
+      expect(
+          parseDuration('11:22:33.456789'),
+          Duration(
+              hours: 11,
+              minutes: 22,
+              seconds: 33,
+              milliseconds: 456,
+              microseconds: 789));
+    });
+    test('gets mocked video duration', () async {
+      // The test container won't have ffprobe installed, so we stub the results
+      final ffprobeStub = (String executable, List<String> arguments) =>
+          ProcessResult(0, 0, '0:00:06.038000', '');
+
+      final videoFile = File('test/resources/six_second_video.mp4');
+      final duration = await getDuration(videoFile, processRunner: ffprobeStub);
+      expect(duration,
+          Duration(hours: 0, minutes: 0, seconds: 6, milliseconds: 38));
     });
   });
 }

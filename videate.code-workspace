@@ -12,5 +12,17 @@
 		{
 			"path": "root_symlinks"
 		}
-	]
+	],
+	"launch": {
+		"compounds": [
+			{
+				"name": "All Tests",
+				"configurations": [
+					"VidLib Tests",
+					"VidClone Tests",
+					"VidCast Tests"
+				]
+			}
+		]
+	}
 }

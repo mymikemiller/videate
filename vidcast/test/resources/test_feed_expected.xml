@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+    <channel>
+        <title>Test Feed</title>
+        <link>https://example.com/</link>
+        <language>en-us</language>
+        <itunes:subtitle>Test Subtitle</itunes:subtitle>
+        <itunes:author>Videate</itunes:author>
+        <itunes:summary>A feed to use for testing</itunes:summary>
+        <description>A feed to use for testing</description>
+        <itunes:owner>
+            <itunes:name>Videate</itunes:name>
+            <itunes:email>john.doe@example.com</itunes:email>
+        </itunes:owner>
+        <itunes:explicit>no</itunes:explicit>
+        <itunes:image href="https://example.com/image.jpg" />
+        <itunes:category text="Arts" />
+        <item>
+            <title>Six Second Video</title>
+            <itunes:summary>A six second video.</itunes:summary>
+            <description>&lt;a href=https://example.com/sixsecond>https://example.com/sixsecond&lt;/a>&lt;br>&lt;br>A six second video.</description>
+            <link>https://example.com/sixsecond</link>
+            <enclosure url="http://example.com/six_second_video.mp4" type="video/mp4" length="56120" />
+            <pubDate>Wed, 01 Jan 2020 00:00:00 +0000</pubDate>
+            <itunes:author>John Doe, Jane Doe</itunes:author>
+            <itunes:duration>00:06:00</itunes:duration>
+            <itunes:explicit>no</itunes:explicit>
+            <guid>http://example.com/six_second_video.mp4</guid>
+        </item>
+        <item>
+            <title>Nine Second Video</title>
+            <itunes:summary>A nine second video.</itunes:summary>
+            <description>&lt;a href=https://example.com/ninesecond>https://example.com/ninesecond&lt;/a>&lt;br>&lt;br>A nine second video.</description>
+            <link>https://example.com/ninesecond</link>
+            <enclosure url="http://example.com/nine_second_video.mp4" type="video/mp4" length="74929" />
+            <pubDate>Wed, 01 Jan 2020 00:00:00 +0000</pubDate>
+            <itunes:author>Joe Schmoe, Jane Q. Public</itunes:author>
+            <itunes:duration>00:09:00</itunes:duration>
+            <itunes:explicit>no</itunes:explicit>
+            <guid>http://example.com/nine_second_video.mp4</guid>
+        </item>
+    </channel>
+</rss>

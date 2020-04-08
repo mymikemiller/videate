@@ -14,9 +14,6 @@ jobs:
       image:  google/dart:latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install ffmpeg
-      working-directory: vidlib
-      run: apt-get install software-properties-common; add-apt-repository ppa:mc3man/trusty-media; apt-get update; apt-get install ffmpeg
     - name: Install pub dependencies
       working-directory: vidlib
       run: pub get

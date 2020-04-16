@@ -1,7 +1,6 @@
 // Generates metdata for the feed generator from sources such as the videos in a folder
 import 'dart:io';
 import 'package:path/path.dart';
-import 'package:mime/mime.dart';
 import 'package:vidlib/vidlib.dart';
 
 class MetadataGenerator {
@@ -29,13 +28,17 @@ class MetadataGenerator {
 
     final files = dir.listSync(recursive: false);
 
-    // Order by date modified so if new videos are added, they'll appear at the end of the list
-    files
-        .sort((a, b) => a.statSync().modified.compareTo(b.statSync().modified));
+    // Order by date modified so if new videos are added, they'll appear at the
+    // top of the list. Secondarily sort by path for consistency when dates match.
+    files.sort((FileSystemEntity a, FileSystemEntity b) {
+      int cmp = a.statSync().modified.compareTo(b.statSync().modified);
+      if (cmp != 0) return cmp;
+      return a.path.compareTo(b.path);
+    });
 
     for (FileSystemEntity file in files) {
       // Only serve video files
-      if (lookupMimeType(file.path).startsWith('video')) {
+      if (isVideo(file)) {
         final duration = await getDuration(file, processRunner: ffprobeRunner);
         final durationString = duration.toString();
 

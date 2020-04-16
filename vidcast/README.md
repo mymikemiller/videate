@@ -2,14 +2,20 @@
 
 A video podcast host and RSS feed generator incorporating viewer feedback to automatically download recommended videos.
 
-## Getting Started
+## Usage
 
+```
 cd vidcast
+```
+
+### Run VidCast server
+```
 dart bin/server.dart
+```
 
 ### Prerequisites
 
-https://dart.dev/get-dart
+Get Dart: (https://dart.dev/get-dart)
 
 ```
  brew tap dart-lang/dart
@@ -22,6 +28,17 @@ Get app dependencies:
 cd vidcast
 pub get
 ```
+
+## Development (VSCode)
+Open the videate/videate.code-workspace workspace in VSCode
+
+### Debug VidCast server
+Set Run Configuration to "VidCast (vidcast)"
+Start Debugging
+
+### Debug Tests
+Set Run Configuration to "VidCast (vidcast)"
+Start Debugging
 
 ## Authors
 

@@ -44,8 +44,10 @@ void main() async {
       final testMetadataFile = File('test/resources/test_feed_metadata.json');
       final testJson = await testMetadataFile.readAsString();
       final testFeedData = jsonDecode(testJson);
-      final testFeed = FeedGenerator.generate('http://example.com',
-          testFeedData, '${Directory.current.path}/test/resources/videos');
+      final testFeed = FeedGenerator.generate(
+          testFeedData,
+          'http://example.com',
+          '${Directory.current.path}/test/resources/videos');
 
       final expectedFile = File('test/resources/test_feed_expected.xml');
       final expectedXml = await expectedFile.readAsString();

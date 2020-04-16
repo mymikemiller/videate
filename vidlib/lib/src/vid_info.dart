@@ -17,11 +17,15 @@ Duration parseDuration(String s) {
   return Duration(hours: hours, minutes: minutes, microseconds: micros);
 }
 
+bool isVideo(File file) {
+  return lookupMimeType(file.path)?.startsWith('video') ?? false;
+}
+
 // Gets the duration of the specified video. Specify a mock processRunner for
 // testing on machines that may not have ffprobe installed.
 Future<Duration> getDuration(File videoFile,
     {processRunner = Process.run}) async {
-  if (!lookupMimeType(videoFile.path).startsWith('video')) {
+  if (!isVideo(videoFile)) {
     throw ArgumentError(
         'Cannot get duration of non-video file ${videoFile.path}');
   }

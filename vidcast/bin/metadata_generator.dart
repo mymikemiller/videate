@@ -1,7 +1,6 @@
 // Generates metdata for the feed generator from sources such as the videos in a folder
 import 'dart:io';
 import 'package:path/path.dart';
-import 'package:mime/mime.dart';
 import 'package:vidlib/vidlib.dart';
 
 class MetadataGenerator {
@@ -35,7 +34,7 @@ class MetadataGenerator {
 
     for (FileSystemEntity file in files) {
       // Only serve video files
-      if (lookupMimeType(file.path).startsWith('video')) {
+      if (isVideo(file)) {
         final duration = await getDuration(file, processRunner: ffprobeRunner);
         final durationString = duration.toString();
 

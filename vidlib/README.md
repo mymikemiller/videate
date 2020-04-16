@@ -15,15 +15,35 @@ main() {
 
 ## Prerequisites
 
-VidCast uses ffprobe to determine the duration of video media, which can be installed along with ffmpeg.
+VidLib uses ffprobe to determine the duration of video media. Ffprobe can be installed along with ffmpeg.
 
-Install ffmpeg (mac instructions below):
+Install ffmpeg (mac instructions using homebrew below):
 
 ```
 brew install ffmpeg
 ```
 
-## Development
+## Development (VSCode)
+
+Open the videate/videate.code-workspace workspace in VSCode
+
+### Prerequisites
+
+Get app dependencies:
+
+```
+cd vidlib
+pub get
+```
+
+### Debug VidClone server
+
+Set Run Configuration to "VidClone (vidclone)"
+Start Debugging
+
+### Debug Tests
+Set Run Configuration to "VidClone (vidclone)"
+Start Debugging
 
 ### Models
 
@@ -38,3 +58,7 @@ Alternatively, run this command in the background to have the generated files au
 ```dart
 pub run build_runner watch
 ```
+
+## Authors
+
+* **Mike Miller** - *Initial work* - [mymikemiller](https://github.com/mymikemiller)

@@ -6,7 +6,7 @@ import 'package:mime/mime.dart';
 
 // See test resources for expected output
 class FeedGenerator {
-  static XmlDocument generate(String hostname, Map feedData, String fileRoot) {
+  static XmlDocument generate(Map feedData, String hostname, String fileRoot) {
     var builder = new XmlBuilder();
     builder.processing('xml', 'version="1.0"');
     builder.element('rss', nest: () {

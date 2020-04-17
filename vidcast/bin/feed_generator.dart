@@ -43,7 +43,7 @@ class FeedGenerator {
             throw 'File not found: $filePath';
           }
           final shownotes =
-              '<a href=${metadata['source_link']}>${metadata['source_link']}</a><br><br>${metadata['description']}';
+              '<a href=http://localhost:8080/tip?creator="${metadata['creators'][0]}">Tip \$1</a><br><br><a href=${metadata['source_link']}>${metadata['source_link']}</a><br><br>${metadata['description']}';
           builder.element('item', nest: () {
             builder.element('title', nest: metadata['title']);
             builder.element('itunes:summary', nest: metadata['description']);

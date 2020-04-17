@@ -16,7 +16,7 @@ final feedsBaseDirectoryPath = '$home/web/feeds/';
 // Set to true to expose the site on external service localhost.run,
 // false to make available at localhost:8080 and videate.org (the latter only
 // works when port forwarding is set up and dns points to correct IP)
-const expose = false;
+const expose = true;
 
 // Writes the specified feed data as rss to the specified response object
 serveFeed(Map feedData, String hostname, HttpResponse response) {
@@ -31,7 +31,7 @@ final videateHost = 'http://videate.org';
 final localHost = 'http://localhost:8080';
 Future main() async {
   final hostname =
-      expose ? (await LocalhostExposer.expose()).hostname : videateHost;
+      expose ? (await LocalhostExposer.expose()).hostname : localHost;
 
   // Find the home directory
   if (!Platform.isMacOS) {
@@ -71,6 +71,10 @@ Future main() async {
     if (request.uri.path == '/') {
       var indexUri = Uri.file('/index.html');
       staticFiles.serveFile(File(indexUri.toFilePath()), request);
+    } else if (request.uri.hasQuery) {
+      final creator = request.uri.queryParameters['creator'];
+      request.response.write('Your \$1 tip has been sent to $creator');
+      request.response.close();
     } else if (path.extension(request.uri.path) == '') {
       // feed request (i.e. a request without a file extension)
       final name = path.basenameWithoutExtension(request.uri.path);

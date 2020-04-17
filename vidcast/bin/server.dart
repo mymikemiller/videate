@@ -11,6 +11,7 @@ import 'metadata_generator.dart';
 
 final home = Platform.environment['HOME'];
 final videosBaseDirectoryPath = '$home/web/videos/';
+final feedsBaseDirectoryPath = '$home/web/feeds/';
 
 // Set to true to expose the site on external service localhost.run,
 // false to make available at localhost:8080 and videate.org (the latter only
@@ -26,10 +27,11 @@ serveFeed(Map feedData, String hostname, HttpResponse response) {
   response.write(feed.toString());
 }
 
+final videateHost = 'http://videate.org';
+final localHost = 'http://localhost:8080';
 Future main() async {
-  final hostname = expose
-      ? (await LocalhostExposer.expose()).hostname
-      : 'http://videate.org';
+  final hostname =
+      expose ? (await LocalhostExposer.expose()).hostname : videateHost;
 
   // Find the home directory
   if (!Platform.isMacOS) {
@@ -37,18 +39,22 @@ Future main() async {
   }
 
   // Print out the url to each valid feed
-  print('Demo Feed: $hostname/demo.xml');
+  final feedsBaseDirectory = Directory(feedsBaseDirectoryPath);
+  final feedFiles = feedsBaseDirectory
+      .listSync(recursive: false)
+      .where((file) => path.extension(file.path) == '.json');
   final videosBaseDirectory = Directory(videosBaseDirectoryPath);
-  for (FileSystemEntity entity
-      in videosBaseDirectory.listSync(recursive: false)) {
-    if (entity is Directory) {
-      final folderName = path.basename(entity.uri.path);
-      print('$folderName Feed: $hostname/$folderName.xml');
-    }
-  }
+  final videoFolders = videosBaseDirectory
+      .listSync(recursive: false)
+      .where((entity) => entity is Directory);
+  final validFeedNames = [...feedFiles, ...videoFolders]
+      .map((entity) => path.basenameWithoutExtension(entity.uri.path))
+      .toSet();
+  validFeedNames
+      .forEach((feedName) => print('$feedName Feed: $hostname/$feedName'));
 
   // Make all media under /web/videos accessible.
-  var staticFiles = VirtualDirectory('$home/web/videos/');
+  var staticFiles = VirtualDirectory(videosBaseDirectoryPath);
   staticFiles.allowDirectoryListing = true;
   staticFiles.directoryHandler = (dir, request) {
     var indexUri = Uri.file(dir.path).resolve('index.html');
@@ -65,12 +71,12 @@ Future main() async {
     if (request.uri.path == '/') {
       var indexUri = Uri.file('/index.html');
       staticFiles.serveFile(File(indexUri.toFilePath()), request);
-    } else if (request.uri.path.endsWith('.xml')) {
-      // Feed request
+    } else if (path.extension(request.uri.path) == '') {
+      // feed request (i.e. a request without a file extension)
       final name = path.basenameWithoutExtension(request.uri.path);
-      
+
       // First look for an explicit json metadata file with the requested name
-      final metadataFile = File('$home/web/feeds/$name.json');
+      final metadataFile = File('$feedsBaseDirectoryPath$name.json');
       if (metadataFile.existsSync()) {
         final metadataJson = await metadataFile.readAsString();
         final feedData = jsonDecode(metadataJson);
@@ -83,8 +89,8 @@ Future main() async {
               directory, videosBaseDirectoryPath);
           serveFeed(feedData, hostname, request.response);
         } else {
-          request.response
-              .write('Failed to generate rss feed for $name. No such feed or folder found.');
+          request.response.write(
+              'Failed to generate rss feed for $name. No such feed or folder found.');
           request.response.close();
         }
       }

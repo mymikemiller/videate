@@ -16,7 +16,7 @@ final feedsBaseDirectoryPath = '$home/web/feeds/';
 // Set to true to expose the site on external service localhost.run,
 // false to make available at localhost:8080 and videate.org (the latter only
 // works when port forwarding is set up and dns points to correct IP)
-const expose = true;
+const expose = false;
 
 // Writes the specified feed data as rss to the specified response object
 serveFeed(Map feedData, String hostname, HttpResponse response) {

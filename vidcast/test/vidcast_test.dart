@@ -46,7 +46,7 @@ void main() async {
       final testFeedData = jsonDecode(testJson);
       final testFeed = FeedGenerator.generate(
           testFeedData,
-          'http://example.com',
+          'https://example.com',
           '${Directory.current.path}/test/resources/videos');
 
       final expectedFile = File('test/resources/test_feed_expected.xml');

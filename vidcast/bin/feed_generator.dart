@@ -12,6 +12,8 @@ class FeedGenerator {
     builder.element('rss', nest: () {
       builder.attribute(
           'xmlns:itunes', 'http://www.itunes.com/dtds/podcast-1.0.dtd');
+      builder.attribute(
+          'xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
       builder.attribute('version', '2.0');
       builder.element('channel', nest: () {
         builder.element('title', nest: feedData['title']);
@@ -42,12 +44,18 @@ class FeedGenerator {
           if (!file.existsSync()) {
             throw 'File not found: $filePath';
           }
+
           final shownotes =
-              '<a href=${metadata['source_link']}>${metadata['source_link']}</a><br><br>${metadata['description']}';
+              '<a href=$hostname/tip?creator="${metadata['creators'][0]}">Tip \$1</a><br><br><a href=${metadata['source_link']}>${metadata['source_link']}</a><br><br>${metadata['description']}';
+
           builder.element('item', nest: () {
             builder.element('title', nest: metadata['title']);
             builder.element('itunes:summary', nest: metadata['description']);
-            builder.element('description', nest: shownotes);
+            builder.element('description', nest: metadata['description']);
+            builder.element('content:encoded', nest: () {
+              // Use cdata here to avoid having to escape "<", ">" and "&"
+              builder.cdata(shownotes);
+            });
             builder.element('link', nest: metadata['source_link']);
             builder.element('enclosure', nest: () {
               builder.attribute('url', servedPath);

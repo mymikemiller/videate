@@ -2,10 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "VidCast",
+            "name": "VidCast Localhost",
             "program": "bin/server.dart",
             "request": "launch",
             "type": "dart",
+        },
+        {
+            // This configuration will expose the server to the outside world 
+            // so the feed will be available on mobile devices, for example
+            "name": "VidCast Exposed",
+            "program": "bin/server.dart",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--expose-localhost",
+            ],
         },
         {
             "name": "VidCast Tests",

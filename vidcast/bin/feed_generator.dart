@@ -6,7 +6,7 @@ import 'package:mime/mime.dart';
 
 // See test resources for expected output
 class FeedGenerator {
-  static XmlDocument generate(Map feedData, String hostname, String fileRoot) {
+  static XmlDocument generate(Map feedData, String baseUrl, String fileRoot) {
     var builder = new XmlBuilder();
     builder.processing('xml', 'version="1.0"');
     builder.element('rss', nest: () {
@@ -38,7 +38,7 @@ class FeedGenerator {
         // Repeat for each episode
         for (final metadata in feedData['episodes']) {
           final fileName = metadata['file_path'];
-          final servedPath = '$hostname/$fileName';
+          final servedPath = '$baseUrl/$fileName';
           final filePath = '$fileRoot/$fileName';
           final file = File(filePath);
           if (!file.existsSync()) {
@@ -46,7 +46,7 @@ class FeedGenerator {
           }
 
           final shownotes =
-              '<a href=$hostname/tip?creator="${metadata['creators'][0]}">Tip \$1</a><br><br><a href=${metadata['source_link']}>${metadata['source_link']}</a><br><br>${metadata['description']}';
+              '<a href=$baseUrl/tip?creator="${metadata['creators'][0]}">Tip \$1</a><br><br><a href=${metadata['source_link']}>${metadata['source_link']}</a><br><br>${metadata['description']}';
 
           builder.element('item', nest: () {
             builder.element('title', nest: metadata['title']);

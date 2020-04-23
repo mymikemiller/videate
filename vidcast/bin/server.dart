@@ -29,8 +29,6 @@ Future main(List<String> args) async {
   load();
   final vidcastBaseUrl = '${env['VIDCAST_BASE_URL']}';
 
-  //test - delete me
-
   // Parse command line args
   var parser = ArgParser()
     ..addFlag('expose-localhost', abbr: 'e', defaultsTo: false);

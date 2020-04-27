@@ -38,7 +38,9 @@ class FeedGenerator {
         // Repeat for each episode
         for (final metadata in feedData['episodes']) {
           final fileName = metadata['file_path'];
-          final servedPath = '$baseUrl/$fileName';
+          // '#' doesn't get encoded because it's a valid url character, so we do it manually for file paths
+          final servedPath =
+              Uri.encodeFull('$baseUrl/$fileName').replaceAll("#", "%23");
           final filePath = '$fileRoot/$fileName';
           final file = File(filePath);
           if (!file.existsSync()) {

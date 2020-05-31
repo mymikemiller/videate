@@ -10,6 +10,9 @@ dependencies:
   googleapis: ^0.54.0
   googleapis_auth: ^0.2.11+1
   http: ^0.12.0+4
+  youtube_explode_dart: ^0.0.16
+  dotenv: ^2.0.0
+  file: ^5.1.0
   vidlib:
     path: ../vidlib
 

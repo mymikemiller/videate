@@ -4,17 +4,23 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:built_value/serializer.dart';
 import 'package:built_value/standard_json_plugin.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:vidlib/src/models/feed.dart';
 import 'package:vidlib/src/models/video.dart';
-
+import 'package:vidlib/vidlib.dart';
+import 'duration_serializer.dart';
 part 'serializers.g.dart';
 
 /// Collection of generated serializers for vidlib models.
 @SerializersFor([
   Video,
+  ServedVideo,
+  Feed,
 ])
 final Serializers standardSerializers = (_$standardSerializers.toBuilder()
       // Serialize dates in a human-readable format instead of ms since epoch
-      ..add(Iso8601DateTimeSerializer()))
+      ..add(Iso8601DateTimeSerializer())
+      // Serialize durations in a human-readable format (h:mm:ss.ssssss) instead of millisconds
+      ..add(DurationSerializer()))
     .build();
 final Serializers jsonSerializers = (standardSerializers.toBuilder()..addPlugin(
     // Serialize as json for easy readability

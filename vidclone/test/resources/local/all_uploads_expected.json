@@ -1,0 +1,27 @@
+{
+    "$": "list",
+    "": [
+        {
+            "$": "Video",
+            "title": "six_second_video.mp4",
+            "description": "six_second_video",
+            "sourceUrl": "test/resources/videos/six_second_video.mp4",
+            "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
+            "creators": [
+                "Mike Miller"
+            ],
+            "duration": "0:00:06.038000"
+        },
+        {
+            "$": "Video",
+            "title": "nine_second_video.mp4",
+            "description": "nine_second_video",
+            "sourceUrl": "test/resources/videos/nine_second_video.mp4",
+            "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
+            "creators": [
+                "Mike Miller"
+            ],
+            "duration": "0:00:09.038000"
+        }
+    ]
+}

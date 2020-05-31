@@ -1,0 +1,40 @@
+{
+    "$": "Feed",
+    "title": "Test Feed 1",
+    "subtitle": "Subtitle 1",
+    "description": "Description 1",
+    "link": "http://videate.org",
+    "author": "Mike Miller",
+    "email": "mike@videate.org",
+    "imageUrl": "http://example.com/example.jpg",
+    "videos": [
+        {
+            "video": {
+                "title": "Video 1",
+                "description": "Description 1",
+                "sourceUrl": "https://www.example.com/1",
+                "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
+                "creators": [
+                    "Mike Miller"
+                ],
+                "duration": "0:01:00.000000"
+            },
+            "uri": "/test/video1.mp4",
+            "lengthInBytes": 100000
+        },
+        {
+            "video": {
+                "title": "Video 2",
+                "description": "Description 2",
+                "sourceUrl": "https://www.example.com/2",
+                "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
+                "creators": [
+                    "Mike Miller"
+                ],
+                "duration": "0:02:00.000000"
+            },
+            "uri": "/test/video2.mp4",
+            "lengthInBytes": 200000
+        }
+    ]
+}

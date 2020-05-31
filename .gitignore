@@ -1,6 +1,13 @@
 # Files and directories created by pub
 .dart_tool/
 .packages
+
+# Generated files
+*.g.dart
+
+# Local env files
+.env
+
 # Remove the following pattern if you wish to check in your lock file
 pubspec.lock
 

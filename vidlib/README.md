@@ -8,7 +8,11 @@ A simple usage example:
 import 'package:vidlib/vidlib.dart';
 
 main() {
-  var video = new Video(...);
+  var video = Video((b) => b
+    ..title = 'My Title'
+    ..description = 'My Description'
+    ..sourceUrl = 'https://www.example.com'
+    ..sourceReleaseDate = DateTime.now().toUtc());
   print('Video: ${video.title}');
 }
 ```
@@ -35,6 +39,8 @@ Get app dependencies:
 cd vidlib
 pub get
 ```
+
+Build the models as described below
 
 ### Debug VidClone server
 

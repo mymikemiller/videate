@@ -2443,7 +2443,7 @@
         }
     ],
     "kind": "youtube#playlistItemListResponse",
-    "nextPageToken": "",
+    "nextPageToken": null,
     "pageInfo": {
         "resultsPerPage": 50,
         "totalResults": 7125

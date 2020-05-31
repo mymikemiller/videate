@@ -1,19 +1,19 @@
 // Contains all the metadata associated with a video
-
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-
+import 'package:built_collection/built_collection.dart';
 part 'video.g.dart';
 
 abstract class Video implements Built<Video, VideoBuilder> {
   String get title;
   String get description;
-  String get url;
-  DateTime get date;
-
-  String get dateString {
-    return date.toString();
-  }
+  // The URL where the video can be accessed on the source platform (the
+  // platform on which it was originally released)
+  String get sourceUrl;
+  // The date the video was released on the source platform
+  DateTime get sourceReleaseDate;
+  BuiltList<String> get creators;
+  Duration get duration;
 
   // The builder pattern is required by built_value, which we use for serialization
   Video._();
@@ -21,7 +21,7 @@ abstract class Video implements Built<Video, VideoBuilder> {
     var video = _$Video(updates);
 
     // Validate fields
-    if (!video.date.isUtc) {
+    if (!video.sourceReleaseDate.isUtc) {
       throw ArgumentError(
           'Dates must be in UTC or built_value serialization will fail. Try adding .toUtc() to the DateTime.');
     }
@@ -34,6 +34,6 @@ abstract class Video implements Built<Video, VideoBuilder> {
   // Used only for debug purposes
   @override
   String toString() {
-    return '$date $url: $title';
+    return '${sourceReleaseDate.toString()} $sourceUrl: $title';
   }
 }

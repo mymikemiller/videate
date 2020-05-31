@@ -5,10 +5,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:http_server/http_server.dart';
+import 'package:vidlib/vidlib.dart';
+import 'feed_formatters/feed_formatter.dart';
 import 'localhost_exposer.dart' as LocalhostExposer;
 import 'package:path/path.dart' as path;
-import 'feed_generator.dart';
-import 'metadata_generator.dart';
+import 'feed_formatters/rss_2_0_feed_formatter.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
 
 final home = Platform.environment['HOME'];
@@ -16,18 +17,17 @@ final videosBaseDirectoryPath = '$home/web/videos/';
 final feedsBaseDirectoryPath = '$home/web/feeds/';
 
 // Writes the specified feed data as rss to the specified response object
-serveFeed(Map feedData, String baseUrl, HttpResponse response) {
-  final feed =
-      FeedGenerator.generate(feedData, baseUrl, videosBaseDirectoryPath);
+serve(Feed feed, FeedFormatter feedFormatter, HttpResponse response) {
+  final formattedFeed = feedFormatter.format(feed);
   response.headers.contentType =
       new ContentType("application", "xml", charset: "utf-8");
-  response.write(feed.toString());
+  response.write(formattedFeed.toString());
 }
 
 Future main(List<String> args) async {
   // Load environment variables from local .env file
   load();
-  final vidcastBaseUrl = '${env['VIDCAST_BASE_URL']}';
+  final vidcastBaseUrl = getEnvVar('VIDCAST_BASE_URL', env);
 
   // Parse command line args
   var parser = ArgParser()
@@ -42,6 +42,7 @@ Future main(List<String> args) async {
   final baseUrl = exposeLocalhost
       ? (await LocalhostExposer.expose()).hostname
       : vidcastBaseUrl;
+  final feedFormatter = RSS_2_0_FeedFormatter(baseUrl);
 
   // Print out the url to each valid feed
   final feedsBaseDirectory = Directory(feedsBaseDirectoryPath);
@@ -84,24 +85,15 @@ Future main(List<String> args) async {
       // feed request (i.e. a request without a file extension)
       final name = path.basenameWithoutExtension(request.uri.path);
 
-      // First look for an explicit json metadata file with the requested name
-      final metadataFile = File('$feedsBaseDirectoryPath$name.json');
-      if (metadataFile.existsSync()) {
-        final metadataJson = await metadataFile.readAsString();
-        final feedData = jsonDecode(metadataJson);
-        serveFeed(feedData, baseUrl, request.response);
+      // We expect to find a json feed file with the requested name
+      final file = File('$feedsBaseDirectoryPath/$name.json');
+      if (file.existsSync()) {
+        final json = await file.readAsString();
+        final data = jsonDecode(json);
+        final feed = Feed.fromJson(data);
+        serve(feed, feedFormatter, request.response);
       } else {
-        // Look for a folder of video files with the requested name
-        final directory = Directory(videosBaseDirectoryPath + name);
-        if (directory.existsSync()) {
-          final feedData = await MetadataGenerator.fromFolder(
-              directory, videosBaseDirectoryPath);
-          serveFeed(feedData, baseUrl, request.response);
-        } else {
-          request.response.write(
-              'Failed to generate rss feed for $name. No such feed or folder found.');
-          request.response.close();
-        }
+        throw 'No feed with the name "$name" found.';
       }
 
       request.response.close();

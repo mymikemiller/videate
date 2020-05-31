@@ -1,35 +1,43 @@
 {
+    "$": "Feed",
     "title": "Test Feed",
-    "subtitle": "Test Subtitle",
-    "link": "https://example.com/",
-    "author": "Videate",
+    "subtitle": "A feed for testing",
+    "description": "A feed used for testing purposes",
+    "link": "http://videate.org",
+    "author": "John Doe",
     "email": "john.doe@example.com",
-    "description": "A feed to use for testing",
+    "imageUrl": "http://example.com/example.jpg",
     "image": "https://example.com/image.jpg",
-    "episodes": [
+    "videos": [
         {
-            "title": "Six Second Video",
-            "description": "A six second video.",
-            "source_link": "https://example.com/sixsecond",
-            "file_path": "six_second_video.mp4",
-            "creators": [
-                "John Doe",
-                "Jane Doe"
-            ],
-            "date": "Wed, 01 Jan 2020 00:00:00 +0000",
-            "duration": "00:06:00"
+            "video": {
+                "title": "Six Second Video",
+                "description": "A six second video.",
+                "sourceUrl": "https://example.com/sixsecond",
+                "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
+                "creators": [
+                    "John Doe",
+                    "Jane Doe"
+                ],
+                "duration": "0:06:00.00000"
+            },
+            "uri": "test/resources/videos/six_second_video.mp4",
+            "lengthInBytes": 56120
         },
         {
-            "title": "Nine Second Video",
-            "description": "A nine second video.",
-            "source_link": "https://example.com/ninesecond",
-            "file_path": "nine_second_video.mp4",
-            "creators": [
-                "Joe Schmoe",
-                "Jane Q. Public"
-            ],
-            "date": "Wed, 01 Jan 2020 00:00:00 +0000",
-            "duration": "00:09:00"
+            "video": {
+                "title": "Nine Second Video",
+                "description": "A nine second video.",
+                "sourceUrl": "https://example.com/ninesecond",
+                "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
+                "creators": [
+                    "Joe Schmoe",
+                    "Jane Q. Public"
+                ],
+                "duration": "0:09:00.00000"
+            },
+            "uri": "test/resources/videos/nine_second_video.mp4",
+            "lengthInBytes": 74929
         }
     ]
 }

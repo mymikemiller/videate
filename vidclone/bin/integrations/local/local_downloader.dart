@@ -43,9 +43,13 @@ class LocalDownloader extends Downloader {
           ..title = basename(file.path)
           ..description = basenameWithoutExtension(file.path)
           ..sourceUrl = file.path
-          // We don't know the source release date, so we set it to the
-          // file's modified date
-          ..sourceReleaseDate = file.statSync().modified.toUtc()
+          // We don't know the source release date, so we set it to epoch.
+          // Setting it to the file's modified date
+          // (file.statSync().modified.toUtc()) would ensure the videos show up
+          // in a somewhat desirable order, but this causes issues with testing
+          // because the test files end up with different modified dates on the
+          // CI server.
+          ..sourceReleaseDate = DateTime.fromMillisecondsSinceEpoch(0).toUtc()
           ..creators = BuiltList<String>(['Mike Miller']).toBuilder()
           ..duration = duration);
 

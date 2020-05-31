@@ -39,7 +39,7 @@ void main() {
     DownloaderTest(
         LocalDownloader(ffprobeRunner: ffprobeStub),
         LocalSourceCollection('test/resources/videos'),
-        DateTime.parse('2019-12-28T18:04:27.000Z')),
+        DateTime.parse('1970-01-01T00:00:00.001Z')),
     DownloaderTest(
         MockYoutubeDownloader(),
         YoutubeChannelSourceCollection('TEST_CHANNEL_ID'),

@@ -73,8 +73,9 @@ void main() {
         final expectedResultJsonString =
             await expectedResultFile.readAsString();
         final decodedExpectedResult = json.decode(expectedResultJsonString);
-        final expectedResult =
+        final deserializedExpectedResult =
             jsonSerializers.deserialize(decodedExpectedResult);
+        final expectedResult = BuiltList<Video>(deserializedExpectedResult);
 
         expect(serializableResult, expectedResult);
       });
@@ -109,8 +110,9 @@ void main() {
         final expectedResultJsonString =
             await expectedResultFile.readAsString();
         final decodedExpectedResult = json.decode(expectedResultJsonString);
-        final expectedResult =
+        final deserializedExpectedResult =
             jsonSerializers.deserialize(decodedExpectedResult);
+        final expectedResult = BuiltList<Video>(deserializedExpectedResult);
 
         expect(serializableResult, expectedResult);
       });

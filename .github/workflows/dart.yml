@@ -34,6 +34,9 @@ jobs:
     - name: Install pub dependencies
       working-directory: vidclone
       run: pub get
+    - name: Generate source
+      working-directory: vidlib
+      run: pub run build_runner build
     - name: Run tests
       working-directory: vidclone
       run: pub run test
@@ -48,6 +51,9 @@ jobs:
     - name: Install pub dependencies
       working-directory: vidcast
       run: pub get
+    - name: Generate source
+      working-directory: vidlib
+      run: pub run build_runner build
     - name: Run tests
       working-directory: vidcast
       run: pub run test

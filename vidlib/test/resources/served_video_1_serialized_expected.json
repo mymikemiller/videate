@@ -1,0 +1,15 @@
+{
+    "$": "ServedVideo",
+    "video": {
+        "title": "Video 1",
+        "description": "Description 1",
+        "sourceUrl": "https://www.example.com/1",
+        "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
+        "creators": [
+            "Mike Miller"
+        ],
+        "duration": "0:01:00.000000"
+    },
+    "uri": "/test/video1.mp4",
+    "lengthInBytes": 100000
+}

@@ -7,16 +7,15 @@ abstract class Downloader {
   // An id unique to this downloader, e.g. "youtube".
   String get id;
 
-  // Download the specified video into the specified file.
+  // Downloads the specified video into the specified file.
   Future<VideoFile> download(Video video, {File file});
 
-  // Return a stream containing all videos in the collection that were
-  // published after the specified date (non-inclusive).
+  // Returns the most recently released video in the collection.
   Future<Video> mostRecentVideo(SourceCollection sourceCollection) async {
     return allVideos(sourceCollection).first;
   }
 
-  // Return a stream containing all videos in the collection that were
+  // Returns a stream containing all videos in the collection that were
   // published after the specified date (non-inclusive).
   Stream<Video> videosAfter(
       DateTime date, SourceCollection sourceCollection) async* {
@@ -29,8 +28,8 @@ abstract class Downloader {
     }
   }
 
-  // Return a stream containing all videos in the collection in order of date
-  // published (most recently published video first).
+  // Returns a stream containing all videos in the collection in order of date
+  // released (most recently released video first).
   Stream<Video> allVideos(SourceCollection sourceCollection);
 
   // Returns a string that is guaranteed to be unique among all videos sourced

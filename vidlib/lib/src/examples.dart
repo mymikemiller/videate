@@ -38,7 +38,7 @@ class Examples {
     ..video = video3.toBuilder()
     ..lengthInBytes = 300000);
 
-  static Feed get feed => Feed((b) => b
+  static Feed get emptyFeed => Feed((b) => b
     ..title = 'Title'
     ..subtitle = 'Subtitle'
     ..description = 'Description'
@@ -48,4 +48,26 @@ class Examples {
     ..imageUrl =
         'https://media.istockphoto.com/vectors/folder-icon-with-a-rss-feed-sign-vector-id483567250'
     ..videos = BuiltList<ServedVideo>([]).toBuilder());
+
+  static Feed get feed1 => Feed((b) => b
+    ..title = 'Test Feed 1'
+    ..subtitle = 'Subtitle 1'
+    ..description = 'Description 1'
+    ..link = 'http://videate.org'
+    ..author = 'Mike Miller'
+    ..email = 'mike@videate.org'
+    ..imageUrl = 'http://example.com/example.jpg'
+    ..videos =
+        BuiltList<ServedVideo>([servedVideo1, servedVideo2]).toBuilder());
+
+  static Feed get feed2 => Feed((b) => b
+    ..title = 'Test Feed 2'
+    ..subtitle = 'Subtitle 2'
+    ..description = 'Description 2'
+    ..link = 'http://videate.org'
+    ..author = 'Mike Miller'
+    ..email = 'mike@videate.org'
+    ..imageUrl = 'http://example.com/example.jpg'
+    ..videos =
+        BuiltList<ServedVideo>([servedVideo1, servedVideo3]).toBuilder());
 }

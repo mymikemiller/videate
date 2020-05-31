@@ -39,6 +39,8 @@ void main() {
     DownloaderTest(
         LocalDownloader(ffprobeRunner: ffprobeStub),
         LocalSourceCollection('test/resources/videos'),
+        // The sourceReleaseDate of all LocalDownloader Videos is epoch, so the
+        // videosAfter test for LocalDownloader is not very useful
         DateTime.parse('1970-01-01T00:00:00.001Z')),
     DownloaderTest(
         MockYoutubeDownloader(),
@@ -81,8 +83,6 @@ void main() {
       });
 
       test('gets only videos uploaded after specified date', () async {
-        // startDate was chosen as a date in the middle of the list of test
-        // videos, so we can test that some are properly excluded
         final result = await downloaderTest.downloader
             .videosAfter(
                 downloaderTest.videosAfterDate, downloaderTest.sourceCollection)

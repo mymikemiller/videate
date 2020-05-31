@@ -16,8 +16,6 @@ class UploaderTest {
 
 void main() {
   final uploaderTests = [
-    // UploaderTest(
-    //     ExposeFileUploader('test/resources/videos', 'http://example.com')),
     UploaderTest(SaveToDiskUploader(memoryFileSystem.systemTempDirectory,
         fileSystem: memoryFileSystem)),
   ];

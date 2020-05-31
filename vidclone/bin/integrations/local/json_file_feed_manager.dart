@@ -33,7 +33,7 @@ class JsonFileFeedManager extends FeedManager {
     final json = file.readAsStringSync();
     if (json.isEmpty) {
       // Create an empty feed
-      manager._feed = Examples.feed.rebuild((b) => b
+      manager._feed = Examples.emptyFeed.rebuild((b) => b
         ..title = basenameWithoutExtension(jsonFilePath)
         ..subtitle = '${basenameWithoutExtension(jsonFilePath)} feed)');
     } else {
@@ -51,7 +51,7 @@ class JsonFileFeedManager extends FeedManager {
       throw 'Json file already exists at $jsonFilePath. Try using open() or createOrOpen()';
     }
     file.createSync();
-    final feed = Examples.feed.rebuild((b) => b
+    final feed = Examples.emptyFeed.rebuild((b) => b
       ..title = basenameWithoutExtension(jsonFilePath)
       ..subtitle = '${basenameWithoutExtension(jsonFilePath)} feed');
 

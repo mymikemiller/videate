@@ -48,18 +48,9 @@ class YoutubeDownloader extends Downloader {
       throw 'YoutubeDownloder::download must be passed a valid File to download into';
     }
     var yt = yt_explode.YoutubeExplode();
-
     final videoId = yt_explode.YoutubeExplode.parseVideoId(video.sourceUrl);
-
     await _download(videoId, yt, file);
-
-    // var mediaStreams = await yt.getVideoMediaStream(videoId);
-    // var videoDetails = mediaStreams
-    //     .videoDetails; //Returns a `Video` instance. Used to avoid calling `yt.getVideo`.
-
-    // print(mediaStreams.muxed);
     yt.close();
-
     return VideoFile(video, file);
   }
 
@@ -74,8 +65,6 @@ class YoutubeDownloader extends Downloader {
     var videoStreamInfo = mediaStream.muxed.firstWhere(
         (streamInfo) => streamInfo.container == yt_explode.Container.mp4);
 
-    // Create the StreamedRequest to track the download status.
-
     // Open the file in appendMode.
     var output = file.openWrite(mode: FileMode.writeOnlyAppend);
 
@@ -84,6 +73,7 @@ class YoutubeDownloader extends Downloader {
     var count = 0;
     var oldProgress = -1;
 
+    // TODO: Use cursorPosition instead of printing progress line after line. Actually, move into downloader.dart and just report back progress here.
     // Create the message and set the cursor position.
     // var msg = 'Downloading `${mediaStream.videoDetails.title}`:  \n';
     // var row = console.cursorPosition.row;
@@ -94,8 +84,6 @@ class YoutubeDownloader extends Downloader {
 
     // Listen for data received.
     await for (var data in videoStreamInfo.downloadStream()) {
-      // downloadStream(audio.url, audio.size)) {
-      //audio.downloadStream()) {
       count += data.length;
       var progress = ((count / len) * 100).round();
       if (progress != oldProgress) {

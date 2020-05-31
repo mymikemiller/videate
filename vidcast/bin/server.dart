@@ -93,7 +93,7 @@ Future main(List<String> args) async {
         final feed = Feed.fromJson(data);
         serve(feed, feedFormatter, request.response);
       } else {
-        throw 'No feed with the name "$name" found.';
+        request.response.write('No feed with the name "$name" found.');
       }
 
       request.response.close();

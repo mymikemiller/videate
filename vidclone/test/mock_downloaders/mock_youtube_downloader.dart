@@ -23,7 +23,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
         .thenAnswer((_) => Future.value(FakeChannelListResponse()));
 
     // Mock the three API requests required to return all the test data.
-    // The data has been modified so that the third request has '' as
+    // The data has been modified so that the third request has null as
     // nextPage, which implies it's the last page.
     when(mockApi.playlistItems.list(
       'contentDetails, snippet',

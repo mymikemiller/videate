@@ -9,10 +9,9 @@ import 'feed_formatter.dart';
 // See test resources for expected output
 class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
   final String servedMediaBaseUri;
-  // final String fileRoot;
 
   // servedMediaBaseUrl will be prepended to the URIs to the video files
-  RSS_2_0_FeedFormatter(this.servedMediaBaseUri /*, this.fileRoot*/);
+  RSS_2_0_FeedFormatter(this.servedMediaBaseUri);
 
   XmlDocument format(Feed feed) {
     var builder = new XmlBuilder();

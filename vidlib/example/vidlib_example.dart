@@ -5,6 +5,6 @@ void main() {
     ..title = 'My Title'
     ..description = 'My Description'
     ..sourceUrl = 'https://www.example.com'
-    ..sourceReleaseDate = DateTime.now().toUtc());
+    ..sourceReleaseDate = DateTime.fromMillisecondsSinceEpoch(0).toUtc());
   print('Video title: ${video.title}');
 }

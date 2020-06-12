@@ -5,7 +5,7 @@
             "name": "VidClone",
             "program": "bin/main.dart",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
         },
         {
             "name": "VidClone Tests",

@@ -13,6 +13,13 @@ import '../../bin/source_collection.dart';
 // create which uses an API we can mock.
 // See https://stackoverflow.com/questions/18564676/extending-a-class-with-only-one-factory-constructor
 class MockYoutubeDownloader implements YoutubeDownloader {
+  @override
+  Platform get platform => Platform(
+        (p) => p
+          ..id = 'youtube'
+          ..uri = Uri(path: 'https://www.youtube.com'),
+      );
+
   final YoutubeDownloader _delegate;
   static final mockApi = MockYoutubeApi();
 
@@ -73,11 +80,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       _delegate.videosAfter(date, sourceCollection);
 
   @override
-  String get id => 'youtube';
-
-  @override
-  Future<VideoFile> download(Video video, {File file}) =>
-      _delegate.download(video, file: file);
+  Future<VideoFile> download(Video video) => _delegate.download(video);
 }
 
 Future<PlaylistItemListResponse> responseWithJson(String filePath) async {

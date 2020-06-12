@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:convert' show json;
 import 'package:test/test.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:built_collection/built_collection.dart';
@@ -12,7 +11,7 @@ import '../bin/source_collection.dart';
 
 bool allVideosAreAfter(List<Video> videos, DateTime dateInclusive) {
   return videos
-      .every((video) => video.sourceReleaseDate.compareTo(dateInclusive) >= 0);
+      .every((video) => video.source.releaseDate.compareTo(dateInclusive) >= 0);
 }
 
 class DownloaderTest {
@@ -49,7 +48,7 @@ void main() {
   ];
 
   for (var downloaderTest in downloaderTests) {
-    group('${downloaderTest.downloader.id} downloader', () {
+    group('${downloaderTest.downloader.platform.id} downloader', () {
       test('gets all video upload metadata for a channel', () async {
         final result = await downloaderTest.downloader
             .allVideos(downloaderTest.sourceCollection)
@@ -59,27 +58,17 @@ void main() {
         // date. The YouTube API often returns videos out of order (and so does
         // our test data)
         final sortedResults = List.from(result);
-        sortedResults
-            .sort((a, b) => b.sourceReleaseDate.compareTo(a.sourceReleaseDate));
+        sortedResults.sort(
+            (a, b) => b.source.releaseDate.compareTo(a.source.releaseDate));
         expect(result, sortedResults);
 
         final serializableResult = BuiltList<Video>(result);
 
-        // Uncomment these lines to copy the results of the test for use in
-        // modifying the expected result file.
-        // final serializedResult = jsonSerializers.serialize(serializableResult);
-        // final encodedResult = json.encode(serializedResult);
-
         final expectedResultFile = await File(
-            'test/resources/${downloaderTest.downloader.id}/all_uploads_expected.json');
-        final expectedResultJsonString =
-            await expectedResultFile.readAsString();
-        final decodedExpectedResult = json.decode(expectedResultJsonString);
-        final deserializedExpectedResult =
-            jsonSerializers.deserialize(decodedExpectedResult);
-        final expectedResult = BuiltList<Video>(deserializedExpectedResult);
+            'test/resources/${downloaderTest.downloader.platform.id}/all_uploads_expected.json');
 
-        expect(serializableResult, expectedResult);
+        await TestUtilities.testJsonSerialization(
+            serializableResult, expectedResultFile);
       });
 
       test('gets only videos uploaded after specified date', () async {
@@ -92,7 +81,8 @@ void main() {
         // date. The YouTube API often returns videos out of order (and so does
         // our test data)
         final copy = List.from(result);
-        copy.sort((a, b) => b.sourceReleaseDate.compareTo(a.sourceReleaseDate));
+        copy.sort(
+            (a, b) => b.source.releaseDate.compareTo(a.source.releaseDate));
         expect(result, copy);
 
         // Verify that we didn't receive any videos outside the expected date range
@@ -100,21 +90,11 @@ void main() {
 
         final serializableResult = BuiltList<Video>(result);
 
-        // Uncomment these lines to copy the results of the test for use in
-        // modifying the expected result file.
-        // final serializedResult = jsonSerializers.serialize(serializableResult);
-        // final encodedResult = json.encode(serializedResult);
-
         final expectedResultFile = await File(
-            'test/resources/${downloaderTest.downloader.id}/videos_after_expected.json');
-        final expectedResultJsonString =
-            await expectedResultFile.readAsString();
-        final decodedExpectedResult = json.decode(expectedResultJsonString);
-        final deserializedExpectedResult =
-            jsonSerializers.deserialize(decodedExpectedResult);
-        final expectedResult = BuiltList<Video>(deserializedExpectedResult);
+            'test/resources/${downloaderTest.downloader.platform.id}/videos_after_expected.json');
 
-        expect(serializableResult, expectedResult);
+        await TestUtilities.testJsonSerialization(
+            serializableResult, expectedResultFile);
       });
     });
   }

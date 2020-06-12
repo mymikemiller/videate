@@ -13,6 +13,7 @@ dependencies:
   youtube_explode_dart: ^0.0.16
   dotenv: ^2.0.0
   file: ^5.1.0
+  aws_s3_client: ^0.1.1
   vidlib:
     path: ../vidlib
 

@@ -20,11 +20,16 @@ abstract class S3Uploader extends Uploader {
         endpointUrl: endpointUrl);
   }
 
+  // Get the s3 key (the latter part of the url, including the bucket name and
+  // file name separated by a slash, with no leading slash)
+  String getKey(Uri uri) {
+    return uri.path.startsWith('/') ? uri.path.replaceFirst('/', '') : uri.path;
+  }
+
   @override
   Future<ServedVideo> upload(VideoFile videoFile) async {
     final uri = getDestinationUri(videoFile.video);
-    final key =
-        uri.path.startsWith('/') ? uri.path.replaceFirst('/', '') : uri.path;
+    final key = getKey(uri);
     final etag = await bucket.uploadFile(
         key, videoFile.file.readAsBytesSync(), 'video/mp4', Permissions.public);
 

@@ -35,9 +35,9 @@ abstract class Uploader {
       // the destination
       final response = await httpGet(uri);
       if (response.statusCode != 200) {
-        print(
-            'Video does not exist at destination ${uri}. If the file is still '
-            'processing, it may be a moment before the file is available at '
+        print('Video does not exist at destination ${uri}. This is expected if'
+            ' the file was recently uploaded and is still processing at the '
+            'destination; it may be a moment before the file is available at '
             'the destination.');
       }
       return response.statusCode == 200;

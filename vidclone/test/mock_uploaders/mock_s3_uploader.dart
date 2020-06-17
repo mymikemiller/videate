@@ -15,8 +15,9 @@ class MockS3Uploader extends S3Uploader {
   Bucket get bucket => _bucket;
 
   @override
-  Future<Response> httpGet(url, {Map<String, String> headers}) {
-    final data = (bucket as FakeS3Bucket).uploads[url.path];
+  Future<Response> httpGet(uri, {Map<String, String> headers}) {
+    final key = getKey(uri);
+    final data = (bucket as FakeS3Bucket).uploads[key];
     if (data != null) {
       return Future.value(Response(data.toString(), 200));
     } else {

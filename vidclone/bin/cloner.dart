@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:vidlib/vidlib.dart';
 import 'package:file/memory.dart';
 import 'downloader.dart';
 import 'feed_manager.dart';
 import 'source_collection.dart';
 import 'uploader.dart';
+import 'package:console/console.dart';
 
 // A fake file system that allows us to interact with downloaded data as though
 // it were a file on an actual file system, but it's only ever stored in
@@ -28,13 +30,20 @@ class Cloner {
     final videoDebugName =
         '${video.source.platform.id} Video ${video.source.id}';
 
+    Console.init();
+    var progressBar = ProgressBar();
+
     // Download
-    print('=== Clone: Download $videoDebugName } ===');
-    final fsVideo = await _downloader.download(video);
+    print('=== Clone: Download $videoDebugName ===');
+    final fsVideo = await _downloader.download(video, (double progress) {
+      updateProgressBar(progressBar, progress);
+    });
 
     // Upload
     print('=== Clone: Upload $videoDebugName ===');
     final servedVideo = await _uploader.upload(fsVideo);
+
+    print('served video: ${servedVideo.uri}');
 
     // Update the feed to include the new video
     print('=== Clone: Add $videoDebugName to Feed ===');
@@ -43,6 +52,21 @@ class Cloner {
     print('=== Clone: Finished Cloning $videoDebugName ===');
 
     return servedVideo;
+  }
+
+  void updateProgressBar(ProgressBar progressBar, double progress) {
+    final progressInt = (progress * 100).round();
+    try {
+      progressBar.update(progressInt);
+    } on StdoutException catch (e) {
+      if (e.message == 'Could not get terminal size') {
+        print(
+            'If using VSCode, make sure you\'re using the Integrated Terminal,'
+            ' as the Debug Console does not support cursor positioning '
+            'necessary to display the progress bar. Set `"console": '
+            '"terminal"` in launch.json.');
+      }
+    }
   }
 
   // Clones the specified video and returns the resulting ServedVideo, or null
@@ -88,22 +112,20 @@ class Cloner {
   // too many simultaneous downloads/uploads.
   Stream<ServedVideo> cloneVideosAfter(
       DateTime date, SourceCollection sourceCollection) async* {
-    final stream = _downloader.videosAfter(date, sourceCollection);
-    if (await stream.isEmpty) {
-      print('No videos found after $date for '
-          '${sourceCollection.platform.id} '
-          '${sourceCollection.identifierMeaning} '
-          '${sourceCollection.identifier}');
-    } else {
-      await for (var video in stream) {
-        // This can be parallelized, but for simplicity's sake we're awaiting
-        // each one here
+    var stream = _downloader.videosAfter(date, sourceCollection);
+    // if (await stream.isEmpty) {print('No videos found after $date for '
+    //   '${sourceCollection.platform.id} '
+    //   '${sourceCollection.identifierMeaning} '
+    //   '${sourceCollection.identifier}');} else {
+    await for (var video in stream) {
+      // This can be parallelized, but for simplicity's sake we're awaiting
+      // each one here
 
-        // TODO: parallelize this (a queue allowing up to x downloads to run at
-        // once). See https://pub.dev/packages/queue
-        final servedVideo = await cloneIfNecessary(video);
-        yield servedVideo;
-      }
+      // TODO: parallelize this (a queue allowing up to x downloads to run at
+      // once). See https://pub.dev/packages/queue
+      final servedVideo = await cloneIfNecessary(video);
+      yield servedVideo;
     }
+    // }
   }
 }

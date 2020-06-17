@@ -48,67 +48,67 @@ class YoutubeDownloader extends Downloader {
 
   @override
   String getSourceUniqueId(Video video) {
-    return yt_explode.YoutubeExplode.parseVideoId(video.source.uri.toString());
+    return yt_explode.VideoId.parseVideoId(video.source.uri.toString());
   }
 
   @override
-  Future<VideoFile> download(Video video) async {
+  Future<VideoFile> download(Video video,
+      [void Function(double progress) callback]) async {
+    print('Downloading `${video.title}`:');
     var yt = yt_explode.YoutubeExplode();
     final videoId =
-        yt_explode.YoutubeExplode.parseVideoId(video.source.uri.toString());
+        yt_explode.VideoId.parseVideoId(video.source.uri.toString());
     final path = p.join(memoryFileSystem.systemTempDirectory.path, videoId);
     final file = memoryFileSystem.file(path);
-    await _download(videoId, yt, file);
+    await _download(videoId, yt, file, callback);
     yt.close();
     return VideoFile(video, file);
   }
 
   // Download the video with the specified id to the specified file, which will
   // be opened for write and when finished, closed and returned.
-  Future<File> _download(
-      String id, yt_explode.YoutubeExplode yt, File file) async {
+  Future<File> _download(String id, yt_explode.YoutubeExplode yt, File file,
+      void Function(double progress) callback) async {
     // Get the video media stream.
-    var mediaStream = await yt.getVideoMediaStream(id);
+    var manifest = await yt.videos.streamsClient.getManifest(id);
 
     // Get the first muxed video (the one with the lowest bitrate to save space
     // and make downloads faster for now). note that mediaStreams.muxed will
     // never be the best quality. To achieve that, we'd need to merge the audio
     // and video streams.
-    var videoStreamInfo = mediaStream.muxed.firstWhere(
+    var videoStreamInfo = manifest.muxed.firstWhere(
         (streamInfo) => streamInfo.container == yt_explode.Container.mp4);
 
-    // Open the file in appendMode.
+    // Track the file download status.
+    var len = videoStreamInfo.size.totalBytes;
+    var count = 0;
+    var oldProgress = -1.0;
+
+    // Prepare the file
     var output = file.openWrite(mode: FileMode.writeOnlyAppend);
 
-    // Track the file download status.
-    var len = videoStreamInfo.size;
-    var count = 0;
-    var oldProgress = -1;
-
-    // TODO: Use cursorPosition instead of printing progress line after line.
-    // Actually, move into downloader.dart and just report back progress here.
-    ///
-    // Create the message and set the cursor position. var msg = 'Downloading
-    // `${mediaStream.videoDetails.title}`:  \n'; var row =
-    // console.cursorPosition.row; var col = msg.length - 2;
-    // console.cursorPosition = Coordinate(row, 0); console.write(msg);
-    print('Downloading `${mediaStream.videoDetails.title}`:  \n');
-
     // Listen for data received.
-    try {
-      await for (var data in videoStreamInfo.downloadStream()) {
-        count += data.length;
-        var progress = ((count / len) * 100).round();
-        if (progress != oldProgress) {
-          // console.cursorPosition = Coordinate(row, col);
-          // console.write('$progress%');
-          print('$progress%');
-          oldProgress = progress;
+    var success = false;
+    while (success == false) {
+      try {
+        await for (var data in yt.videos.streamsClient.get(videoStreamInfo)) {
+          count += data.length;
+          var progress = count / len;
+          if (progress != oldProgress) {
+            callback(progress);
+            oldProgress = progress;
+          }
+          output.add(data);
         }
-        output.add(data);
+        success = true;
+      } catch (e) {
+        print(e);
+        // Clear the file
+        await file.writeAsBytes([]);
+        output = file.openWrite(mode: FileMode.writeOnlyAppend);
+        count = 0;
+        oldProgress = 1;
       }
-    } catch (e) {
-      print(e);
     }
     // console.writeLine();
     print('done');

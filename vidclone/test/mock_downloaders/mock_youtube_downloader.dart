@@ -80,7 +80,9 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       _delegate.videosAfter(date, sourceCollection);
 
   @override
-  Future<VideoFile> download(Video video) => _delegate.download(video);
+  Future<VideoFile> download(Video video,
+          [void Function(double progress) progressCallback]) =>
+      _delegate.download(video);
 }
 
 Future<PlaylistItemListResponse> responseWithJson(String filePath) async {

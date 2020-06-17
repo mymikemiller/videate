@@ -39,7 +39,7 @@ abstract class S3Uploader extends Uploader {
 
   @override
   Uri getDestinationUri(Video video, [extension = 'mp4']) {
-    final test = '2';
+    final test = '3';
     final name =
         'videate${test}_${video.source.platform.id}_${video.source.id}';
     return Uri.parse('$endpointUrl/$name/$name.$extension');

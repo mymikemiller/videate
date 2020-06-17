@@ -9,7 +9,8 @@ abstract class Downloader {
   Platform get platform;
 
   // Downloads the specified video.
-  Future<VideoFile> download(Video video);
+  Future<VideoFile> download(Video video,
+      [void Function(double progress) callback]);
 
   // Returns the most recently released video in the collection.
   Future<Video> mostRecentVideo(SourceCollection sourceCollection) async {

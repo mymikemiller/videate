@@ -78,7 +78,8 @@ class LocalDownloader extends Downloader {
 
   /// Downloads the specified [Video].
   @override
-  Future<VideoFile> download(Video video) {
+  Future<VideoFile> download(Video video,
+      [void Function(double progress) callback]) {
     final sourceFile = File(video.source.uri.toString());
     final videoFile = VideoFile(video, sourceFile);
     return Future.value(videoFile);

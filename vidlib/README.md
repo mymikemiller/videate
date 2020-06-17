@@ -8,11 +8,23 @@ A simple usage example:
 import 'package:vidlib/vidlib.dart';
 
 main() {
-  var video = Video((b) => b
-    ..title = 'My Title'
-    ..description = 'My Description'
-    ..sourceUrl = 'https://www.example.com'
-    ..sourceReleaseDate = DateTime.now().toUtc());
+  static Video get video1 => Video(
+        (v) => v
+          ..title = 'Video 1'
+          ..description = 'Description 1'
+          ..duration = Duration(minutes: 1)
+          ..source = Source(
+            (s) => s
+              ..platform = Platform(
+                (p) => p
+                  ..id = 'example'
+                  ..uri = Uri.parse('https://example.com'),
+              ).toBuilder()
+              ..releaseDate = DateTime.fromMillisecondsSinceEpoch(0).toUtc()
+              ..id = 'aaa111'
+              ..uri = Uri.parse('https://www.example.com/aaa111'),
+          ).toBuilder(),
+      );
   print('Video: ${video.title}');
 }
 ```

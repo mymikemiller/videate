@@ -9,6 +9,7 @@ environment:
 dependencies:
   built_value: ^7.0.9
   duration: ^2.0.11
+  xml: ^3.7.0
 
 dev_dependencies:
   pedantic: ^1.8.0

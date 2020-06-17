@@ -2,10 +2,10 @@
 // Use the URL localhost:8080 in your browser.
 import 'dart:async';
 import 'dart:convert';
+import 'package:vidlib/vidlib.dart' hide Platform;
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:http_server/http_server.dart';
-import 'package:vidlib/vidlib.dart';
 import 'feed_formatters/feed_formatter.dart';
 import 'localhost_exposer.dart' as LocalhostExposer;
 import 'package:path/path.dart' as path;

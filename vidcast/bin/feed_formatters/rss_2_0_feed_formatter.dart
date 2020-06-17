@@ -44,11 +44,13 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
 
         // Repeat for each episode
         for (final video in feed.videos) {
-          final servedPath = p.join(servedMediaBaseUri, video.uri.toString());
+          final servedPath = video.uri.isAbsolute
+              ? video.uri.toString()
+              : p.join(servedMediaBaseUri, video.uri.toString());
 
           // TODO: Bring back 'creators' // <a href=$baseUrl/tip?creator="${video.video.creators[0]}">Tip \$1</a><br><br>
           final shownotes =
-              '<a href=${video.video.sourceReleaseDate}>${video.video.sourceUrl}</a><br><br>${video.video.description}';
+              '<a href=${video.video.source.releaseDate}>${video.video.source.uri}</a><br><br>${video.video.description}';
 
           builder.element('item', nest: () {
             builder.element('title', nest: video.video.title);
@@ -58,13 +60,13 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
               // Use cdata here to avoid having to escape "<", ">" and "&"
               builder.cdata(shownotes);
             });
-            builder.element('link', nest: video.video.sourceUrl);
+            builder.element('link', nest: video.video.source.uri.toString());
             builder.element('enclosure', nest: () {
               builder.attribute('url', servedPath);
               builder.attribute('type', lookupMimeType(video.uri.path));
               builder.attribute('length', video.lengthInBytes);
             });
-            builder.element('pubDate', nest: video.video.sourceReleaseDate);
+            builder.element('pubDate', nest: video.video.source.releaseDate);
             builder.element('itunes:author',
                 nest: video.video.creators.join(', '));
             builder.element('itunes:duration',

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:test/test.dart';
-import 'serialization_testing.dart';
 
 void main() {
   group('ServedVideo', () {
@@ -13,12 +12,12 @@ void main() {
     });
 
     test('JSON serialization/deserialization', () async {
-      await testValueSerialization(Examples.servedVideo1,
+      await TestUtilities.testValueSerialization(Examples.servedVideo1,
           File('test/resources/served_video_1_serialized_expected.json'));
     });
 
     test('JSON serialization of lists', () async {
-      await testListSerialization(
+      await TestUtilities.testListSerialization(
           BuiltList<ServedVideo>.from(
               [Examples.servedVideo1, Examples.servedVideo2]),
           File('test/resources/served_videos_serialized_expected.json'));

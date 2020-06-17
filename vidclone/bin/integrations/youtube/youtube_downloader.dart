@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file/memory.dart';
 import 'package:vidlib/src/models/video.dart';
 import 'dart:async';
 import 'package:googleapis_auth/auth_io.dart' as auth;
@@ -9,21 +10,29 @@ import '../../downloader.dart';
 import '../../source_collection.dart';
 import 'channel_source_collection.dart';
 import 'source_collection.dart';
+import 'package:path/path.dart' as p;
 
 // We use 50, Youtube's max for this value.
 final maxApiResultsPerCall = 50;
 
-// The maximum number of videos returned by the API before yeilding the earliest in the window.
-// This is necessary because videos are returned in upload order, not publish order. We're specifying
-// here that we can expect any set of videos this size returned consecutively by
-// the API to include the most recent video of any videos that have yet to be returned
-// (in other words, we're expecting that creators will never upload this many
-// videos before publishing an old video)
+// The maximum number of videos returned by the API before yeilding the
+// earliest in the window. This is necessary because videos are returned in
+// upload order, not publish order. We're specifying here that we can expect
+// any set of videos this size returned consecutively by the API to include the
+// most recent video of any videos that have yet to be returned (in other
+// words, we're expecting that creators will never upload this many videos
+// before publishing an old video)
 final slidingWindowSize = 99;
+
+final memoryFileSystem = MemoryFileSystem();
 
 class YoutubeDownloader extends Downloader {
   @override
-  String get id => 'youtube';
+  Platform get platform => Platform(
+        (p) => p
+          ..id = 'youtube'
+          ..uri = Uri.parse('https://www.youtube.com'),
+      );
 
   final YoutubeApi api;
 
@@ -39,60 +48,76 @@ class YoutubeDownloader extends Downloader {
 
   @override
   String getSourceUniqueId(Video video) {
-    return yt_explode.YoutubeExplode.parseVideoId(video.sourceUrl);
+    return yt_explode.VideoId.parseVideoId(video.source.uri.toString());
   }
 
   @override
-  Future<VideoFile> download(Video video, {File file}) async {
-    if (file == null) {
-      throw 'YoutubeDownloder::download must be passed a valid File to download into';
-    }
+  Future<VideoFile> download(Video video,
+      [void Function(double progress) callback]) async {
+    print('Downloading `${video.title}`:');
     var yt = yt_explode.YoutubeExplode();
-    final videoId = yt_explode.YoutubeExplode.parseVideoId(video.sourceUrl);
-    await _download(videoId, yt, file);
+    final videoId =
+        yt_explode.VideoId.parseVideoId(video.source.uri.toString());
+    final path = p.join(memoryFileSystem.systemTempDirectory.path, videoId);
+    final file = memoryFileSystem.file(path);
+    await _download(videoId, yt, file, callback);
     yt.close();
     return VideoFile(video, file);
   }
 
-  // Download the video with the specified id to the specified file, which will be opened for write and when finished, closed and returned.
-  Future<File> _download(
-      String id, yt_explode.YoutubeExplode yt, File file) async {
+  // Download the video with the specified id to the specified file, which will
+  // be opened for write and when finished, closed and returned.
+  Future<File> _download(String id, yt_explode.YoutubeExplode yt, File file,
+      void Function(double progress) callback) async {
     // Get the video media stream.
-    var mediaStream = await yt.getVideoMediaStream(id);
+    var manifest = await yt.videos.streamsClient.getManifest(id);
 
-    // Get the first muxed video (the one with the lowest bitrate to save space and make downloads faster for now).
-    // note that mediaStreams.muxed will never be the best quality. To achieve that, we'd need to merge the audio and video streams.
-    var videoStreamInfo = mediaStream.muxed.firstWhere(
+    // Get the first muxed video (the one with the lowest bitrate to save space
+    // and make downloads faster for now). note that mediaStreams.muxed will
+    // never be the best quality. To achieve that, we'd need to merge the audio
+    // and video streams.
+    var videoStreamInfo = manifest.muxed.firstWhere(
         (streamInfo) => streamInfo.container == yt_explode.Container.mp4);
 
-    // Open the file in appendMode.
+    // Track the file download status.
+    var len = videoStreamInfo.size.totalBytes;
+    var count = 0;
+    var oldProgress = -1.0;
+
+    // Prepare the file
     var output = file.openWrite(mode: FileMode.writeOnlyAppend);
 
-    // Track the file download status.
-    var len = videoStreamInfo.size;
-    var count = 0;
-    var oldProgress = -1;
-
-    // TODO: Use cursorPosition instead of printing progress line after line. Actually, move into downloader.dart and just report back progress here.
-    // Create the message and set the cursor position.
-    // var msg = 'Downloading `${mediaStream.videoDetails.title}`:  \n';
-    // var row = console.cursorPosition.row;
-    // var col = msg.length - 2;
-    // console.cursorPosition = Coordinate(row, 0);
-    // console.write(msg);
-    print('Downloading `${mediaStream.videoDetails.title}`:  \n');
-
     // Listen for data received.
-    await for (var data in videoStreamInfo.downloadStream()) {
-      count += data.length;
-      var progress = ((count / len) * 100).round();
-      if (progress != oldProgress) {
-        // console.cursorPosition = Coordinate(row, col);
-        // console.write('$progress%');
-        print('$progress%');
-        oldProgress = progress;
+    var success = false;
+    while (success == false) {
+      try {
+        await for (var data in yt.videos.streamsClient.get(videoStreamInfo)) {
+          count += data.length;
+          var progress = count / len;
+          if (progress != oldProgress) {
+            callback(progress);
+            oldProgress = progress;
+          }
+          output.add(data);
+        }
+        success = true;
+      } catch (e) {
+        // We sometimes get the following error from the youtube_explode
+        // library, which I'm not sure how to overcome so we just restart the
+        // download and hope for the best the next time.
+        //
+        // _TypeError (type '(HttpException) => Null' is not a subtype of type
+        // '(dynamic) => dynamic')
+        //
+        // See
+        // https://stackoverflow.com/questions/62419270/re-trying-last-item-in-stream-and-continuing-from-there
+        print(e);
+        // Clear the file and start over
+        await file.writeAsBytes([]);
+        output = file.openWrite(mode: FileMode.writeOnlyAppend);
+        count = 0;
+        oldProgress = 1;
       }
-      output.add(data);
     }
     // console.writeLine();
     print('done');
@@ -144,24 +169,29 @@ class YoutubeDownloader extends Downloader {
           pageToken: nextPageToken,
           maxResults: maxApiResultsPerCall);
 
-      // To save API responses as json for the purposes of making tests,
-      // uncomment this line and break on the next line to copy the json response
-      // to the clipboard
-      // final encoded = json.encode(playlistItemsResponse);
-
       nextPageToken = playlistItemsResponse.nextPageToken;
 
       // Add the videos in this page one by one to the sliding window, keeping
-      // them in date order, picking off from the sliding window when it gets too full
+      // them in date order, picking off from the sliding window when it gets
+      // too full
       for (var playlistItem in playlistItemsResponse.items) {
-        final video = Video((b) => b
-          ..title = playlistItem.snippet.title
-          ..description = playlistItem.snippet.description
-          ..sourceUrl =
-              'https://www.youtube.com/watch?v=${playlistItem.snippet.resourceId.videoId}'
-          ..sourceReleaseDate = playlistItem.snippet.publishedAt
-          // TODO: find correct duration. See https://stackoverflow.com/questions/15596753/how-do-i-get-video-durations-with-youtube-api-version-3 and https://issuetracker.google.com/issues/35170788#comment10
-          ..duration = Duration(hours: 0, minutes: 15, seconds: 0));
+        final videoId = playlistItem.snippet.resourceId.videoId;
+        final video = Video(
+          (v) => v
+            ..title = playlistItem.snippet.title
+            ..description = playlistItem.snippet.description
+            ..source = Source(
+              (s) => s
+                ..id = videoId
+                ..uri = Uri.parse('https://www.youtube.com/watch?v=$videoId')
+                ..platform = platform.toBuilder()
+                ..releaseDate = playlistItem.snippet.publishedAt,
+            ).toBuilder()
+            // TODO: find correct duration. See
+            // https://stackoverflow.com/questions/15596753/how-do-i-get-video-durations-with-youtube-api-version-3
+            // and https://issuetracker.google.com/issues/35170788#comment10
+            ..duration = Duration(hours: 0, minutes: 15, seconds: 0),
+        );
 
         // We want the videos in slidingWindow to be in reverse date order (they
         // generally are returned by the YouTube API in this order, but often
@@ -172,8 +202,8 @@ class YoutubeDownloader extends Downloader {
         // videos)
         var i;
         for (i = 0; i < slidingWindow.length; i++) {
-          if (video.sourceReleaseDate
-                  .compareTo(slidingWindow[i].sourceReleaseDate) >
+          if (video.source.releaseDate
+                  .compareTo(slidingWindow[i].source.releaseDate) >
               0) {
             break;
           }
@@ -186,8 +216,8 @@ class YoutubeDownloader extends Downloader {
           final toYield = slidingWindow.removeAt(0);
           // Assert that we're always yielding in reverse date order
           assert(previouslyYielded == null ||
-              previouslyYielded.sourceReleaseDate
-                      .compareTo(toYield.sourceReleaseDate) >
+              previouslyYielded.source.releaseDate
+                      .compareTo(toYield.source.releaseDate) >
                   0);
           previouslyYielded = toYield;
           yield toYield;
@@ -200,8 +230,8 @@ class YoutubeDownloader extends Downloader {
       // Guarantee that we're return videos in publish order, not upload order.
       // If this ever fails, slidingWindowSize may need to be increased.
       assert(previouslyYielded == null ||
-          previouslyYielded.sourceReleaseDate
-                  .compareTo(video.sourceReleaseDate) >
+          previouslyYielded.source.releaseDate
+                  .compareTo(video.source.releaseDate) >
               0);
       previouslyYielded = video;
       yield video;

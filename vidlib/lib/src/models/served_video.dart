@@ -7,6 +7,7 @@ part 'served_video.g.dart';
 abstract class ServedVideo implements Built<ServedVideo, ServedVideoBuilder> {
   Video get video;
   Uri get uri;
+  String get etag;
   int get lengthInBytes;
 
   // The builder pattern is required by built_value, which we use for serialization

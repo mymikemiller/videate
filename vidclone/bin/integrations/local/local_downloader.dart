@@ -54,7 +54,7 @@ class LocalDownloader extends Downloader {
                 // Assume filenames will be unique among all local files.
                 // Obviously a faulty assumption as this could cause collisions
                 // when this id is used during upload, but the simplicity is
-                // worth the tradeoff for the places we make of
+                // worth the tradeoff for the places we make use of
                 // LocalDownloader.
                 ..id = basenameWithoutExtension(file.path)
                 // We don't know the source release date, so we set it to

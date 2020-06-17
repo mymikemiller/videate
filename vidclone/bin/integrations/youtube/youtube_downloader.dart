@@ -102,8 +102,17 @@ class YoutubeDownloader extends Downloader {
         }
         success = true;
       } catch (e) {
+        // We sometimes get the following error from the youtube_explode
+        // library, which I'm not sure how to overcome so we just restart the
+        // download and hope for the best the next time.
+        //
+        // _TypeError (type '(HttpException) => Null' is not a subtype of type
+        // '(dynamic) => dynamic')
+        //
+        // See
+        // https://stackoverflow.com/questions/62419270/re-trying-last-item-in-stream-and-continuing-from-there
         print(e);
-        // Clear the file
+        // Clear the file and start over
         await file.writeAsBytes([]);
         output = file.openWrite(mode: FileMode.writeOnlyAppend);
         count = 0;
@@ -159,11 +168,6 @@ class YoutubeDownloader extends Downloader {
           playlistId: uploadsPlaylistId,
           pageToken: nextPageToken,
           maxResults: maxApiResultsPerCall);
-
-      // To save API responses as json for the purposes of making tests,
-      // uncomment this line and break on the next line to copy the json
-      // response to the clipboard final encoded =
-      // json.encode(playlistItemsResponse);
 
       nextPageToken = playlistItemsResponse.nextPageToken;
 

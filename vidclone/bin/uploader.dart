@@ -2,13 +2,12 @@ import 'package:file/file.dart';
 import 'package:http/http.dart' as http;
 import 'package:vidlib/vidlib.dart';
 
-// typedef httpGetType = ;
-
 abstract class Uploader {
   /// An id unique to this uploader, e.g. "internet_archive".
   String get id;
 
-  /// fileSystem must be specified for file-based uploaders
+  /// fileSystem must be specified for file-based uploaders (uploaders whose
+  /// destination is a file on a file system, not a file on the web)
   FileSystem get fileSystem => null;
 
   /// httpGet, used to determine whether a file already exists at the upload
@@ -35,6 +34,12 @@ abstract class Uploader {
       // Assume the video has been uploaded already if we get a 200 response at
       // the destination
       final response = await httpGet(uri);
+      if (response.statusCode != 200) {
+        print(
+            'Video does not exist at destination ${uri}. If the file is still '
+            'processing, it may be a moment before the file is available at '
+            'the destination.');
+      }
       return response.statusCode == 200;
     } else {
       if (fileSystem == null) {

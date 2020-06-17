@@ -21,15 +21,14 @@ void main(List<String> arguments) async {
   final videosBaseDirectory = Directory('$home/web/videos');
   final feedsBaseDirectory = Directory('$home/web/feeds');
 
-  // Download from YouTube
   final downloader = YoutubeDownloader.fromApiKey(googleApiKey);
   // final downloader = LocalDownloader();
 
-  // Save the file under the user's home directory
-  // final uploader = SaveToDiskUploader(
-  //     Directory(p.join(videosBaseDirectory.path, downloader.id)));
   final uploader = InternetArchiveUploader(
       internetArchiveAccessKey, internetArchiveSecretKey);
+  // final uploader =
+  //     SaveToDiskUploader(Directory(p.join(videosBaseDirectory.path,
+  //     downloader.id)));
 
   // Save the feed to a json file
   final demoJsonFilePath = p.join(feedsBaseDirectory.path, 'tdts.json');

@@ -13,7 +13,7 @@ class TestUtilities {
   // source control if the modifications are correct (saving the files in
   // VSCode with 'Format on Save' enabled will format the file properly). This
   // value should always be *false* in the version checked into source control,
-  // but is useful when making updates to json encodable types.
+  // but is useful when making updates to xml and json encodable types.
   static bool get autofix => false;
 
   static const _autofixHint = 'If the results of this run are correct, enable '
@@ -34,7 +34,7 @@ class TestUtilities {
   };
 
   static bool _equalsIgnoringWhitespace(String observed, String expected) {
-    final whitespaceRegex = RegExp(r'\s+\b|\b\s');
+    final whitespaceRegex = RegExp(r'\s');
     final modifiedObserved = observed.replaceAll(whitespaceRegex, '');
     final modifiedExpected = expected.replaceAll(whitespaceRegex, '');
     return modifiedObserved == modifiedExpected;
@@ -42,7 +42,7 @@ class TestUtilities {
 
   static bool _needsFixing(String result, File expectedResult) {
     final expectedString = expectedResult.readAsStringSync();
-    return _equalsIgnoringWhitespace(result, expectedString);
+    return !_equalsIgnoringWhitespace(result, expectedString);
   }
 
   static Future<void> testJsonSerialization(
@@ -50,7 +50,7 @@ class TestUtilities {
     final serialized = jsonSerializers.serialize(encodableObject);
     final encoded = json.encode(serialized);
     if (autofix && _needsFixing(encoded, expectedJson)) {
-      await expectedJson.writeAsString(encoded);
+      await expectedJson.writeAsString(encoded + '\n');
     } else {
       final expectedResultJsonString = await expectedJson.readAsString();
       final decodedExpectedResult = json.decode(expectedResultJsonString);

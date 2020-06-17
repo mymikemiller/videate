@@ -35,8 +35,17 @@ class LocalDownloader extends Downloader {
     // top of the list. Secondarily sort by path for consistency when dates
     // match.
     files.sort((FileSystemEntity a, FileSystemEntity b) {
-      var cmp = b.statSync().modified.compareTo(a.statSync().modified);
-      if (cmp != 0) return cmp;
+      // Note: We tried sorting first by date modified and secondarily by path,
+      // but this caused files to be returned in different order on different
+      // machines even if all the files in the folder were the same (e.g. on
+      // the CI server, where the modified date doesn't match that of the
+      // original file). So instead we use sort by path, which should be a
+      // consistent order across machines, even if the absolute paths differ
+      // since everything shoudld be in the same folder. Uncomment the below
+      // lines to add back in the sort-by-date-then-by-path logic.
+      //
+      // var cmp = b.statSync().modified.compareTo(a.statSync().modified); if
+      // (cmp != 0) return cmp;
       return b.path.compareTo(a.path);
     });
 

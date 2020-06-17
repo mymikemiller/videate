@@ -1,6 +1,5 @@
 import 'package:aws_s3_client/aws_s3_client.dart';
 import 'package:vidlib/vidlib.dart';
-import 'package:path/path.dart' as p;
 import '../../uploader.dart';
 
 // Base class for uploaders that support the S3 protocol.

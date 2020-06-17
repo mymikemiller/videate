@@ -50,24 +50,31 @@ void main() {
   for (var downloaderTest in downloaderTests) {
     group('${downloaderTest.downloader.platform.id} downloader', () {
       test('gets all video upload metadata for a channel', () async {
-        final result = await downloaderTest.downloader
+        final result = BuiltList<Video>(await downloaderTest.downloader
             .allVideos(downloaderTest.sourceCollection)
-            .toList();
+            .toList());
 
-        // Verify that the results are correctly returned in descending order by
-        // date. The YouTube API often returns videos out of order (and so does
-        // our test data)
-        final sortedResults = List.from(result);
-        sortedResults.sort(
-            (a, b) => b.source.releaseDate.compareTo(a.source.releaseDate));
-        expect(result, sortedResults);
+        // Verify that the results are correctly returned in descending order
+        // by date. The YouTube API, for example, often returns videos out of
+        // order (and so does our test data). For dates that match, secondarily
+        // sort by source uri path.
+        final sortedResult = List.from(result).cast<Video>();
+        sortedResult.sort((Video a, Video b) {
+          var cmp = b.source.releaseDate.compareTo(a.source.releaseDate);
+          if (cmp != 0) return cmp;
+          // Secondarily sort based on the uri when dates match, which is what
+          // the downloader should be doing too
+          return b.source.uri.path.compareTo(a.source.uri.path);
+        });
+
+        expect(result, sortedResult);
 
         final serializableResult = BuiltList<Video>(result);
 
         final expectedResultFile = await File(
             'test/resources/${downloaderTest.downloader.platform.id}/all_uploads_expected.json');
 
-        await TestUtilities.testJsonSerialization(
+        await TestUtilities.testListSerialization(
             serializableResult, expectedResultFile);
       });
 

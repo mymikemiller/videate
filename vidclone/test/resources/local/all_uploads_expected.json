@@ -21,24 +21,6 @@
         },
         {
             "$": "Video",
-            "title": "nine_second_video",
-            "description": "nine_second_video.mp4",
-            "source": {
-                "platform": {
-                    "uri": "/",
-                    "id": "local"
-                },
-                "uri": "test/resources/videos/nine_second_video.mp4",
-                "id": "nine_second_video",
-                "releaseDate": "1970-01-01T00:00:00.000Z"
-            },
-            "creators": [
-                "Mike Miller"
-            ],
-            "duration": "0:00:09.038000"
-        },
-        {
-            "$": "Video",
             "title": "six_second_video",
             "description": "six_second_video.mp4",
             "source": {
@@ -54,6 +36,24 @@
                 "Mike Miller"
             ],
             "duration": "0:00:06.038000"
+        },
+        {
+            "$": "Video",
+            "title": "nine_second_video",
+            "description": "nine_second_video.mp4",
+            "source": {
+                "platform": {
+                    "uri": "/",
+                    "id": "local"
+                },
+                "uri": "test/resources/videos/nine_second_video.mp4",
+                "id": "nine_second_video",
+                "releaseDate": "1970-01-01T00:00:00.000Z"
+            },
+            "creators": [
+                "Mike Miller"
+            ],
+            "duration": "0:00:09.038000"
         }
     ]
 }

@@ -4,26 +4,52 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:test/test.dart';
+import 'package:xml/xml.dart' as xml;
 
 class TestUtilities {
-  // *DANGEROUS* If autofix is true, this test will update any given expectedJson
-  // files to match the output. This will cause all tests to succeed and will
-  // modify the files, which can be compared and checked into source control if
-  // the modifications are correct (saving the files in VSCode with 'Format on
-  // Save' enabled will format the file properly). This value should always be
-  // *false* in the version checked into source control, but is useful when
-  // making updates to json encodable types.
+  // *DANGEROUS* If autofix is true, this test will update any given
+  // expectedJson files to match the output. This will cause all tests to
+  // succeed and will modify the files, which can be compared and checked into
+  // source control if the modifications are correct (saving the files in
+  // VSCode with 'Format on Save' enabled will format the file properly). This
+  // value should always be *false* in the version checked into source control,
+  // but is useful when making updates to json encodable types.
   static bool get autofix => false;
 
   static const _autofixHint = 'If the results of this run are correct, enable '
-      'TestUtils.autofix and run the test again and update all expected files with '
-      'the results of that run.';
+      'TestUtils.autofix and run the test again and update all expected files '
+      'with the results of that run.';
+
+  static final String Function(xml.XmlDocument) _formatXml =
+      (xml.XmlDocument input) {
+    final formatted = input
+        .toXmlString(pretty: true)
+        .replaceFirst('<?xml version="1.0"?>', '<?xml version="1.0" ?>')
+        .replaceAll('/>', ' />');
+    if (formatted.endsWith('\n')) {
+      return formatted;
+    } else {
+      return formatted + '\n';
+    }
+  };
+
+  static bool _equalsIgnoringWhitespace(String observed, String expected) {
+    final whitespaceRegex = RegExp(r'\s+\b|\b\s');
+    final modifiedObserved = observed.replaceAll(whitespaceRegex, '');
+    final modifiedExpected = expected.replaceAll(whitespaceRegex, '');
+    return modifiedObserved == modifiedExpected;
+  }
+
+  static bool _needsFixing(String result, File expectedResult) {
+    final expectedString = expectedResult.readAsStringSync();
+    return _equalsIgnoringWhitespace(result, expectedString);
+  }
 
   static Future<void> testJsonSerialization(
       Object encodableObject, File expectedJson) async {
-    if (autofix) {
-      final serialized = jsonSerializers.serialize(encodableObject);
-      final encoded = json.encode(serialized);
+    final serialized = jsonSerializers.serialize(encodableObject);
+    final encoded = json.encode(serialized);
+    if (autofix && _needsFixing(encoded, expectedJson)) {
       await expectedJson.writeAsString(encoded);
     } else {
       final expectedResultJsonString = await expectedJson.readAsString();
@@ -72,4 +98,18 @@ class TestUtilities {
   // https://github.com/google/built_value.dart/issues/404
   static Future<void> testValueSerialization(Built value, File expectedJson) =>
       _testSerialization(value, expectedJson);
+
+  static Future<void> testXml(
+      xml.XmlDocument observed, File expectedXml) async {
+    final formattedObserved = _formatXml(observed);
+
+    if (autofix && _needsFixing(formattedObserved, expectedXml)) {
+      await expectedXml.writeAsString(formattedObserved);
+    } else {
+      final expectedString = await expectedXml.readAsString();
+      final expectedFeed = xml.parse(expectedString);
+      final formattedExpected = _formatXml(expectedFeed);
+      expect(formattedObserved, formattedExpected, reason: _autofixHint);
+    }
+  }
 }

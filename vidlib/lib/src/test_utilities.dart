@@ -31,8 +31,8 @@ class TestUtilities {
 
       var deserializedExpectedResult;
       try {
-        // If this line fails for expected reasons, try toggling
-        // TestUtilities.autofix.
+        // If this line fails for *expected* reasons, try toggling
+        // TestUtilities.autofix to modify the expected results.
         deserializedExpectedResult =
             jsonSerializers.deserialize(decodedExpectedResult);
       } catch (e) {
@@ -40,8 +40,8 @@ class TestUtilities {
         rethrow;
       }
 
-      // If this line fails for expected reasons, try toggling
-      // TestUtilities.autofix.
+      // If this line fails for *expected* reasons, try toggling
+      // TestUtilities.autofix to modify the expected results.
       expect(encodableObject, deserializedExpectedResult, reason: _autofixHint);
     }
   }

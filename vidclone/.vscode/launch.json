@@ -5,7 +5,13 @@
             "name": "VidClone",
             "program": "bin/main.dart",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "console": "terminal",
+            "presentation": {
+                "panel": "shared",
+                "reveal": "always",
+                "focus": true
+            },
         },
         {
             "name": "VidClone Tests",

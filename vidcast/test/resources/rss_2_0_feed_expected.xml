@@ -1,49 +1,49 @@
 <?xml version="1.0" ?>
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
-    <channel>
-        <title>Test Feed</title>
-        <link>http://videate.org</link>
-        <language>en-us</language>
-        <itunes:subtitle>A feed for testing</itunes:subtitle>
-        <itunes:author>John Doe</itunes:author>
-        <itunes:summary>A feed used for testing purposes</itunes:summary>
-        <description>A feed used for testing purposes</description>
-        <itunes:owner>
-            <itunes:name>John Doe</itunes:name>
-            <itunes:email>john.doe@example.com</itunes:email>
-        </itunes:owner>
-        <itunes:explicit>no</itunes:explicit>
-        <itunes:image href="http://example.com/example.jpg" />
-        <itunes:category text="Arts" />
-        <item>
-            <title>Six Second Video</title>
-            <itunes:summary>A six second video.</itunes:summary>
-            <description>A six second video.</description>
-            <content:encoded>
-                <![CDATA[<a href=1970-01-01 00:00:00.000Z>https://example.com/sixsecond</a><br><br>A six second video.]]>
-            </content:encoded>
-            <link>https://example.com/sixsecond</link>
-            <enclosure url="https://example.com/test/resources/videos/six_second_video.mp4" type="video/mp4" length="56120" />
-            <pubDate>1970-01-01 00:00:00.000Z</pubDate>
-            <itunes:author>John Doe, Jane Doe</itunes:author>
-            <itunes:duration>0:06:00.000000</itunes:duration>
-            <itunes:explicit>no</itunes:explicit>
-            <guid>https://example.com/test/resources/videos/six_second_video.mp4</guid>
-        </item>
-        <item>
-            <title>Nine Second Video</title>
-            <itunes:summary>A nine second video.</itunes:summary>
-            <description>A nine second video.</description>
-            <content:encoded>
-                <![CDATA[<a href=1970-01-01 00:00:00.000Z>https://example.com/ninesecond</a><br><br>A nine second video.]]>
-            </content:encoded>
-            <link>https://example.com/ninesecond</link>
-            <enclosure url="https://example.com/test/resources/videos/nine_second_video.mp4" type="video/mp4" length="74929" />
-            <pubDate>1970-01-01 00:00:00.000Z</pubDate>
-            <itunes:author>Joe Schmoe, Jane Q. Public</itunes:author>
-            <itunes:duration>0:09:00.000000</itunes:duration>
-            <itunes:explicit>no</itunes:explicit>
-            <guid>https://example.com/test/resources/videos/nine_second_video.mp4</guid>
-        </item>
-    </channel>
+  <channel>
+    <title>Test Feed</title>
+    <link>http://videate.org</link>
+    <language>en-us</language>
+    <itunes:subtitle>A feed for testing</itunes:subtitle>
+    <itunes:author>John Doe</itunes:author>
+    <itunes:summary>A feed used for testing purposes</itunes:summary>
+    <description>A feed used for testing purposes</description>
+    <itunes:owner>
+      <itunes:name>John Doe</itunes:name>
+      <itunes:email>john.doe@example.com</itunes:email>
+    </itunes:owner>
+    <itunes:explicit>no</itunes:explicit>
+    <itunes:image href="http://example.com/example.jpg" />
+    <itunes:category text="Arts" />
+    <item>
+      <title>Six Second Video</title>
+      <itunes:summary>A six second video.</itunes:summary>
+      <description>A six second video.</description>
+      <content:encoded>
+        <![CDATA[<a href=1970-01-01 00:00:00.000Z>https://example.com/sixsecond</a><br><br>A six second video.]]>
+      </content:encoded>
+      <link>https://example.com/sixsecond</link>
+      <enclosure url="https://example.com/test/resources/videos/six_second_video.mp4" type="video/mp4" length="56120" />
+      <pubDate>1970-01-01 00:00:00.000Z</pubDate>
+      <itunes:author>John Doe, Jane Doe</itunes:author>
+      <itunes:duration>0:06:00.000000</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+      <guid>https://example.com/test/resources/videos/six_second_video.mp4</guid>
+    </item>
+    <item>
+      <title>Nine Second Video</title>
+      <itunes:summary>A nine second video.</itunes:summary>
+      <description>A nine second video.</description>
+      <content:encoded>
+        <![CDATA[<a href=1970-01-01 00:00:00.000Z>https://example.com/ninesecond</a><br><br>A nine second video.]]>
+      </content:encoded>
+      <link>https://example.com/ninesecond</link>
+      <enclosure url="https://example.com/test/resources/videos/nine_second_video.mp4" type="video/mp4" length="74929" />
+      <pubDate>1970-01-01 00:00:00.000Z</pubDate>
+      <itunes:author>Joe Schmoe, Jane Q. Public</itunes:author>
+      <itunes:duration>0:09:00.000000</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+      <guid>https://example.com/test/resources/videos/nine_second_video.mp4</guid>
+    </item>
+  </channel>
 </rss>

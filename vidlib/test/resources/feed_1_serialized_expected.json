@@ -12,28 +12,40 @@
             "video": {
                 "title": "Video 1",
                 "description": "Description 1",
-                "sourceUrl": "https://www.example.com/1",
-                "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
-                "creators": [
-                    "Mike Miller"
-                ],
+                "source": {
+                    "platform": {
+                        "uri": "https://example.com",
+                        "id": "example"
+                    },
+                    "uri": "https://www.example.com/aaa111",
+                    "id": "aaa111",
+                    "releaseDate": "1970-01-01T00:00:00.000Z"
+                },
+                "creators": [],
                 "duration": "0:01:00.000000"
             },
             "uri": "/test/video1.mp4",
+            "etag": "abc111xyz",
             "lengthInBytes": 100000
         },
         {
             "video": {
                 "title": "Video 2",
                 "description": "Description 2",
-                "sourceUrl": "https://www.example.com/2",
-                "sourceReleaseDate": "1970-01-01T00:00:00.000Z",
-                "creators": [
-                    "Mike Miller"
-                ],
+                "source": {
+                    "platform": {
+                        "uri": "https://example.com",
+                        "id": "example"
+                    },
+                    "uri": "https://www.example.com/bbb222",
+                    "id": "bbb222",
+                    "releaseDate": "1970-01-01T00:00:00.000Z"
+                },
+                "creators": [],
                 "duration": "0:02:00.000000"
             },
             "uri": "/test/video2.mp4",
+            "etag": "abc222xyz",
             "lengthInBytes": 200000
         }
     ]

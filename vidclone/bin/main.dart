@@ -5,6 +5,9 @@ import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:path/path.dart' as p;
 import 'integrations/internet_archive/internet_archive_uploader.dart';
 import 'integrations/local/json_file_feed_manager.dart';
+import 'integrations/local/local_downloader.dart';
+import 'integrations/local/local_source_collection.dart';
+import 'integrations/local/save_to_disk_uploader.dart';
 import 'integrations/youtube/channel_source_collection.dart';
 import 'integrations/youtube/youtube_downloader.dart';
 
@@ -21,8 +24,8 @@ void main(List<String> arguments) async {
   final videosBaseDirectory = Directory('$home/web/videos');
   final feedsBaseDirectory = Directory('$home/web/feeds');
 
-  final downloader = YoutubeDownloader.fromApiKey(googleApiKey);
-  // final downloader = LocalDownloader();
+  // final downloader = YoutubeDownloader();
+  final downloader = LocalDownloader();
 
   final uploader = InternetArchiveUploader(
       internetArchiveAccessKey, internetArchiveSecretKey);
@@ -31,7 +34,8 @@ void main(List<String> arguments) async {
   //     downloader.id)));
 
   // Save the feed to a json file
-  final demoJsonFilePath = p.join(feedsBaseDirectory.path, 'tdts.json');
+  final demoJsonFilePath =
+      p.join(feedsBaseDirectory.path, 'favorites.json'); //'$example_key.json');
   final feedManager = await JsonFileFeedManager.createOrOpen(demoJsonFilePath);
 
   // Download from YouTube and "upload" by saving to a local file
@@ -40,9 +44,9 @@ void main(List<String> arguments) async {
   // Game Grumps: UC9CuvdOVfMPvKCiwdGKL3cQ \
   // Ninja Sex Party: UCs7yDP7KWrh0wd_4qbDP32g \
   // The Daily Talk Show: UCNl_4FD4qQdZZJMzAM7LJqQ \
-  final sourceCollection =
-      YoutubeChannelSourceCollection('UCNl_4FD4qQdZZJMzAM7LJqQ');
-  // final sourceCollection = LocalSourceCollection('test/resources/videos');
+  // final sourceCollection =
+  //     YoutubeChannelSourceCollection(example_channel_ids[example_key]);
+  final sourceCollection = LocalSourceCollection('$home/web/videos/favorites');
 
   // Figure out how far back in time we need to clone. This value will be null
   // if the feed is currently empty.

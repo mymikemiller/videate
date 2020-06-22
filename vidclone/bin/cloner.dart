@@ -22,10 +22,10 @@ class Cloner {
   Future<ServedVideo> clone(Video video) async {
     // We don't need to download if the eventual upload result already exists.
     final uri = _uploader.getDestinationUri(video);
-    if (await _uploader.existsAtDestination(video)) {
-      throw 'Upload result $uri already exists. Use CloneIfNecessary or check '
-          'uploader.existsAtDestination before calling clone';
-    }
+    // if (await _uploader.existsAtDestination(video)) {throw 'Upload result
+    //   $uri already exists. Use CloneIfNecessary or check '
+    //   'uploader.existsAtDestination before calling clone';
+    // }
 
     final videoDebugName =
         '${video.source.platform.id} Video ${video.source.id}';
@@ -76,14 +76,14 @@ class Cloner {
   // already-cloned video, but that would require knowing all the information
   // required to construct a Video (title, description, etc)
   Future<ServedVideo> cloneIfNecessary(Video video) async {
-    if (await _uploader.existsAtDestination(video)) {
-      final uri = _uploader.getDestinationUri(video);
-      print('Skipping "${video.title}" because it already exists at '
-          'destination: $uri');
-      return null;
-    } else {
-      return clone(video);
-    }
+    // if (await _uploader.existsAtDestination(video)) {
+    //   final uri = _uploader.getDestinationUri(video);
+    //   print('Skipping "${video.title}" because it already exists at '
+    //       'destination: $uri');
+    //   return null;
+    // } else {
+    return clone(video);
+    // }
   }
 
   // Downloads and subsequently uploads the collection's most recent video.

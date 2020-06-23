@@ -112,20 +112,21 @@ class Cloner {
   // too many simultaneous downloads/uploads.
   Stream<ServedVideo> cloneVideosAfter(
       DateTime date, SourceCollection sourceCollection) async* {
+    // Because videosAfter returns newest videos first, we must first get the
+    // list of all videos and reverse it before cloning any videos.
     var stream = _downloader.videosAfter(date, sourceCollection);
-    // if (await stream.isEmpty) {print('No videos found after $date for '
-    //   '${sourceCollection.platform.id} '
-    //   '${sourceCollection.identifierMeaning} '
-    //   '${sourceCollection.identifier}');} else {
-    await for (var video in stream) {
-      // This can be parallelized, but for simplicity's sake we're awaiting
-      // each one here
-
-      // TODO: parallelize this (a queue allowing up to x downloads to run at
-      // once). See https://pub.dev/packages/queue
-      final servedVideo = await cloneIfNecessary(video);
-      yield servedVideo;
+    final videos = await stream.toList();
+    if (videos.isEmpty) {
+      print('No videos found after $date for ${sourceCollection}');
+    } else {
+      for (var video in videos.reversed) {
+        // This can be parallelized, but for simplicity's sake we're awaiting
+        // each one here
+        // TODO: parallelize this (a queue allowing up to x downloads to run at
+        // once). See https://pub.dev/packages/queue
+        final servedVideo = await cloneIfNecessary(video);
+        yield servedVideo;
+      }
     }
-    // }
   }
 }

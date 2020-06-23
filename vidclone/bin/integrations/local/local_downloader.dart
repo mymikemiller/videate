@@ -98,4 +98,9 @@ class LocalDownloader extends Downloader {
   String getSourceUniqueId(Video video) {
     return video.source.uri.toString();
   }
+
+  @override
+  void close() {
+    // do nothing
+  }
 }

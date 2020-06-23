@@ -32,6 +32,11 @@ class MockS3Uploader extends S3Uploader {
 
   @override
   String get endpointUrl => 'http://example.com';
+
+  @override
+  void close() {
+    // do nothing
+  }
 }
 
 // This fake bucket holds on to all uploaded data in memory instead of

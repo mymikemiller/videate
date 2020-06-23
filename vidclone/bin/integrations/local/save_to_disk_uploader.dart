@@ -1,5 +1,5 @@
 import 'dart:io' as io;
-import 'package:file/file.dart';
+import 'package:file/file.dart' as file;
 import 'package:vidlib/vidlib.dart';
 import 'package:path/path.dart' as p;
 import '../../uploader.dart';
@@ -11,12 +11,13 @@ class SaveToDiskUploader extends Uploader {
 
   final io.Directory directory;
 
-  FileSystem _fileSystem;
+  file.FileSystem _fileSystem;
   @override
-  FileSystem get fileSystem => _fileSystem;
+  file.FileSystem get fileSystem => _fileSystem;
 
   SaveToDiskUploader(this.directory) {
-    _fileSystem = (directory as FileSystemEntity).fileSystem;
+    final entity = directory as file.FileSystemEntity;
+    _fileSystem = entity.fileSystem;
   }
 
   @override
@@ -41,15 +42,15 @@ class SaveToDiskUploader extends Uploader {
     // sources. Use the Video's source id in the file name to ensure we don't
     // have collisions between videos from the same source that happen to have
     // the same title.
-    return Uri.parse(p.join(
-        directory.path, id, '${video.source.id}_${video.title}.$extension'));
+    return Uri.parse(
+        p.join(directory.path, '${video.source.id}_${video.title}.$extension'));
   }
 
   // Copies the contents of 'file' into a new file at 'path' on this
   // SaveToDiskUploader's fileSystem. This function can be used to copy files
   // from a file system other than the LocalFileSystem, such as the File
   // library's MemoryFileSystem, where the file.copy() function fails.
-  File copyToFileSystem(io.File file, Uri uri) {
+  file.File copyToFileSystem(io.File file, Uri uri) {
     final newFile = fileSystem.file(uri);
     newFile.createSync(recursive: true);
 
@@ -60,5 +61,10 @@ class SaveToDiskUploader extends Uploader {
 
     newFile.writeAsBytesSync(bytes);
     return newFile;
+  }
+
+  @override
+  void close() {
+    // do nothing
   }
 }

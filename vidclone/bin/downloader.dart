@@ -18,7 +18,8 @@ abstract class Downloader {
   }
 
   // Returns a stream containing all videos in the collection that were
-  // published after the specified date (non-inclusive).
+  // published after the specified date (non-inclusive) in reverse date order
+  // (most recently released video first)
   Stream<Video> videosAfter(
       DateTime date, SourceCollection sourceCollection) async* {
     await for (var video in allVideos(sourceCollection)) {
@@ -30,11 +31,15 @@ abstract class Downloader {
     }
   }
 
-  // Returns a stream containing all videos in the collection in order of date
-  // released (most recently released video first).
+  // Returns a stream containing all videos in the collection in reverse order
+  // of date released (most recently released video first).
   Stream<Video> allVideos(SourceCollection sourceCollection);
 
   // Returns a string that is guaranteed to be unique among all videos sourced
   // from the cloner's platform
   String getSourceUniqueId(Video video);
+
+  // Perform any cleanup. This downloader should no longer be used after this
+  // is called.
+  void close();
 }

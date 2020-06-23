@@ -51,4 +51,8 @@ abstract class Uploader {
       return fileSystem.file(uri).exists();
     }
   }
+
+  // Perform any cleanup. This uploader should no longer be used after this is
+  // called.
+  void close();
 }

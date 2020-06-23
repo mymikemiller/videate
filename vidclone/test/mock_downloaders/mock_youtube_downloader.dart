@@ -23,7 +23,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   final YoutubeDownloader _delegate;
   static final mockApi = MockYoutubeApi();
 
-  MockYoutubeDownloader() : _delegate = YoutubeDownloader.fromApi(mockApi) {
+  MockYoutubeDownloader() : _delegate = YoutubeDownloader() {
     // Make sure the initial channel request will succeed
     when(mockApi.channels
             .list('contentDetails, snippet', id: 'TEST_CHANNEL_ID'))
@@ -66,9 +66,6 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       _delegate.allVideos(sourceCollection);
 
   @override
-  YoutubeApi get api => _delegate.api;
-
-  @override
   String getSourceUniqueId(Video video) => _delegate.getSourceUniqueId(video);
 
   @override
@@ -83,6 +80,11 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   Future<VideoFile> download(Video video,
           [void Function(double progress) progressCallback]) =>
       _delegate.download(video);
+
+  @override
+  void close() {
+    // do nothing
+  }
 }
 
 Future<PlaylistItemListResponse> responseWithJson(String filePath) async {

@@ -41,15 +41,13 @@ void main(List<String> arguments) async {
       .directory(p.join(videosBaseDirectory.path, downloader.platform.id)));
 
   // Save the feed to a json file
-  final demoJsonFilePath = p.join(feedsBaseDirectory.path, '$example_key.json');
+  final demoJsonFilePath =
+      p.join(feedsBaseDirectory.path, 'favorites.json'); //'$example_key.json');
   final feedManager = await JsonFileFeedManager.createOrOpen(demoJsonFilePath);
 
   // Download from YouTube and "upload" by saving to a local file
   final cloner = Cloner(downloader, uploader, feedManager);
 
-  // Game Grumps: UC9CuvdOVfMPvKCiwdGKL3cQ \
-  // Ninja Sex Party: UCs7yDP7KWrh0wd_4qbDP32g \
-  // The Daily Talk Show: UCNl_4FD4qQdZZJMzAM7LJqQ \
   final sourceCollection =
       YoutubeChannelSourceCollection(example_channel_ids[example_key]);
   // final sourceCollection = LocalSourceCollection('test/resources/videos');

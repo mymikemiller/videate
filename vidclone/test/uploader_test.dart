@@ -22,7 +22,7 @@ void main() {
   for (var uploaderTest in uploaderTests) {
     group('${uploaderTest.uploader.id} uploader', () {
       test('uploads', () async {
-        final file = File('test/resources/videos/six_second_video.mp4');
+        final file = File('test/resources/videos/video_1.mp4');
 
         final videoFile = VideoFile(Examples.video1, file);
 

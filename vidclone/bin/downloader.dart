@@ -35,29 +35,31 @@ abstract class Downloader {
     var slidingWindow = <Video>[];
     Video previouslyYielded;
 
-    final isBefore = (Video a, Video b) {
+    // Essentially this acts like "is after", 1=yes, -1=no, 0=same
+    final dateComparator = (Video a, Video b) {
+      // Sort first on releaseDate...
       var cmp = a.source.releaseDate.compareTo(b.source.releaseDate);
       if (cmp == 0) {
-        // When dates match, secondarily yield in order of uri path
-        return a.source.uri.path.compareTo(b.source.uri.path) < 0;
+        // When dates match, secondarily sort by uri path
+        return a.source.uri.path.compareTo(b.source.uri.path);
       }
-
-      return cmp < 0;
+      return cmp;
     };
 
     // Do the best to ensure the videos are returned in the order expected
     await for (var video in allVideos(sourceCollection)) {
-      // We want the videos in slidingWindow to be in reverse date order (they
+      // We want the videos in slidingWindow to be in reverse date order. They
       // generally are returned by the YouTube API in this order (and assumably
       // ALWAYS in this order by YoutubeExplode), but often videos may come
-      // back slightly out of order (with the Youtube API (they're returned in
+      // back slightly out of order (with the Youtube API they're returned in
       // upload order not publish order), so find the first video in the window
       // that has a date older than this video and add this video right before
       // it (otherwise add this video at the end if we don't find any out of
       // order videos)
-      var i;
-      for (i = 0; i < slidingWindow.length; i++) {
-        if (isBefore(slidingWindow[i], video)) break;
+      var i = 0;
+      while (i < slidingWindow.length &&
+          dateComparator(video, slidingWindow[i]) < 0) {
+        i++;
       }
 
       slidingWindow.insert(i, video);
@@ -65,10 +67,11 @@ abstract class Downloader {
       if (slidingWindow.length > slidingWindowSize) {
         // Yield the most recent video from the sliding window
         final toYield = slidingWindow.removeAt(0);
-        // Assert that we're always yielding in reverse date order. If not,
-        // slidingWindowSize may need to be increased for this [Downloader]
+        // Assert that we're always yielding in reverse date order. If we ever
+        // fail this assertion, slidingWindowSize may need to be increased for
+        // this [Downloader]
         if (previouslyYielded != null) {
-          assert(isBefore(toYield, previouslyYielded));
+          assert(dateComparator(previouslyYielded, toYield) > 0);
         }
         previouslyYielded = toYield;
         yield toYield;
@@ -80,7 +83,7 @@ abstract class Downloader {
       if (previouslyYielded != null) {
         // Assert that we're always yielding in reverse date order. If not,
         // slidingWindowSize may need to be increased for this [Downloader]
-        assert(isBefore(video, previouslyYielded));
+        assert(dateComparator(video, previouslyYielded) <= 0);
       }
       previouslyYielded = video;
       yield video;

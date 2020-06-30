@@ -14,12 +14,14 @@ import 'package:collection/collection.dart';
 
 bool allVideosAreInOrder(List<Video> videos) {
   final sortedVideos = List.from(videos).cast<Video>();
+
   sortedVideos.sort((Video a, Video b) {
-    var cmp = a.source.releaseDate.compareTo(b.source.releaseDate);
-    if (cmp != 0) return cmp;
-    // Secondarily sort on the uri path when dates match, which should
-    // match what the downloader does.
-    return a.source.uri.path.compareTo(b.source.uri.path);
+    var cmp = b.source.releaseDate.compareTo(a.source.releaseDate);
+    if (cmp == 0) {
+      // When dates match, secondarily sort by uri path
+      return b.source.uri.path.compareTo(a.source.uri.path);
+    }
+    return cmp;
   });
 
   return ListEquality().equals(videos.toList(), sortedVideos.toList());
@@ -126,20 +128,23 @@ void main() async {
       });
 
       test('gets most recent video', () async {
-        final result = await downloaderTest.downloader
+        final mostRecentExpected = await downloaderTest.downloader
+            .allVideos(downloaderTest.sourceCollection)
+            .reduce((previous, element) =>
+                previous.source.releaseDate.isAfter(element.source.releaseDate)
+                    ? previous
+                    : element);
+
+        // Reset the downloader so we can use the stream. This avoids "Stream
+        // has already been listened to" error on the next line. There's
+        // probably a better way to handle this...
+        // https://github.com/Hexer10/youtube_explode_dart/issues/48
+        downloaderTests = generateDownloaderTests();
+
+        final mostRecent = await downloaderTest.downloader
             .mostRecentVideo(downloaderTest.sourceCollection);
 
-        // Verify that we didn't receive any videos outside the expected date range
-        // expect(allVideosAreAfter(result, downloaderTest.videosAfterDate),
-        // true);
-
-        // final serializableResult = BuiltList<Video>(result);
-
-        // final expectedResultFile = await
-        //     File('test/resources/${downloaderTest.downloader.platform.id}/videos_after_expected.json');
-
-        // await TestUtilities.testJsonSerialization(serializableResult,
-        //     expectedResultFile);
+        expect(mostRecent, mostRecentExpected);
       });
 
       test('gets only videos uploaded after specified date', () async {

@@ -88,8 +88,8 @@ class TestUtilities {
     expect(deserialized, object);
   }
 
-  static Future<void> testListSerialization(
-          BuiltList list, File expectedJson) =>
+  static Future<void> testListSerialization<T>(
+          BuiltList<T> list, File expectedJson) =>
       _testSerialization(list, expectedJson);
 
   // Note that to support automatic deserialization of lists no matter where they

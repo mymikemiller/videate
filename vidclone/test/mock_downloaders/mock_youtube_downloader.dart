@@ -52,16 +52,6 @@ class MockYoutubeDownloader implements YoutubeDownloader {
 
     final mockVideoStream = Stream.fromIterable([
       yt_explode.Video(
-          yt_explode.VideoId('11234567890'),
-          'Title 1',
-          'Author 1`',
-          DateTime.parse('2020-01-01 09:37:16.000'),
-          'Description 1',
-          Duration(minutes: 1, seconds: 11),
-          yt_explode.ThumbnailSet('11234567890'),
-          [],
-          yt_explode.Engagement(95128, 12708, 25)),
-      yt_explode.Video(
           yt_explode.VideoId('21234567890'),
           'Title 3',
           'Author 3`',
@@ -78,6 +68,16 @@ class MockYoutubeDownloader implements YoutubeDownloader {
           DateTime.parse('2020-01-02 09:37:16.000'),
           'Description 2',
           Duration(minutes: 2, seconds: 22),
+          yt_explode.ThumbnailSet('11234567890'),
+          [],
+          yt_explode.Engagement(95128, 12708, 25)),
+      yt_explode.Video(
+          yt_explode.VideoId('11234567890'),
+          'Title 1',
+          'Author 1`',
+          DateTime.parse('2020-01-01 09:37:16.000'),
+          'Description 1',
+          Duration(minutes: 1, seconds: 11),
           yt_explode.ThumbnailSet('11234567890'),
           [],
           yt_explode.Engagement(95128, 12708, 25)),

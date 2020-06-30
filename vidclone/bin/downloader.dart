@@ -30,7 +30,7 @@ abstract class Downloader {
   // Returns a stream that does its best to yield all videos in the collection
   // in reverse order of date released (most recently released video first).
   // The [slidingWindowSize] property of this Downloader can be used to
-  // increase the size of the sliding window used to ensure order.
+  // increase the size of the sliding window used to better ensure order.
   Stream<Video> allVideosInOrder(SourceCollection sourceCollection) async* {
     var slidingWindow = <Video>[];
     Video previouslyYielded;
@@ -45,18 +45,19 @@ abstract class Downloader {
       return cmp < 0;
     };
 
-    // Do the best to ensure the videos are returned in order of date released
+    // Do the best to ensure the videos are returned in the order expected
     await for (var video in allVideos(sourceCollection)) {
       // We want the videos in slidingWindow to be in reverse date order (they
-      // generally are returned by the YouTube API in this order, but often
-      // videos may come back slightly out of order like what happens when
-      // using the youtube API (they're returned in upload order not publish
-      // order), so find the first video that has a date older than this video
-      // and add this video right before it (otherwise add this video at the
-      // end if we don't find any out of order videos)
+      // generally are returned by the YouTube API in this order (and assumably
+      // ALWAYS in this order by YoutubeExplode), but often videos may come
+      // back slightly out of order (with the Youtube API (they're returned in
+      // upload order not publish order), so find the first video in the window
+      // that has a date older than this video and add this video right before
+      // it (otherwise add this video at the end if we don't find any out of
+      // order videos)
       var i;
       for (i = 0; i < slidingWindow.length; i++) {
-        if (isBefore(video, slidingWindow[i])) break;
+        if (isBefore(slidingWindow[i], video)) break;
       }
 
       slidingWindow.insert(i, video);
@@ -67,7 +68,7 @@ abstract class Downloader {
         // Assert that we're always yielding in reverse date order. If not,
         // slidingWindowSize may need to be increased for this [Downloader]
         if (previouslyYielded != null) {
-          assert(isBefore(previouslyYielded, toYield));
+          assert(isBefore(toYield, previouslyYielded));
         }
         previouslyYielded = toYield;
         yield toYield;
@@ -77,7 +78,9 @@ abstract class Downloader {
     // Yield the remaining items in the window
     for (var video in slidingWindow) {
       if (previouslyYielded != null) {
-        assert(isBefore(previouslyYielded, video));
+        // Assert that we're always yielding in reverse date order. If not,
+        // slidingWindowSize may need to be increased for this [Downloader]
+        assert(isBefore(video, previouslyYielded));
       }
       previouslyYielded = video;
       yield video;

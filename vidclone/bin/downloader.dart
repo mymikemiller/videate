@@ -23,27 +23,8 @@ abstract class Downloader {
   Future<VideoFile> download(Video video,
       [void Function(double progress) callback]);
 
-  // Returns the most recently released video in the collection.
-  Future<Video> mostRecentVideo(SourceCollection sourceCollection) async {
-    return allVideos(sourceCollection).first;
-  }
-
-  // Returns a stream containing all videos in the collection that were
-  // published after the specified date (non-inclusive) in reverse date order
-  // (most recently released video first)
-  Stream<Video> videosAfter(
-      DateTime date, SourceCollection sourceCollection) async* {
-    await for (var video in allVideosInOrder(sourceCollection)) {
-      // Stop at the first video that is too old
-      if (!video.source.releaseDate.isAfter(date)) {
-        return;
-      }
-      yield video;
-    }
-  }
-
   // Returns a stream containing all videos in the collection. The order of
-  // [Videos] is not guaranteed.
+  // [Videos] is not guaranteed, but returning them in
   Stream<Video> allVideos(SourceCollection sourceCollection);
 
   // Returns a stream that does its best to yield all videos in the collection
@@ -99,6 +80,25 @@ abstract class Downloader {
         assert(isBefore(previouslyYielded, video));
       }
       previouslyYielded = video;
+      yield video;
+    }
+  }
+
+  // Returns the most recently released video in the collection.
+  Future<Video> mostRecentVideo(SourceCollection sourceCollection) async {
+    return allVideosInOrder(sourceCollection).first;
+  }
+
+  // Returns a stream containing all videos in the collection that were
+  // published after the specified date (non-inclusive) in reverse date order
+  // (most recently released video first)
+  Stream<Video> videosAfter(
+      DateTime date, SourceCollection sourceCollection) async* {
+    await for (var video in allVideosInOrder(sourceCollection)) {
+      // Stop at the first video that is too old
+      if (!video.source.releaseDate.isAfter(date)) {
+        return;
+      }
       yield video;
     }
   }

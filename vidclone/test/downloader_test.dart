@@ -125,6 +125,23 @@ void main() async {
             serializableResult, expectedResultFile);
       });
 
+      test('gets most recent video', () async {
+        final result = await downloaderTest.downloader
+            .mostRecentVideo(downloaderTest.sourceCollection);
+
+        // Verify that we didn't receive any videos outside the expected date range
+        // expect(allVideosAreAfter(result, downloaderTest.videosAfterDate),
+        // true);
+
+        // final serializableResult = BuiltList<Video>(result);
+
+        // final expectedResultFile = await
+        //     File('test/resources/${downloaderTest.downloader.platform.id}/videos_after_expected.json');
+
+        // await TestUtilities.testJsonSerialization(serializableResult,
+        //     expectedResultFile);
+      });
+
       test('gets only videos uploaded after specified date', () async {
         final result = await downloaderTest.downloader
             .videosAfter(

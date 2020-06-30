@@ -24,7 +24,9 @@ abstract class Downloader {
       [void Function(double progress) callback]);
 
   // Returns a stream containing all videos in the collection. The order of
-  // [Videos] is not guaranteed, but returning them in
+  // [Videos] is not guaranteed, but because allVideosInOrder uses this
+  // function, [Downloader]s should aim to return them in as close to reverse
+  // chronological order as possible so the slidingWindowSize can remain small.
   Stream<Video> allVideos(SourceCollection sourceCollection);
 
   // Returns a stream that does its best to yield all videos in the collection

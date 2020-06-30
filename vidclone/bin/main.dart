@@ -22,7 +22,7 @@ void main(List<String> arguments) async {
   // Load environment variables from local .env file
   load();
 
-  // print('');
+  print('');
 
   final internetArchiveAccessKey =
       getEnvVar('INTERNET_ARCHIVE_ACCESS_KEY', env);

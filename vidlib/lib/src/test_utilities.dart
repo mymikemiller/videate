@@ -86,6 +86,13 @@ class TestUtilities {
 
     // Test deserialization
     final deserialized = jsonSerializers.deserialize(serialized);
+    print('deserialized == object: ' + (deserialized == object).toString());
+    if (object.runtimeType.toString().contains('BuiltList')) {
+      final objectList = object as BuiltList;
+      final deserializedList = object as BuiltList;
+      print('deserialized[0] == object[0]: ' +
+          (deserializedList[0] == objectList[0]).toString());
+    }
     expect(deserialized, object);
   }
 

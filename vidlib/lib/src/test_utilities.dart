@@ -68,6 +68,27 @@ class TestUtilities {
         rethrow;
       }
 
+      if ((deserializedExpectedResult as BuiltList).isNotEmpty &&
+          (encodableObject as BuiltList).isNotEmpty) {
+        final other = deserializedExpectedResult[0];
+        final video = (encodableObject as BuiltList)[0];
+
+        print(
+            'identical(other, this): ' + (identical(other, video)).toString());
+        print('other is Video: ' + (other is Video).toString());
+        print('title == other.title: ' +
+            (other is Video && video.title == other.title).toString());
+        print('description == other.description: ' +
+            (other is Video && video.description == other.description)
+                .toString());
+        print('source == other.source: ' +
+            (other is Video && video.source == other.source).toString());
+        print('creators == other.creators: ' +
+            (other is Video && video.creators == other.creators).toString());
+        print('duration == other.duration: ' +
+            (other is Video && video.duration == other.duration).toString());
+      }
+
       // If this line fails for *expected* reasons, try toggling
       // TestUtilities.autofix to modify the expected results file.
       print('encodableObject == deserializedExpectedResult: ' +

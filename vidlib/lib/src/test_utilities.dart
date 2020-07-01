@@ -73,6 +73,9 @@ class TestUtilities {
         final other = deserializedExpectedResult[0];
         final video = (encodableObject as BuiltList)[0];
 
+        print('video.source: ' + (video.source).toString());
+        print('other.source: ' + (other.source).toString());
+
         print(
             'identical(other, this): ' + (identical(other, video)).toString());
         print('other is Video: ' + (other is Video).toString());

@@ -48,6 +48,7 @@ class TestUtilities {
 
   static Future<void> testJsonSerialization(
       Object encodableObject, File expectedJson) async {
+    print('testJsonSerialization');
     final serialized = jsonSerializers.serialize(encodableObject);
     final encoded = json.encode(serialized);
     if (autofix && _needsFixing(encoded, expectedJson)) {
@@ -69,6 +70,8 @@ class TestUtilities {
 
       // If this line fails for *expected* reasons, try toggling
       // TestUtilities.autofix to modify the expected results file.
+      print('encodableObject == deserializedExpectedResult: ' +
+          (encodableObject == deserializedExpectedResult).toString());
       expect(encodableObject, deserializedExpectedResult, reason: _autofixHint);
     }
   }
@@ -77,7 +80,9 @@ class TestUtilities {
       Object object, File expectedJson) async {
     print('_testSerialization');
     // Test serialization
+    print('calling testJsonSerialization');
     await TestUtilities.testJsonSerialization(object, expectedJson);
+    print('testJsonSerialization done');
 
     // Test encoding/decoding serialized object to/from a string
     final serialized = jsonSerializers.serialize(object);

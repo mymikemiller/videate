@@ -75,6 +75,7 @@ class TestUtilities {
 
   static Future<void> _testSerialization(
       Object object, File expectedJson) async {
+    print('_testSerialization');
     // Test serialization
     await TestUtilities.testJsonSerialization(object, expectedJson);
 
@@ -82,7 +83,9 @@ class TestUtilities {
     final serialized = jsonSerializers.serialize(object);
     final encoded = json.encode(serialized);
     final decoded = json.decode(encoded);
+    print('expect(decoded, serialized)');
     expect(decoded, serialized);
+    print('expect(decoded, serialized) done');
 
     // Test deserialization
     final deserialized = jsonSerializers.deserialize(serialized);
@@ -93,7 +96,9 @@ class TestUtilities {
       print('deserialized[0] == object[0]: ' +
           (deserializedList[0] == objectList[0]).toString());
     }
+    print('expect(deserialized, object)');
     expect(deserialized, object);
+    print('expect(deserialized, object done)');
   }
 
   static Future<void> testListSerialization(

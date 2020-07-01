@@ -11,16 +11,23 @@ import 'local_source_collection.dart';
 // Doesn't actually download anything, instead constructs Video objects based
 // on files in a folder.
 class LocalDownloader extends Downloader {
-  @override
-  Platform get platform => Platform(
+  static Platform getPlatform() => Platform(
         (p) => p
           ..id = 'local'
           ..uri = Uri(path: '/'),
       );
 
+  @override
+  Platform get platform => getPlatform();
+
+  // An arbitrarily large slidingWindowSize will ensure we return [Video]s in a
+  // predictable order
+  @override
+  int get slidingWindowSize => 99999;
+
   final dynamic ffprobeRunner;
 
-  LocalDownloader({this.ffprobeRunner = Process.run});
+  LocalDownloader({this.ffprobeRunner = Process.run}) : super();
 
   // collectionIdentifier is unused for this Downloader
   @override
@@ -31,22 +38,21 @@ class LocalDownloader extends Downloader {
     final files =
         Directory(sourceCollection.identifier).listSync(recursive: false);
 
-    // Order by date modified so if new videos are added, they'll appear at the
-    // top of the list. Secondarily sort by path for consistency when dates
-    // match.
+    // Sort by path for consistency, since we don't know the release date for
+    // local files
     files.sort((FileSystemEntity a, FileSystemEntity b) {
       // Note: We tried sorting first by date modified and secondarily by path,
       // but this caused files to be returned in different order on different
       // machines even if all the files in the folder were the same (e.g. on
       // the CI server, where the modified date doesn't match that of the
-      // original file). So instead we use sort by path, which should be a
-      // consistent order across machines, even if the absolute paths differ
-      // since everything shoudld be in the same folder. Uncomment the below
-      // lines to add back in the sort-by-date-then-by-path logic.
+      // original file). So instead we sort by path, which will be a consistent
+      // order across machines, even if the absolute paths differ since
+      // everything shoudld be in the same folder. Uncomment the below lines to
+      // add back in the sort-by-date-then-by-path logic.
       //
       // var cmp = b.statSync().modified.compareTo(a.statSync().modified); if
       // (cmp != 0) return cmp;
-      return b.path.compareTo(a.path);
+      return a.path.compareTo(b.path);
     });
 
     for (var file in files) {
@@ -97,5 +103,10 @@ class LocalDownloader extends Downloader {
   @override
   String getSourceUniqueId(Video video) {
     return video.source.uri.toString();
+  }
+
+  @override
+  void close() {
+    // do nothing
   }
 }

@@ -22,9 +22,10 @@ final Serializers standardSerializers = (_$standardSerializers.toBuilder()
       // Serialize durations in a human-readable format (h:mm:ss.ssssss) instead of millisconds
       ..add(DurationSerializer()))
     .build();
-final Serializers jsonSerializers = (standardSerializers.toBuilder()..addPlugin(
-    // Serialize as json for easy readability
-    StandardJsonPlugin())).build();
+final Serializers jsonSerializers = (standardSerializers.toBuilder()
+      // Serialize as json for easy readability
+      ..addPlugin(StandardJsonPlugin()))
+    .build();
 
 T standardDeserialize<T>(dynamic value) => standardSerializers
     .deserializeWith<T>(standardSerializers.serializerForType(T), value);

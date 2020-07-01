@@ -7,7 +7,7 @@ environment:
   sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
-  built_value: ^7.0.9
+  built_value: ^7.1.0
   duration: ^2.0.11
   xml: ^3.7.0
 

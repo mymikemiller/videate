@@ -1,0 +1,53 @@
+{
+    "$": "list",
+    "": [
+        {
+            "$": "Video",
+            "title": "Title 3",
+            "description": "Description 3",
+            "source": {
+                "platform": {
+                    "uri": "https://www.youtube.com",
+                    "id": "youtube"
+                },
+                "uri": "https://www.youtube.com/watch?v=33333333333",
+                "id": "33333333333",
+                "releaseDate": "2020-01-03T03:33:00.000Z"
+            },
+            "creators": [],
+            "duration": "0:03:33.000000"
+        },
+        {
+            "$": "Video",
+            "title": "Title 2",
+            "description": "Description 2",
+            "source": {
+                "platform": {
+                    "uri": "https://www.youtube.com",
+                    "id": "youtube"
+                },
+                "uri": "https://www.youtube.com/watch?v=22222222222",
+                "id": "22222222222",
+                "releaseDate": "2020-01-02T02:22:00.000Z"
+            },
+            "creators": [],
+            "duration": "0:02:22.000000"
+        },
+        {
+            "$": "Video",
+            "title": "Title 1",
+            "description": "Description 1",
+            "source": {
+                "platform": {
+                    "uri": "https://www.youtube.com",
+                    "id": "youtube"
+                },
+                "uri": "https://www.youtube.com/watch?v=11111111111",
+                "id": "11111111111",
+                "releaseDate": "2020-01-01T01:11:00.000Z"
+            },
+            "creators": [],
+            "duration": "0:01:11.000000"
+        }
+    ]
+}

@@ -17,7 +17,7 @@ class TestUtilities {
   static bool get autofix => false;
 
   static const _autofixHint = 'If the results of this run are correct, enable '
-      'TestUtils.autofix and run the test again and update all expected files '
+      'TestUtils.autofix and run the test again to update all expected files '
       'with the results of that run.';
 
   static final String Function(xml.XmlDocument) _formatXml =
@@ -67,7 +67,7 @@ class TestUtilities {
       }
 
       // If this line fails for *expected* reasons, try toggling
-      // TestUtilities.autofix to modify the expected results.
+      // TestUtilities.autofix to modify the expected results file.
       expect(encodableObject, deserializedExpectedResult, reason: _autofixHint);
     }
   }

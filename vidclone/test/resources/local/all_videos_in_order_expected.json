@@ -3,15 +3,15 @@
     "": [
         {
             "$": "Video",
-            "title": "six_second_video_3",
-            "description": "six_second_video_3.mp4",
+            "title": "video_3",
+            "description": "video_3.mp4",
             "source": {
                 "platform": {
                     "uri": "/",
                     "id": "local"
                 },
-                "uri": "test/resources/videos/six_second_video_3.mp4",
-                "id": "six_second_video_3",
+                "uri": "test/resources/videos/video_3.mp4",
+                "id": "video_3",
                 "releaseDate": "1970-01-01T00:00:00.000Z"
             },
             "creators": [
@@ -21,15 +21,15 @@
         },
         {
             "$": "Video",
-            "title": "six_second_video",
-            "description": "six_second_video.mp4",
+            "title": "video_2",
+            "description": "video_2.mp4",
             "source": {
                 "platform": {
                     "uri": "/",
                     "id": "local"
                 },
-                "uri": "test/resources/videos/six_second_video.mp4",
-                "id": "six_second_video",
+                "uri": "test/resources/videos/video_2.mp4",
+                "id": "video_2",
                 "releaseDate": "1970-01-01T00:00:00.000Z"
             },
             "creators": [
@@ -39,21 +39,21 @@
         },
         {
             "$": "Video",
-            "title": "nine_second_video",
-            "description": "nine_second_video.mp4",
+            "title": "video_1",
+            "description": "video_1.mp4",
             "source": {
                 "platform": {
                     "uri": "/",
                     "id": "local"
                 },
-                "uri": "test/resources/videos/nine_second_video.mp4",
-                "id": "nine_second_video",
+                "uri": "test/resources/videos/video_1.mp4",
+                "id": "video_1",
                 "releaseDate": "1970-01-01T00:00:00.000Z"
             },
             "creators": [
                 "Mike Miller"
             ],
-            "duration": "0:00:09.038000"
+            "duration": "0:00:06.038000"
         }
     ]
 }

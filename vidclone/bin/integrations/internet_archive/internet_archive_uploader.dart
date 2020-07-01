@@ -20,4 +20,9 @@ class InternetArchiveUploader extends S3Uploader {
 
   @override
   String get authorizationHeader => 'LOW $accessKey:$secretKey';
+
+  @override
+  void close() {
+    // do nothing
+  }
 }

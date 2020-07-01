@@ -1,6 +1,9 @@
 // Contains all the metadata associated with a source
+import 'dart:convert';
+
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
+import 'package:vidlib/vidlib.dart';
 import 'platform.dart';
 part 'source.g.dart';
 
@@ -40,6 +43,8 @@ abstract class Source implements Built<Source, SourceBuilder> {
   // Used only for debug purposes
   @override
   String toString() {
-    return uri.toString();
+    final serialized = jsonSerializers.serialize(this);
+    final encoded = json.encode(serialized);
+    return encoded;
   }
 }

@@ -3,22 +3,28 @@ import 'package:built_collection/built_collection.dart';
 
 // Contains some static Video objects that can be used for testing purposes
 class Examples {
+  static Platform get platform => Platform(
+        (p) => p
+          ..id = 'example'
+          ..uri = Uri.parse('https://example.com'),
+      );
+
+  static Source get source => Source((s) => s
+    ..platform = platform.toBuilder()
+    ..releaseDate = DateTime.fromMillisecondsSinceEpoch(0).toUtc()
+    ..id = 'aaa111'
+    ..uri = Uri.parse('https://www.example.com/aaa111'));
+
   static Video get video1 => Video(
         (v) => v
           ..title = 'Video 1'
           ..description = 'Description 1'
           ..duration = Duration(minutes: 1)
-          ..source = Source(
-            (s) => s
-              ..platform = Platform(
-                (p) => p
-                  ..id = 'example'
-                  ..uri = Uri.parse('https://example.com'),
-              ).toBuilder()
-              ..releaseDate = DateTime.fromMillisecondsSinceEpoch(0).toUtc()
-              ..id = 'aaa111'
-              ..uri = Uri.parse('https://www.example.com/aaa111'),
-          ).toBuilder(),
+          ..source = source
+              .rebuild((s) => s
+                ..id = 'aaa111'
+                ..uri = Uri.parse('https://www.example.com/aaa111'))
+              .toBuilder(),
       );
 
   static Video get video2 => Video(
@@ -26,17 +32,11 @@ class Examples {
           ..title = 'Video 2'
           ..description = 'Description 2'
           ..duration = Duration(minutes: 2)
-          ..source = Source(
-            (s) => s
-              ..platform = Platform(
-                (p) => p
-                  ..id = 'example'
-                  ..uri = Uri.parse('https://example.com'),
-              ).toBuilder()
-              ..releaseDate = DateTime.fromMillisecondsSinceEpoch(0).toUtc()
-              ..id = 'bbb222'
-              ..uri = Uri.parse('https://www.example.com/bbb222'),
-          ).toBuilder(),
+          ..source = source
+              .rebuild((s) => s
+                ..id = 'bbb222'
+                ..uri = Uri.parse('https://www.example.com/bbb222'))
+              .toBuilder(),
       );
 
   static Video get video3 => Video(
@@ -44,17 +44,11 @@ class Examples {
           ..title = 'Video 3'
           ..description = 'Description 3'
           ..duration = Duration(minutes: 3)
-          ..source = Source(
-            (s) => s
-              ..platform = Platform(
-                (p) => p
-                  ..id = 'example'
-                  ..uri = Uri.parse('https://example.com'),
-              ).toBuilder()
-              ..releaseDate = DateTime.fromMillisecondsSinceEpoch(0).toUtc()
-              ..id = 'ccc333'
-              ..uri = Uri.parse('https://www.example.com/ccc333'),
-          ).toBuilder(),
+          ..source = source
+              .rebuild((s) => s
+                ..id = 'ccc333'
+                ..uri = Uri.parse('https://www.example.com/ccc333'))
+              .toBuilder(),
       );
 
   static ServedVideo get servedVideo1 => ServedVideo((b) => b

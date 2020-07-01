@@ -34,12 +34,9 @@ abstract class Uploader {
       // Assume the video has been uploaded already if we get a 200 response at
       // the destination
       final response = await httpGet(uri);
-      if (response.statusCode != 200) {
-        print('Video does not exist at destination ${uri}. This is expected if'
-            ' the file was recently uploaded and is still processing at the '
-            'destination; it may be a moment before the file is available at '
-            'the destination.');
-      }
+
+      // Note that a recently uploaded file may not return a 200 until the file
+      // finishes processing at the destination
       return response.statusCode == 200;
     } else {
       if (fileSystem == null) {
@@ -51,4 +48,8 @@ abstract class Uploader {
       return fileSystem.file(uri).exists();
     }
   }
+
+  // Perform any cleanup. This uploader should no longer be used after this is
+  // called.
+  void close();
 }

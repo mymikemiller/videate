@@ -1,8 +1,10 @@
+import 'package:mockito/mockito.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
+import 'package:youtube_explode_dart/src/videos/streams/streams_client.dart';
+
 import 'dart:convert';
 import 'dart:io';
-import 'package:googleapis/youtube/v3.dart' hide Video;
 import 'package:mockito/mockito.dart';
-import 'package:vidlib/src/models/video.dart';
 import 'package:vidlib/vidlib.dart';
 import '../../bin/integrations/youtube/youtube_downloader.dart';
 import '../../bin/source_collection.dart';
@@ -10,8 +12,8 @@ import '../../bin/source_collection.dart';
 // MockYoutubeDownloader implements, not extends, YoutubeDownloader because
 // YoutubeDownloader's only constructors are factory constructors which can't
 // be extended. So we implement it instead and send all calls to a delegate we
-// create which uses an API we can mock.
-// See https://stackoverflow.com/questions/18564676/extending-a-class-with-only-one-factory-constructor
+// create which uses an API we can mock. See
+// https://stackoverflow.com/questions/18564676/extending-a-class-with-only-one-factory-constructor
 class MockYoutubeDownloader implements YoutubeDownloader {
   @override
   Platform get platform => Platform(
@@ -21,44 +23,85 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       );
 
   final YoutubeDownloader _delegate;
-  static final mockApi = MockYoutubeApi();
+  static final _mockYoutubeExplode = MockYoutubeExplode();
 
-  MockYoutubeDownloader() : _delegate = YoutubeDownloader.fromApi(mockApi) {
-    // Make sure the initial channel request will succeed
-    when(mockApi.channels
-            .list('contentDetails, snippet', id: 'TEST_CHANNEL_ID'))
-        .thenAnswer((_) => Future.value(FakeChannelListResponse()));
+  // The file that will be "downloaded"
+  final File file;
 
-    // Mock the three API requests required to return all the test data.
-    // The data has been modified so that the third request has null as
-    // nextPage, which implies it's the last page.
-    when(mockApi.playlistItems.list(
-      'contentDetails, snippet',
-      playlistId: 'TEST_UPLOADS_PLAYLIST_ID',
-      pageToken: '',
-      maxResults: 50,
-    )).thenAnswer((_) async {
-      return responseWithJson(
-          'test/resources/youtube/playlist_items_list_response_1.json');
-    });
-    when(mockApi.playlistItems.list(
-      'contentDetails, snippet',
-      playlistId: 'TEST_UPLOADS_PLAYLIST_ID',
-      pageToken: 'CDIQAA',
-      maxResults: 50,
-    )).thenAnswer((_) async {
-      return responseWithJson(
-          'test/resources/youtube/playlist_items_list_response_2.json');
-    });
-    when(mockApi.playlistItems.list(
-      'contentDetails, snippet',
-      playlistId: 'TEST_UPLOADS_PLAYLIST_ID',
-      pageToken: 'CGQQAA',
-      maxResults: 50,
-    )).thenAnswer((_) async {
-      return responseWithJson(
-          'test/resources/youtube/playlist_items_list_response_3.json');
-    });
+  MockYoutubeDownloader(this.file)
+      : _delegate = YoutubeDownloader(_mockYoutubeExplode) {
+    final yt_explode.StreamManifest mockStreamManifest = MockStreamManifest();
+    final yt_explode.StreamsClient mockStreamsClient = MockStreamsClient();
+    final yt_explode.ChannelClient mockChannelClient = MockChannelClient();
+    when(mockStreamsClient.getManifest('abc12345678'))
+        .thenAnswer((realInvocation) => Future.value(mockStreamManifest));
+
+    final mockStreamInfo = yt_explode.MuxedStreamInfo(
+        18,
+        Uri.parse(
+            'https://r4---sn-bvvbax4pcxg-naje.googlevideo.com/videoplayback?expire=1593062474&ei=6t_zXu7OJ5mHkgagxp_4BQ&ip=2605%3Aa601%3Aa9b3%3Af900%3A7c9e%3A2092%3A2934%3A8bd9&id=o-AIDNpzWbjS0BJtVrHOU-dOdheDdhWDlDT3CDAD77NZEZ&itag=18&source=youtube&requiressl=yes&mh=ee&mm=31%2C29&mn=sn-bvvbax4pcxg-naje%2Csn-vgqskned&ms=au%2Crdu&mv=m&mvi=3&pl=42&initcwndbps=1463750&vprv=1&mime=video%2Fmp4&gir=yes&clen=6513153&ratebypass=yes&dur=85.542&lmt=1573895279325191&mt=1593040836&fvip=4&c=WEB&txp=5531432&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&sig=AOq0QJ8wRQIgIC2xPHSeTb9gu9EPpbkOV9eH8dIfFarXEF7obiKv_mMCIQD9n5qLVBa6hzVJfLBd66deMS7gDw60IbJ8aN2i7y4uQw%3D%3D&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgIo2Oq8fk3bbzfB9FbtIpFTNDaLxEbGs5qaIJhjW5Pb8CIQC0t2RjdE1U0PxcWPwCOnI6DBVwjKEO9Q3Zx1XxOU4iTA%3D%3D'),
+        yt_explode.Container.mp4,
+        yt_explode.FileSize(6211426),
+        yt_explode.Bitrate(595238),
+        'mp4a.40.2',
+        'avc1.42001e',
+        '360p',
+        yt_explode.VideoQuality.medium360,
+        yt_explode.VideoResolution(640, 360),
+        yt_explode.Framerate(30));
+
+    final mockVideoStream = Stream.fromIterable([
+      yt_explode.Video(
+          yt_explode.VideoId('33333333333'),
+          'Title 3',
+          'Author 3`',
+          yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+          DateTime.parse('2020-01-03 03:33:00.000Z'),
+          'Description 3',
+          Duration(minutes: 3, seconds: 33),
+          yt_explode.ThumbnailSet('33333333333'),
+          [],
+          yt_explode.Engagement(95128, 12708, 25)),
+      yt_explode.Video(
+          yt_explode.VideoId('22222222222'),
+          'Title 2',
+          'Author 2`',
+          yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+          DateTime.parse('2020-01-02 02:22:00.000Z'),
+          'Description 2',
+          Duration(minutes: 2, seconds: 22),
+          yt_explode.ThumbnailSet('22222222222'),
+          [],
+          yt_explode.Engagement(95128, 12708, 25)),
+      yt_explode.Video(
+          yt_explode.VideoId('11111111111'),
+          'Title 1',
+          'Author 1`',
+          yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+          DateTime.parse('2020-01-01 01:11:00.000Z'),
+          'Description 1',
+          Duration(minutes: 1, seconds: 11),
+          yt_explode.ThumbnailSet('11111111111'),
+          [],
+          yt_explode.Engagement(95128, 12708, 25)),
+    ]);
+
+    when(mockStreamManifest.muxed).thenReturn([mockStreamInfo]);
+
+    final yt_explode.VideoClient mockVideoClient = MockVideoClient();
+    when(_mockYoutubeExplode.videos).thenReturn(mockVideoClient);
+
+    when(mockVideoClient.streamsClient).thenReturn(mockStreamsClient);
+
+    when(_mockYoutubeExplode.channels).thenReturn(mockChannelClient);
+
+    when(mockStreamsClient.get(mockStreamInfo))
+        .thenAnswer((realInvocation) => file.openRead());
+
+    when(mockChannelClient
+            .getUploads(yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ')))
+        .thenAnswer((realInvocation) =>
+            mockVideoStream); // This should maybe regenerate the stream every time
   }
 
   @override
@@ -66,7 +109,8 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       _delegate.allVideos(sourceCollection);
 
   @override
-  YoutubeApi get api => _delegate.api;
+  Stream<Video> allVideosInOrder(SourceCollection sourceCollection) =>
+      _delegate.allVideosInOrder(sourceCollection);
 
   @override
   String getSourceUniqueId(Video video) => _delegate.getSourceUniqueId(video);
@@ -83,76 +127,25 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   Future<VideoFile> download(Video video,
           [void Function(double progress) progressCallback]) =>
       _delegate.download(video);
-}
-
-Future<PlaylistItemListResponse> responseWithJson(String filePath) async {
-  final testResonseJsonFile = await File(filePath);
-  final testResponseJson =
-      json.decode(await testResonseJsonFile.readAsString());
-  return PlaylistItemListResponse.fromJson(testResponseJson);
-}
-
-class MockYoutubeApi extends Mock implements YoutubeApi {
-  ChannelsResourceApi mChannels = MockChannelsResourceApi();
-  PlaylistItemsResourceApi mPlaylistItems = MockPlaylistItemsResourceApi();
 
   @override
-  ChannelsResourceApi get channels {
-    return mChannels;
+  void close() {
+    // do nothing
   }
 
   @override
-  PlaylistItemsResourceApi get playlistItems {
-    return mPlaylistItems;
-  }
+  // TODO: implement slidingWindowSize
+  int get slidingWindowSize => throw UnimplementedError();
 }
 
-class FakeChannelSnippet extends Fake implements ChannelSnippet {
-  @override
-  String get description => 'Fake Channel Description';
-}
+class MockYoutubeExplode extends Mock implements yt_explode.YoutubeExplode {}
 
-class FakeChannelContentDetailsRelatedPlaylists extends Fake
-    implements ChannelContentDetailsRelatedPlaylists {
-  @override
-  String get uploads => 'TEST_UPLOADS_PLAYLIST_ID';
-}
+class MockVideoClient extends Mock implements yt_explode.VideoClient {}
 
-class FakeContentDetails extends Fake implements ChannelContentDetails {
-  @override
-  ChannelContentDetailsRelatedPlaylists get relatedPlaylists =>
-      FakeChannelContentDetailsRelatedPlaylists();
-}
+class MockStreamsClient extends Mock implements yt_explode.StreamsClient {}
 
-class FakeChannel extends Fake implements Channel {
-  @override
-  ChannelSnippet get snippet => FakeChannelSnippet();
+class MockChannelClient extends Mock implements yt_explode.ChannelClient {}
 
-  @override
-  ChannelContentDetails get contentDetails => FakeContentDetails();
-}
+class MockStreamManifest extends Mock implements yt_explode.StreamManifest {}
 
-class MockChannelsResourceApi extends Mock implements ChannelsResourceApi {}
-
-class MockPlaylistItemsResourceApi extends Mock
-    implements PlaylistItemsResourceApi {}
-
-class FakeChannelListResponse extends Fake implements ChannelListResponse {
-  @override
-  List<Channel> get items {
-    return [
-      FakeChannel(),
-    ];
-  }
-}
-
-class FakePlaylistItemsListResponse extends Fake
-    implements PlaylistItemListResponse {
-  @override
-  List<PlaylistItem> get items {
-    return [];
-  }
-
-  @override
-  String get nextPageToken => null;
-}
+class MockMuxedStreamInfo extends Mock implements yt_explode.MuxedStreamInfo {}

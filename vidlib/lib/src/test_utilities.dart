@@ -14,7 +14,7 @@ class TestUtilities {
   // VSCode with 'Format on Save' enabled will format the file properly). This
   // value should always be *false* in the version checked into source control,
   // but is useful when making updates to xml and json encodable types.
-  static bool get autofix => true;
+  static bool get autofix => false;
 
   static const _autofixHint = 'If the results of this run are correct, enable '
       'TestUtils.autofix and run the test again to update all expected files '
@@ -47,7 +47,6 @@ class TestUtilities {
 
   static Future<void> testJsonSerialization(
       Object encodableObject, File expectedJson) async {
-    print('testJsonSerialization');
     final serialized = jsonSerializers.serialize(encodableObject);
     final encoded = json.encode(serialized);
     if (autofix && _needsFixing(encoded, expectedJson)) {
@@ -67,66 +66,26 @@ class TestUtilities {
         rethrow;
       }
 
-      if ((deserializedExpectedResult as BuiltList).isNotEmpty &&
-          (encodableObject as BuiltList).isNotEmpty) {
-        final other = deserializedExpectedResult[0];
-        final video = (encodableObject as BuiltList)[0];
-
-        print('video.source: ' + (video.source).toString());
-        print('other.source: ' + (other.source).toString());
-
-        print(
-            'identical(other, this): ' + (identical(other, video)).toString());
-        print('other is Video: ' + (other is Video).toString());
-        print('title == other.title: ' +
-            (other is Video && video.title == other.title).toString());
-        print('description == other.description: ' +
-            (other is Video && video.description == other.description)
-                .toString());
-        print('source == other.source: ' +
-            (other is Video && video.source == other.source).toString());
-        print('creators == other.creators: ' +
-            (other is Video && video.creators == other.creators).toString());
-        print('duration == other.duration: ' +
-            (other is Video && video.duration == other.duration).toString());
-      }
-
       // If this line fails for *expected* reasons, try toggling
       // TestUtilities.autofix to modify the expected results file.
-      print('encodableObject == deserializedExpectedResult: ' +
-          (encodableObject == deserializedExpectedResult).toString());
       expect(encodableObject, deserializedExpectedResult, reason: _autofixHint);
     }
   }
 
   static Future<void> _testSerialization(
       Object object, File expectedJson) async {
-    print('_testSerialization');
     // Test serialization
-    print('calling testJsonSerialization');
     await TestUtilities.testJsonSerialization(object, expectedJson);
-    print('testJsonSerialization done');
 
     // Test encoding/decoding serialized object to/from a string
     final serialized = jsonSerializers.serialize(object);
     final encoded = json.encode(serialized);
     final decoded = json.decode(encoded);
-    print('expect(decoded, serialized)');
     expect(decoded, serialized);
-    print('expect(decoded, serialized) done');
 
     // Test deserialization
     final deserialized = jsonSerializers.deserialize(serialized);
-    print('deserialized == object: ' + (deserialized == object).toString());
-    if (object.runtimeType.toString().contains('BuiltList')) {
-      final objectList = object as BuiltList;
-      final deserializedList = object as BuiltList;
-      print('deserialized[0] == object[0]: ' +
-          (deserializedList[0] == objectList[0]).toString());
-    }
-    print('expect(deserialized, object)');
     expect(deserialized, object);
-    print('expect(deserialized, object done)');
   }
 
   static Future<void> testListSerialization(

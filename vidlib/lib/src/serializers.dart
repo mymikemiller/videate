@@ -22,9 +22,26 @@ final Serializers standardSerializers = (_$standardSerializers.toBuilder()
       // Serialize durations in a human-readable format (h:mm:ss.ssssss) instead of millisconds
       ..add(DurationSerializer()))
     .build();
-final Serializers jsonSerializers = (standardSerializers.toBuilder()..addPlugin(
-    // Serialize as json for easy readability
-    StandardJsonPlugin())).build();
+final Serializers jsonSerializers = (standardSerializers.toBuilder()
+      // Serialize as json for easy readability
+      ..addPlugin(StandardJsonPlugin())
+      // Add builder factories for the things we will have built_lists of. This
+      // is necessary because built_value's support for auto-generating these
+      // builder factories is incomplete. See
+      // https://github.com/google/built_value.dart/blob/v7.1.0/built_value/lib/serializer.dart#L200
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(Video)]),
+        () => ListBuilder<Video>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ServedVideo)]),
+        () => ListBuilder<ServedVideo>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(Feed)]),
+        () => ListBuilder<Feed>(),
+      ))
+    .build();
 
 T standardDeserialize<T>(dynamic value) => standardSerializers
     .deserializeWith<T>(standardSerializers.serializerForType(T), value);

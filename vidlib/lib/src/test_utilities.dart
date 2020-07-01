@@ -2,6 +2,7 @@ import 'dart:convert' show json;
 import 'dart:io';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:test/test.dart';
 import 'package:xml/xml.dart' as xml;
@@ -67,7 +68,7 @@ class TestUtilities {
       }
 
       // If this line fails for *expected* reasons, try toggling
-      // TestUtilities.autofix to modify the expected results.
+      // TestUtilities.autofix to modify the expected results file.
       expect(encodableObject, deserializedExpectedResult, reason: _autofixHint);
     }
   }
@@ -88,8 +89,8 @@ class TestUtilities {
     expect(deserialized, object);
   }
 
-  static Future<void> testListSerialization<T>(
-          BuiltList<T> list, File expectedJson) =>
+  static Future<void> testListSerialization(
+          BuiltList list, File expectedJson) =>
       _testSerialization(list, expectedJson);
 
   // Note that to support automatic deserialization of lists no matter where they

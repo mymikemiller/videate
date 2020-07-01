@@ -15,7 +15,7 @@ class TestUtilities {
   // VSCode with 'Format on Save' enabled will format the file properly). This
   // value should always be *false* in the version checked into source control,
   // but is useful when making updates to xml and json encodable types.
-  static bool get autofix => false;
+  static bool get autofix => true;
 
   static const _autofixHint = 'If the results of this run are correct, enable '
       'TestUtils.autofix and run the test again to update all expected files '

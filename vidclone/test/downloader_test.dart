@@ -135,12 +135,6 @@ void main() async {
                     ? previous
                     : element);
 
-        // Reset the downloader so we can use the stream. This avoids "Stream
-        // has already been listened to" error on the next line. There's
-        // probably a better way to handle this...
-        // https://github.com/Hexer10/youtube_explode_dart/issues/48
-        downloaderTests = generateDownloaderTests();
-
         final mostRecent = await downloaderTest.downloader
             .mostRecentVideo(downloaderTest.sourceCollection);
 

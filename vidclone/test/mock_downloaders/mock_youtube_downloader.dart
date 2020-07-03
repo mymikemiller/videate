@@ -50,41 +50,41 @@ class MockYoutubeDownloader implements YoutubeDownloader {
         yt_explode.VideoResolution(640, 360),
         yt_explode.Framerate(30));
 
-    final mockVideoStream = Stream.fromIterable([
-      yt_explode.Video(
-          yt_explode.VideoId('33333333333'),
-          'Title 3',
-          'Author 3`',
-          yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
-          DateTime.parse('2020-01-03 03:33:00.000Z'),
-          'Description 3',
-          Duration(minutes: 3, seconds: 33),
-          yt_explode.ThumbnailSet('33333333333'),
-          [],
-          yt_explode.Engagement(95128, 12708, 25)),
-      yt_explode.Video(
-          yt_explode.VideoId('22222222222'),
-          'Title 2',
-          'Author 2`',
-          yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
-          DateTime.parse('2020-01-02 02:22:00.000Z'),
-          'Description 2',
-          Duration(minutes: 2, seconds: 22),
-          yt_explode.ThumbnailSet('22222222222'),
-          [],
-          yt_explode.Engagement(95128, 12708, 25)),
-      yt_explode.Video(
-          yt_explode.VideoId('11111111111'),
-          'Title 1',
-          'Author 1`',
-          yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
-          DateTime.parse('2020-01-01 01:11:00.000Z'),
-          'Description 1',
-          Duration(minutes: 1, seconds: 11),
-          yt_explode.ThumbnailSet('11111111111'),
-          [],
-          yt_explode.Engagement(95128, 12708, 25)),
-    ]);
+    Stream<yt_explode.Video> generateMockVideoStream() => Stream.fromIterable([
+          yt_explode.Video(
+              yt_explode.VideoId('33333333333'),
+              'Title 3',
+              'Author 3`',
+              yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+              DateTime.parse('2020-01-03 03:33:00.000Z'),
+              'Description 3',
+              Duration(minutes: 3, seconds: 33),
+              yt_explode.ThumbnailSet('33333333333'),
+              [],
+              yt_explode.Engagement(95128, 12708, 25)),
+          yt_explode.Video(
+              yt_explode.VideoId('22222222222'),
+              'Title 2',
+              'Author 2`',
+              yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+              DateTime.parse('2020-01-02 02:22:00.000Z'),
+              'Description 2',
+              Duration(minutes: 2, seconds: 22),
+              yt_explode.ThumbnailSet('22222222222'),
+              [],
+              yt_explode.Engagement(95128, 12708, 25)),
+          yt_explode.Video(
+              yt_explode.VideoId('11111111111'),
+              'Title 1',
+              'Author 1`',
+              yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+              DateTime.parse('2020-01-01 01:11:00.000Z'),
+              'Description 1',
+              Duration(minutes: 1, seconds: 11),
+              yt_explode.ThumbnailSet('11111111111'),
+              [],
+              yt_explode.Engagement(95128, 12708, 25)),
+        ]);
 
     when(mockStreamManifest.muxed).thenReturn([mockStreamInfo]);
 
@@ -100,8 +100,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
 
     when(mockChannelClient
             .getUploads(yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ')))
-        .thenAnswer((realInvocation) =>
-            mockVideoStream); // This should maybe regenerate the stream every time
+        .thenAnswer((realInvocation) => generateMockVideoStream());
   }
 
   @override
@@ -134,8 +133,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   }
 
   @override
-  // TODO: implement slidingWindowSize
-  int get slidingWindowSize => throw UnimplementedError();
+  int get slidingWindowSize => 1;
 }
 
 class MockYoutubeExplode extends Mock implements yt_explode.YoutubeExplode {}

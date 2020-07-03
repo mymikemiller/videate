@@ -103,38 +103,23 @@ class YoutubeDownloader extends Downloader {
 
   @override
   Stream<Video> allVideos(SourceCollection sourceCollection) {
-    if (!(sourceCollection is YoutubeSourceCollection)) {
-      throw 'sourceCollection must be a YoutubeSourceCollection';
-    }
-
-    return _allVideos(sourceCollection);
-  }
-
-  // Return a stream of all YouTube videos in reverse publishedAt date order
-  // (most recently published video first)
-  Stream<Video> _allVideos(YoutubeSourceCollection sourceCollection) async* {
     if (!(sourceCollection is YoutubeChannelSourceCollection)) {
       throw 'The Youtube downloader currently only supports YoutubeChannelSourceCollection';
     }
-    final channelId =
-        yt_explode.ChannelId.fromString(sourceCollection.identifier);
+    final channelId = yt_explode.ChannelId(sourceCollection.identifier);
     final stream = _youtubeExplode.channels.getUploads(channelId);
 
-    await for (var upload in stream) {
-      final video = Video((v) => v
-        ..title = upload.title
-        ..description = upload.description
-        ..duration = upload.duration
-        ..source = Source(
-          (s) => s
-            ..id = upload.id.toString()
-            ..uri = Uri.parse('https://www.youtube.com/watch?v=${upload.id}')
-            ..platform = platform.toBuilder()
-            ..releaseDate = upload.uploadDate.toUtc(),
-        ).toBuilder());
-
-      yield video;
-    }
+    return stream.map((upload) => Video((v) => v
+      ..title = upload.title
+      ..description = upload.description
+      ..duration = upload.duration
+      ..source = Source(
+        (s) => s
+          ..id = upload.id.toString()
+          ..uri = Uri.parse('https://www.youtube.com/watch?v=${upload.id}')
+          ..platform = platform.toBuilder()
+          ..releaseDate = upload.uploadDate.toUtc(),
+      ).toBuilder()));
   }
 
   @override

@@ -27,27 +27,9 @@ abstract class Uploader {
   /// even across different sources.
   Uri getDestinationUri(Video video);
 
-  /// Returns true if the video already exists at the destination
-  Future<bool> existsAtDestination(Video video) async {
-    final uri = getDestinationUri(video);
-    if (uri.scheme == 'http' || uri.scheme == 'https') {
-      // Assume the video has been uploaded already if we get a 200 response at
-      // the destination
-      final response = await httpGet(uri);
-
-      // Note that a recently uploaded file may not return a 200 until the file
-      // finishes processing at the destination
-      return response.statusCode == 200;
-    } else {
-      if (fileSystem == null) {
-        throw 'File-based uploaders must specify a fileSystem';
-      }
-
-      // This is a file-based uploader. Check for a file on the given
-      // fileSystem
-      return fileSystem.file(uri).exists();
-    }
-  }
+  // Returns the [ServedVideo] if it already exists at the destination,
+  // otherwise returns null.
+  Future<ServedVideo> getExistingServedVideo(Video video);
 
   // Perform any cleanup. This uploader should no longer be used after this is
   // called.

@@ -1,3 +1,4 @@
+import 'package:googleapis/datastore/v1.dart';
 import 'package:vidlib/src/models/video_file.dart';
 import 'package:vidlib/src/models/video.dart';
 import 'package:built_collection/built_collection.dart';
@@ -91,11 +92,16 @@ class LocalDownloader extends Downloader {
     }
   }
 
-  /// Downloads the specified [Video].
+  /// "Downloads" the specified [Video] by simply creating a [VideoFile] from
+  /// the [File] at the [Video]'s uri
   @override
   Future<VideoFile> download(Video video,
       [void Function(double progress) callback]) {
-    final sourceFile = File(video.source.uri.path.toString());
+    final path = Uri.decodeFull(video.source.uri.path.toString());
+    final sourceFile = File(path);
+    if (!sourceFile.existsSync()) {
+      throw 'Could not download local file. File not found: $path';
+    }
     final videoFile = VideoFile(video, sourceFile);
     return Future.value(videoFile);
   }

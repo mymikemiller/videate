@@ -61,7 +61,7 @@ void main() async {
           arguments.last.contains('d') ? '0:00:06.038000' : '0:00:09.038000',
           '');
   final testVideoFile = File('test/resources/videos/video_1.mp4');
-  final testVideoFileHash = md5.convert(await testVideoFile.readAsBytes());
+  final testVideoFileHash = md5.convert(testVideoFile.readAsBytesSync());
 
   List<DownloaderTest> generateDownloaderTests() => [
         DownloaderTest(
@@ -110,7 +110,7 @@ void main() async {
     group('${downloaderTest.downloader.platform.id} downloader', () {
       test('gets all video upload metadata for a source collection', () async {
         final result = await downloaderTest.downloader
-            .allVideosInOrder(downloaderTest.sourceCollection)
+            .reverseChronologicalVideos(downloaderTest.sourceCollection)
             .toList();
 
         // Verify that the results are correctly returned in descending order
@@ -143,8 +143,8 @@ void main() async {
 
       test('gets only videos uploaded after specified date', () async {
         final result = await downloaderTest.downloader
-            .videosAfter(
-                downloaderTest.videosAfterDate, downloaderTest.sourceCollection)
+            .reverseChronologicalVideos(
+                downloaderTest.sourceCollection, downloaderTest.videosAfterDate)
             .toList();
 
         // Verify that we didn't receive any videos outside the expected date range

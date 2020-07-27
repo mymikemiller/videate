@@ -108,8 +108,9 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       _delegate.allVideos(sourceCollection);
 
   @override
-  Stream<Video> allVideosInOrder(SourceCollection sourceCollection) =>
-      _delegate.allVideosInOrder(sourceCollection);
+  Stream<Video> reverseChronologicalVideos(SourceCollection sourceCollection,
+          [DateTime after]) =>
+      _delegate.reverseChronologicalVideos(sourceCollection, after);
 
   @override
   String getSourceUniqueId(Video video) => _delegate.getSourceUniqueId(video);
@@ -117,10 +118,6 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   @override
   Future<Video> mostRecentVideo(SourceCollection sourceCollection) =>
       _delegate.mostRecentVideo(sourceCollection);
-
-  @override
-  Stream<Video> videosAfter(DateTime date, SourceCollection sourceCollection) =>
-      _delegate.videosAfter(date, sourceCollection);
 
   @override
   Future<VideoFile> download(Video video,

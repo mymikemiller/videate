@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'dart:io';
 import 'package:file/file.dart' as file;
 import 'package:vidlib/vidlib.dart';
 import 'package:path/path.dart' as p;
@@ -29,21 +30,40 @@ class SaveToDiskUploader extends Uploader {
     final servedVideo = ServedVideo((b) => b
       ..video = videoFile.video.toBuilder()
       ..uri = uri
-      ..etag = 'a1b2c3'
+      ..etag = _generateEtag(videoFile)
       ..lengthInBytes = videoFile.file.lengthSync());
 
     return servedVideo;
   }
 
+  String _generateEtag(VideoFile videoFile) {
+    // Assume a file has not been changed if its size exactly matches. Using a
+    // crypto checksum shoudn't be necessary.
+    return videoFile.file.lengthSync().toString();
+  }
+
   @override
   Uri getDestinationUri(Video video, [extension = 'mp4']) {
-    // Put videos from the same source into folders named with the uploader's
-    // id to ensure that we don't have collisions between videos from different
-    // sources. Use the Video's source id in the file name to ensure we don't
-    // have collisions between videos from the same source that happen to have
-    // the same title.
-    return Uri.parse(
-        p.join(directory.path, '${video.source.id}_${video.title}.$extension'));
+    // The video's source id is guaranteed to be unique among all videos on that
+    // source, so we use that as the filename. We won't have collisions across
+    // sources because we also put each video into a folder named after its
+    // source platform.
+    return Uri.parse(p.join(directory.path, '${video.source.id}.$extension'));
+  }
+
+  @override
+  Future<ServedVideo> getExistingServedVideo(Video video) async {
+    final uri = getDestinationUri(video);
+    final file = fileSystem.file(Uri.decodeFull(uri.path));
+    if (!file.existsSync()) {
+      return null;
+    }
+
+    return ServedVideo((b) => b
+      ..uri = uri
+      ..video = video.toBuilder()
+      ..etag = _generateEtag(VideoFile(video, file))
+      ..lengthInBytes = file.lengthSync());
   }
 
   // Copies the contents of 'file' into a new file at 'path' on this

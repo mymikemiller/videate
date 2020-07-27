@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 import '../../bin/integrations/s3/s3_uploader.dart';
-import 'package:aws_s3_client/aws_s3_client.dart';
+import 'package:aws_s3_client/aws_s3.dart';
 import 'dart:typed_data';
 
 /// This uploader emulates uploading to s3 by storing uploaded data in memory
@@ -45,10 +47,13 @@ class FakeS3Bucket extends Fake implements Bucket {
   Map<String, Uint8List> uploads = {};
 
   @override
-  Future<String> uploadFile(String key, Uint8List content, String contentType,
-      Permissions permissions,
+  Future<String> uploadFile(
+      String key, String filePath, String contentType, Permissions permissions,
       {Map<String, String> meta}) async {
-    uploads[key] = content;
+    final file = File(filePath);
+    uploads[key] = file.readAsBytesSync();
     return 'a1b2c3';
   }
+
+  // @override listContent() {}
 }

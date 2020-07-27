@@ -9,4 +9,5 @@ export 'src/serializers.dart';
 export 'src/vid_info.dart';
 export 'src/environment.dart';
 export 'src/examples.dart';
+export 'src/utilities.dart';
 export 'src/test_utilities.dart';

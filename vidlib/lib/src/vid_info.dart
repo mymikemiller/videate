@@ -40,6 +40,10 @@ Future<Duration> getDuration(File videoFile,
     videoFile.path
   ]);
 
+  if (output.stderr.isNotEmpty) {
+    throw 'ffprobe error: ${output.stderr}';
+  }
+
   final duration = parseDuration(output.stdout);
   return duration;
 }

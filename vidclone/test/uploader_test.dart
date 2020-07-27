@@ -27,18 +27,22 @@ void main() {
         final videoFile = VideoFile(Examples.video1, file);
 
         // The file should not exist at the destination yet
-        final existsInitially =
-            await uploaderTest.uploader.existsAtDestination(Examples.video1);
-        expect(existsInitially, false);
+        final existingServedVideo =
+            await uploaderTest.uploader.getExistingServedVideo(Examples.video1);
+        expect(existingServedVideo == null, true);
 
         // Upload the file
         final servedVideo = await uploaderTest.uploader.upload(videoFile);
         expect(servedVideo == null, false);
 
         // Verify that the file now exists at the destination
-        final existsFinally =
-            await uploaderTest.uploader.existsAtDestination(Examples.video1);
-        expect(existsFinally, true);
+        final finalServedVideo =
+            await uploaderTest.uploader.getExistingServedVideo(Examples.video1);
+        expect(finalServedVideo == null, false);
+
+        // Both [upload] and [getExistingServedVideo] should return the same
+        // object
+        expect(finalServedVideo, servedVideo);
       });
     });
   }

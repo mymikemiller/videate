@@ -16,10 +16,7 @@ class InternetArchiveUploader extends S3Uploader {
   String get id => 'internet_archive';
 
   @override
-  String get endpointUrl => 'http://s3.us.archive.org';
-
-  @override
-  String get authorizationHeader => 'LOW $accessKey:$secretKey';
+  String get endpointUrl => 's3.us.archive.org';
 
   @override
   void close() {

@@ -1,7 +1,8 @@
-import 'package:http/http.dart';
+import 'dart:io';
 import 'package:mockito/mockito.dart';
+import 'package:vidlib/vidlib.dart';
 import '../../bin/integrations/s3/s3_uploader.dart';
-import 'package:aws_s3_client/aws_s3_client.dart';
+import 'package:aws_s3_client/aws_s3.dart';
 import 'dart:typed_data';
 
 /// This uploader emulates uploading to s3 by storing uploaded data in memory
@@ -10,25 +11,12 @@ class MockS3Uploader extends S3Uploader {
   @override
   String get id => 's3';
 
-  final FakeS3Bucket _bucket = FakeS3Bucket();
-  @override
-  Bucket get bucket => _bucket;
+  final Bucket _bucket = FakeS3Bucket();
 
   @override
-  Future<Response> httpGet(uri, {Map<String, String> headers}) {
-    final key = getKey(uri);
-    final data = (bucket as FakeS3Bucket).uploads[key];
-    if (data != null) {
-      return Future.value(Response(data.toString(), 200));
-    } else {
-      return Future.value(Response('', 404));
-    }
-  }
+  Bucket getBucket(Video video) => _bucket;
 
   MockS3Uploader() : super('TEST', 'TEST');
-
-  @override
-  String get authorizationHeader => 'TEST';
 
   @override
   String get endpointUrl => 'http://example.com';
@@ -45,10 +33,21 @@ class FakeS3Bucket extends Fake implements Bucket {
   Map<String, Uint8List> uploads = {};
 
   @override
-  Future<String> uploadFile(String key, Uint8List content, String contentType,
-      Permissions permissions,
+  Future<String> uploadFile(
+      String key, String filePath, String contentType, Permissions permissions,
       {Map<String, String> meta}) async {
-    uploads[key] = content;
+    final file = File(filePath);
+    uploads[key] = file.readAsBytesSync();
     return 'a1b2c3';
+  }
+
+  @override
+  Stream<BucketContent> listContents(
+      {String delimiter, String prefix, int maxKeys}) async* {
+    yield* Stream.fromIterable(uploads.entries.map((upload) => BucketContent(
+        key: upload.key,
+        lastModifiedUtc: DateTime.fromMillisecondsSinceEpoch(0),
+        eTag: 'a1b2c3',
+        size: upload.value.length)));
   }
 }

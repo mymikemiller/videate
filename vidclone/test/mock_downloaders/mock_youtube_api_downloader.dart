@@ -79,8 +79,9 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
       _delegate.mostRecentVideo(sourceCollection);
 
   @override
-  Stream<Video> videosAfter(DateTime date, SourceCollection sourceCollection) =>
-      _delegate.videosAfter(date, sourceCollection);
+  Stream<Video> reverseChronologicalVideos(SourceCollection sourceCollection,
+          [DateTime after]) =>
+      _delegate.reverseChronologicalVideos(sourceCollection, after);
 
   @override
   Future<VideoFile> download(Video video,
@@ -93,8 +94,9 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
   }
 
   @override
-  Stream<Video> allVideosInOrder(SourceCollection sourceCollection) {
-    return _delegate.allVideosInOrder(sourceCollection);
+  Stream<Video> allVideosInReverseChronologicalOrder(
+      SourceCollection sourceCollection) {
+    return _delegate.reverseChronologicalVideos(sourceCollection);
   }
 }
 

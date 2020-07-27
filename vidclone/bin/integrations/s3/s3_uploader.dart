@@ -103,22 +103,6 @@ abstract class S3Uploader extends Uploader {
     var contents = await bucket.listContents();
     final list = await contents.toList();
 
-//start
-    final num = 1;
-    final uri = getDestinationUri(video);
-    final etagFile = await bucket.uploadFile('test/file$num.txt',
-        'test/resources/local/deleteme.txt', 'text/plain', Permissions.public);
-
-    final file = File('test/resources/local/deleteme.txt');
-    final length = file.lengthSync();
-    // Dart complains about type mismatches unless we explicitly convert each
-    // entry into a List<int> type, not Uint8List
-    final Stream<List<int>> fileStream =
-        file.openRead().map((uInt8List) => List<int>.from(uInt8List));
-    final etagStream = await bucket.uploadFileStream('test/stream$num.txt',
-        fileStream, length, 'text/plain', Permissions.public);
-//end
-
     if (list.isEmpty) {
       return null;
     }

@@ -1,7 +1,6 @@
 import 'dart:io';
-
-import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
+import 'package:vidlib/vidlib.dart';
 import '../../bin/integrations/s3/s3_uploader.dart';
 import 'package:aws_s3_client/aws_s3.dart';
 import 'dart:typed_data';
@@ -12,25 +11,12 @@ class MockS3Uploader extends S3Uploader {
   @override
   String get id => 's3';
 
-  final FakeS3Bucket _bucket = FakeS3Bucket();
-  @override
-  Bucket get bucket => _bucket;
+  final Bucket _bucket = FakeS3Bucket();
 
   @override
-  Future<Response> httpGet(uri, {Map<String, String> headers}) {
-    final key = getKey(uri);
-    final data = (bucket as FakeS3Bucket).uploads[key];
-    if (data != null) {
-      return Future.value(Response(data.toString(), 200));
-    } else {
-      return Future.value(Response('', 404));
-    }
-  }
+  Bucket getBucket(Video video) => _bucket;
 
   MockS3Uploader() : super('TEST', 'TEST');
-
-  @override
-  String get authorizationHeader => 'TEST';
 
   @override
   String get endpointUrl => 'http://example.com';
@@ -55,5 +41,13 @@ class FakeS3Bucket extends Fake implements Bucket {
     return 'a1b2c3';
   }
 
-  // @override listContent() {}
+  @override
+  Stream<BucketContent> listContents(
+      {String delimiter, String prefix, int maxKeys}) async* {
+    yield* Stream.fromIterable(uploads.entries.map((upload) => BucketContent(
+        key: upload.key,
+        lastModifiedUtc: DateTime.fromMillisecondsSinceEpoch(0),
+        eTag: 'a1b2c3',
+        size: upload.value.length)));
+  }
 }

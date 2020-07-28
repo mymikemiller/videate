@@ -48,7 +48,7 @@ class SaveToDiskUploader extends Uploader {
     // source, so we use that as the filename. We won't have collisions across
     // sources because we also put each video into a folder named after its
     // source platform.
-    return Uri.parse(p.join(directory.path, '${video.source.id}.$extension'));
+    return Uri.file(p.join(directory.path, '${video.source.id}.$extension'));
   }
 
   @override

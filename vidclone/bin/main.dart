@@ -15,7 +15,7 @@ import 'integrations/youtube/youtube_downloader.dart';
 import 'package:file/file.dart' as file;
 import 'dart:convert';
 
-const feedName = 'test';
+const feedName = 'favorites';
 const youtube_channel_ids = {
   'gamegrumps': 'UC9CuvdOVfMPvKCiwdGKL3cQ',
   'nsp': 'UCs7yDP7KWrh0wd_4qbDP32g',
@@ -41,20 +41,19 @@ void main(List<String> arguments) async {
 
   // final sourceCollection =
   // YoutubeChannelSourceCollection(youtube_channel_ids[feedName]);
-  final localFolder =
-      p.join(videosBaseDirectory.path, downloader.platform.id, feedName);
-  final sourceCollection = LocalSourceCollection(localFolder);
+  final sourceCollection = LocalSourceCollection(
+      p.join(videosBaseDirectory.path, downloader.platform.id, feedName));
 
-  final uploader = InternetArchiveUploader(
-      internetArchiveAccessKey, internetArchiveSecretKey);
-  // final uploader =
-  // SaveToDiskUploader(LocalFileSystem().directory(localFolder));
+  // final uploader = InternetArchiveUploader(internetArchiveAccessKey,
+  //     internetArchiveSecretKey);
+  final uploader = SaveToDiskUploader(LocalFileSystem().directory(
+      p.join(videosBaseDirectory.path, downloader.platform.id, feedName)));
 
   // Save the feed to a json file
-  final demoJsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');
-  final feedManager = await JsonFileFeedManager.createOrOpen(demoJsonFilePath);
+  final jsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');
+  final feedManager = await JsonFileFeedManager.createOrOpen(jsonFilePath);
 
-  // Download from YouTube and "upload" by saving to a local file
+  // Create the Cloner
   final cloner = Cloner(downloader, uploader, feedManager);
 
   if (downloader is LocalDownloader) {

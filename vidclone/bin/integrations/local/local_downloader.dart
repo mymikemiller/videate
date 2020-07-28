@@ -1,4 +1,3 @@
-import 'package:googleapis/datastore/v1.dart';
 import 'package:vidlib/src/models/video_file.dart';
 import 'package:vidlib/src/models/video.dart';
 import 'package:built_collection/built_collection.dart';
@@ -36,20 +35,23 @@ class LocalDownloader extends Downloader {
     if (!(sourceCollection is LocalSourceCollection)) {
       throw 'sourceCollection must be a LocalSourceCollection';
     }
-    final files =
-        Directory(sourceCollection.identifier).listSync(recursive: false);
+    final localSourceCollection = sourceCollection as LocalSourceCollection;
+    final files = Directory(sourceCollection.identifier)
+        .listSync(recursive: false)
+        .whereType<File>()
+        .toList();
 
     // Sort by path for consistency, since we don't know the release date for
     // local files
     files.sort((FileSystemEntity a, FileSystemEntity b) {
       // Note: We tried sorting first by date modified and secondarily by path,
       // but this caused files to be returned in different order on different
-      // machines even if all the files in the folder were the same (e.g. on
-      // the CI server, where the modified date doesn't match that of the
-      // original file). So instead we sort by path, which will be a consistent
-      // order across machines, even if the absolute paths differ since
-      // everything shoudld be in the same folder. Uncomment the below lines to
-      // add back in the sort-by-date-then-by-path logic.
+      // machines even if all the files in the folder were the same (e.g. on the
+      // CI server, where the modified date doesn't match that of the original
+      // file). So instead we sort by path, which will be a consistent order
+      // across machines, even if the absolute paths differ since everything
+      // should be in the same folder. Uncomment the below lines to add back in
+      // the sort-by-date-then-by-path logic.
       //
       // var cmp = b.statSync().modified.compareTo(a.statSync().modified); if
       // (cmp != 0) return cmp;

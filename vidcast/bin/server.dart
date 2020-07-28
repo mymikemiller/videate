@@ -11,10 +11,11 @@ import 'localhost_exposer.dart' as LocalhostExposer;
 import 'package:path/path.dart' as path;
 import 'feed_formatters/rss_2_0_feed_formatter.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
+import 'package:path/path.dart' as p;
 
 final home = Platform.environment['HOME'];
-final videosBaseDirectoryPath = '$home/web/videos/';
-final feedsBaseDirectoryPath = '$home/web/feeds/';
+final videosBaseDirectoryPath = '$home/web/videos';
+final feedsBaseDirectoryPath = '$home/web/feeds';
 
 // Writes the specified feed data as rss to the specified response object
 serve(Feed feed, FeedFormatter feedFormatter, HttpResponse response) {
@@ -42,7 +43,11 @@ Future main(List<String> args) async {
   final baseUrl = exposeLocalhost
       ? (await LocalhostExposer.expose()).hostname
       : vidcastBaseUrl;
-  final feedFormatter = RSS_2_0_FeedFormatter(baseUrl);
+
+  final UriTransformer uriTransformer = (Uri input) =>
+      Uri.parse(input.path.replaceFirst(videosBaseDirectoryPath, baseUrl));
+
+  final feedFormatter = RSS_2_0_FeedFormatter(uriTransformer);
 
   // Print out the url to each valid feed
   final feedsBaseDirectory = Directory(feedsBaseDirectoryPath);

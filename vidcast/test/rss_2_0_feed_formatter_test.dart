@@ -6,7 +6,11 @@ import '../bin/feed_formatters/rss_2_0_feed_formatter.dart';
 
 void main() async {
   group('RSS feeds', () {
-    final feedFormatter = RSS_2_0_FeedFormatter('https://example.com');
+    final uriTransformer = (Uri input) => Uri.parse(input
+        .toString()
+        .replaceFirst('test/resources/videos', 'https://example.com'));
+
+    final feedFormatter = RSS_2_0_FeedFormatter(uriTransformer);
     test('generate properly', () async {
       final testMetadataFile = File('test/resources/test_feed_metadata.json');
       final testJson = await testMetadataFile.readAsString();

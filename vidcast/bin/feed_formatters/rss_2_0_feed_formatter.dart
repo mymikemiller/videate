@@ -3,15 +3,12 @@
 import 'package:xml/xml.dart';
 import 'package:mime/mime.dart';
 import 'package:vidlib/vidlib.dart';
-import 'package:path/path.dart' as p;
 import 'feed_formatter.dart';
 
 // See test resources for expected output
 class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
-  final String servedMediaBaseUri;
-
-  // servedMediaBaseUrl will be prepended to the URIs to the video files
-  RSS_2_0_FeedFormatter(this.servedMediaBaseUri);
+  RSS_2_0_FeedFormatter([UriTransformer uriTransformer])
+      : super(uriTransformer);
 
   XmlDocument format(Feed feed) {
     var builder = new XmlBuilder();
@@ -44,13 +41,11 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
 
         // Repeat for each episode
         for (final video in feed.videos) {
-          final servedPath = video.uri.isAbsolute
-              ? video.uri.toString()
-              : p.join(servedMediaBaseUri, video.uri.toString());
+          final uri = transformUri(video.uri);
 
           // TODO: Bring back 'creators' // <a href=$baseUrl/tip?creator="${video.video.creators[0]}">Tip \$1</a><br><br>
           final shownotes =
-              '<a href=${video.video.source.releaseDate}>${video.video.source.uri}</a><br><br>${video.video.description}';
+              '<a href=${video.video.source.releaseDate}>${uri}</a><br><br>${video.video.description}';
 
           builder.element('item', nest: () {
             builder.element('title', nest: video.video.title);
@@ -60,9 +55,9 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
               // Use cdata here to avoid having to escape "<", ">" and "&"
               builder.cdata(shownotes);
             });
-            builder.element('link', nest: video.video.source.uri.toString());
+            builder.element('link', nest: uri);
             builder.element('enclosure', nest: () {
-              builder.attribute('url', servedPath);
+              builder.attribute('url', uri);
               builder.attribute('type', lookupMimeType(video.uri.path));
               builder.attribute('length', video.lengthInBytes);
             });
@@ -72,7 +67,7 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
             builder.element('itunes:duration',
                 nest: video.video.duration.toString());
             builder.element('itunes:explicit', nest: 'no');
-            builder.element('guid', nest: servedPath);
+            builder.element('guid', nest: uri);
           });
         }
         ;

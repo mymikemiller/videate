@@ -1,10 +1,7 @@
-// Contains all the information required to find a collection of videos on a
-// source platform.
-import 'package:vidlib/vidlib.dart';
+// Contains all the information required to find a collection of videos on the
+// associated source platform.
 
 abstract class SourceCollection {
-  Platform platform;
-
   // identifier will mean a different thing for each cloner, but it's usually a
   // user id, channel id or something similar
   String identifier;
@@ -18,6 +15,6 @@ abstract class SourceCollection {
   // Used only for debug purposes
   @override
   String toString() {
-    return '${platform.id} source: $identifierMeaning $identifier';
+    return 'source: $identifierMeaning $identifier';
   }
 }

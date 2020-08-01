@@ -8,7 +8,9 @@ abstract class RsyncUploader extends Uploader {
   final String username;
   final String password;
 
-  RsyncUploader(this.username, this.password);
+  final dynamic rsyncRunner;
+
+  RsyncUploader(this.username, this.password, {this.rsyncRunner = Process.run});
 
   String getKey(Video video, [String extension = 'mp4']) {
     return 'videos/${video.source.platform.id}/${video.source.id}.$extension';
@@ -17,13 +19,13 @@ abstract class RsyncUploader extends Uploader {
   @override
   Future<ServedVideo> upload(VideoFile videoFile) async {
     final path = videoFile.file.path;
-    // final path = '/Users/mikem/web/videos/local/test/./test5.mp4';
     final key = getKey(videoFile.video);
     final destinationFolderPath = key.substring(0, key.lastIndexOf('/') + 1);
 
-    final output = await Process.run('rsync', [
-      '-aq',
-      '--progress',
+    // rsync -e "ssh -i ~/.ssh/cdn77_id_rsa" /path/to/file user_amhl64ul@push-24.cdn77.com:/www/
+    final output = await rsyncRunner('rsync', [
+      '-e',
+      '"ssh -i ~/.ssh/cdn77_id_rsa"',
       path,
       'user_amhl64ul@push-24.cdn77.com:/www/$destinationFolderPath',
     ]);
@@ -31,7 +33,7 @@ abstract class RsyncUploader extends Uploader {
     if (output.stderr.isNotEmpty) {
       if (output.stderr.toString().contains('connection unexpectedly closed')) {
         print(
-            'rsync error possibly caused by a missing directory structure at the destination. Try creating the $destinationFolderPath directory.');
+            'rsync error may imply a missing directory structure at the destination. Try creating the $destinationFolderPath directory.');
       }
       throw 'rsync error: ${output.stderr}';
     }

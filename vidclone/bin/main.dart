@@ -5,6 +5,7 @@ import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:path/path.dart' as p;
+import 'integrations/cdn77/cdn77_uploader.dart';
 import 'integrations/internet_archive/internet_archive_uploader.dart';
 import 'integrations/local/json_file_feed_manager.dart';
 import 'integrations/local/local_downloader.dart';
@@ -15,7 +16,7 @@ import 'integrations/youtube/youtube_downloader.dart';
 import 'package:file/file.dart' as file;
 import 'dart:convert';
 
-const feedName = 'favorites';
+const feedName = 'test';
 const youtube_channel_ids = {
   'gamegrumps': 'UC9CuvdOVfMPvKCiwdGKL3cQ',
   'nsp': 'UCs7yDP7KWrh0wd_4qbDP32g',
@@ -32,6 +33,8 @@ void main(List<String> arguments) async {
       getEnvVar('INTERNET_ARCHIVE_ACCESS_KEY', env);
   final internetArchiveSecretKey =
       getEnvVar('INTERNET_ARCHIVE_SECRET_KEY', env);
+  final cdn77Username = getEnvVar('CDN77_USERNAME', env);
+  final cdn77Password = getEnvVar('CDN77_PASSWORD', env);
   final home = Platform.environment['HOME'];
   final videosBaseDirectory = Directory('$home/web/videos');
   final feedsBaseDirectory = Directory('$home/web/feeds');
@@ -46,8 +49,10 @@ void main(List<String> arguments) async {
 
   // final uploader = InternetArchiveUploader(internetArchiveAccessKey,
   //     internetArchiveSecretKey);
-  final uploader = SaveToDiskUploader(LocalFileSystem().directory(
-      p.join(videosBaseDirectory.path, downloader.platform.id, feedName)));
+  //     final uploader =
+  //     SaveToDiskUploader(LocalFileSystem().directory(p.join(videosBaseDirectory.path,
+  //     downloader.platform.id, feedName)));
+  final uploader = Cdn77Uploader();
 
   // Save the feed to a json file
   final jsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');
@@ -60,27 +65,28 @@ void main(List<String> arguments) async {
     // Special case for LocalDownloader, where we always "download" everything.
     // This is necessary because all local videos have the same releaseDate.
     await for (var servedVideo in cloner.cloneCollection(sourceCollection)) {
-      print('Cloned video now at ${servedVideo.uri}');
+      print('(Local) Cloned video available at ${servedVideo.uri}');
     }
   } else {
-    // Figure out how far back in time we need to clone. This value will be null
-    // if the feed is currently empty.
+    // Figure out how far back in time we need to clone. This value will be
+    // null if the feed is currently empty.
     final mostRecentVideoAlreadyInFeed = feedManager.feed.mostRecentVideo;
 
     if (mostRecentVideoAlreadyInFeed == null) {
       // Clone the source's most recent video
       final servedVideo = await cloner.cloneMostRecentVideo(sourceCollection);
-      print('Cloned video now at ${servedVideo.uri}');
+      print('(First) Cloned video available at ${servedVideo.uri}');
     } else {
       // Clone only videos later than the most recent video we already have
       final cloneStartDate =
           mostRecentVideoAlreadyInFeed.video.source.releaseDate;
       await for (var servedVideo
           in cloner.cloneCollection(sourceCollection, cloneStartDate)) {
-        print('Cloned video now at ${servedVideo.uri}');
+        print('(Additional) Cloned video available at ${servedVideo.uri}');
       }
     }
   }
 
   downloader.close();
+  uploader.close();
 }

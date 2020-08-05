@@ -1,5 +1,5 @@
 import 'package:file/file.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:vidlib/vidlib.dart';
 
 abstract class Uploader {
@@ -10,12 +10,7 @@ abstract class Uploader {
   /// destination is a file on a file system, not a file on the web)
   FileSystem get fileSystem => null;
 
-  /// httpGet, used to determine whether a file already exists at the upload
-  /// destination, defaults to the [get] function in the [http] library, but
-  /// can be overridden for testing purposes
-  Future<http.Response> httpGet(url, {Map<String, String> headers}) {
-    return http.get(url, headers: headers);
-  }
+  Client client = Client();
 
   Uploader();
 

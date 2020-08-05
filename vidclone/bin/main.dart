@@ -65,27 +65,28 @@ void main(List<String> arguments) async {
     // Special case for LocalDownloader, where we always "download" everything.
     // This is necessary because all local videos have the same releaseDate.
     await for (var servedVideo in cloner.cloneCollection(sourceCollection)) {
-      print('Cloned video now at ${servedVideo.uri}');
+      print('(Local) Cloned video available at ${servedVideo.uri}');
     }
   } else {
-    // Figure out how far back in time we need to clone. This value will be null
-    // if the feed is currently empty.
+    // Figure out how far back in time we need to clone. This value will be
+    // null if the feed is currently empty.
     final mostRecentVideoAlreadyInFeed = feedManager.feed.mostRecentVideo;
 
     if (mostRecentVideoAlreadyInFeed == null) {
       // Clone the source's most recent video
       final servedVideo = await cloner.cloneMostRecentVideo(sourceCollection);
-      print('Cloned video now at ${servedVideo.uri}');
+      print('(First) Cloned video available at ${servedVideo.uri}');
     } else {
       // Clone only videos later than the most recent video we already have
       final cloneStartDate =
           mostRecentVideoAlreadyInFeed.video.source.releaseDate;
       await for (var servedVideo
           in cloner.cloneCollection(sourceCollection, cloneStartDate)) {
-        print('Cloned video now at ${servedVideo.uri}');
+        print('(Additional) Cloned video available at ${servedVideo.uri}');
       }
     }
   }
 
   downloader.close();
+  uploader.close();
 }

@@ -22,7 +22,7 @@ abstract class RsyncUploader extends Uploader {
     final destinationFolderPath = key.substring(0, key.lastIndexOf('/') + 1);
 
     // rsync -e "ssh -i ~/.ssh/cdn77_id_rsa" /path/to/file user_amhl64ul@push-24.cdn77.com:/www/...
-    final output = await Process.run('rsync', [
+    final output = await rsyncRunner('rsync', [
       '-e',
       'ssh -i ~/.ssh/cdn77_id_rsa',
       path,

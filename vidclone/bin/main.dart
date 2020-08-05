@@ -52,7 +52,7 @@ void main(List<String> arguments) async {
   //     final uploader =
   //     SaveToDiskUploader(LocalFileSystem().directory(p.join(videosBaseDirectory.path,
   //     downloader.platform.id, feedName)));
-  final uploader = Cdn77Uploader(cdn77Username, cdn77Password);
+  final uploader = Cdn77Uploader();
 
   // Save the feed to a json file
   final jsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');

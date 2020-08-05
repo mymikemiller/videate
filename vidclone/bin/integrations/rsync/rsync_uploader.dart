@@ -5,16 +5,11 @@ import '../../uploader.dart';
 // Base class for uploaders that use the rsync command to upload.
 abstract class RsyncUploader extends Uploader {
   String get endpointUrl;
-  final String username;
-  final String password;
-
   final dynamic rsyncRunner;
-  // final dynamic httpClientHeadUrl;
 
-  // We use dependency injection to mock rsync (for uploading) and headUrl (for
-  // getExistingServedVideo). Setting the default value for httpClientHeadUrl
-  // must be done this way because HttpClient().headUrl is not constant.
-  RsyncUploader(this.username, this.password, {this.rsyncRunner = Process.run});
+  // We use dependency injection to allow for mocking the rsync command when
+  // uploading
+  RsyncUploader({this.rsyncRunner = Process.run});
 
   String getKey(Video video, [String extension = 'mp4']) {
     return 'videos/${video.source.platform.id}/${video.source.id}.$extension';

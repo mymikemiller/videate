@@ -4,7 +4,7 @@ With permission from a user, automatically clones their video content into a for
 
 ## Usage
 ```
-cd videate
+cd vidclone
 dart bin/main.dart
 ```
 

@@ -3,7 +3,7 @@ import '../../bin/integrations/rsync/rsync_uploader.dart';
 
 class MockRsyncUploader extends RsyncUploader {
   MockRsyncUploader({rsyncRunner, Client client})
-      : super('FAKE_USER', 'FAKE_PASS', rsyncRunner: rsyncRunner);
+      : super(rsyncRunner: rsyncRunner);
 
   @override
   String get id => 'rsync';

@@ -1,7 +1,7 @@
 import '../rsync/rsync_uploader.dart';
 
 class Cdn77Uploader extends RsyncUploader {
-  Cdn77Uploader(String username, String password) : super(username, password);
+  Cdn77Uploader() : super();
 
   @override
   String get id => 'CDN77';

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:googleapis/youtube/v3.dart' hide Video;
+import 'package:http/src/client.dart';
 import 'package:mockito/mockito.dart';
 import 'package:vidlib/src/models/video.dart';
 import 'package:vidlib/vidlib.dart';
@@ -86,18 +87,24 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
   @override
   Future<VideoFile> download(Video video,
           [void Function(double progress) progressCallback]) =>
-      _delegate.download(video);
+      _delegate.download(video, progressCallback);
 
   @override
-  void close() {
-    // do nothing
-  }
+  void close() => _delegate.close();
 
   @override
-  Stream<Video> allVideosInReverseChronologicalOrder(
-      SourceCollection sourceCollection) {
-    return _delegate.reverseChronologicalVideos(sourceCollection);
-  }
+  Feed createEmptyFeed(SourceCollection sourceCollection) =>
+      _delegate.createEmptyFeed(sourceCollection);
+
+  @override
+  Client get client => _delegate.client;
+  @override
+  set client(Client _client) => _delegate.client = _client;
+
+  @override
+  dynamic get processRunner => _delegate.processRunner;
+  @override
+  set processRunner(_processRunner) => _delegate.processRunner = _processRunner;
 }
 
 Future<PlaylistItemListResponse> responseWithJson(String filePath) async {

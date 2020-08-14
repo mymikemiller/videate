@@ -5,6 +5,7 @@ import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:path/path.dart' as p;
+import 'integrations/cdn77/cdn77_feed_manager.dart';
 import 'integrations/cdn77/cdn77_uploader.dart';
 import 'integrations/internet_archive/internet_archive_uploader.dart';
 import 'integrations/local/json_file_feed_manager.dart';
@@ -33,8 +34,6 @@ void main(List<String> arguments) async {
       getEnvVar('INTERNET_ARCHIVE_ACCESS_KEY', env);
   final internetArchiveSecretKey =
       getEnvVar('INTERNET_ARCHIVE_SECRET_KEY', env);
-  final cdn77Username = getEnvVar('CDN77_USERNAME', env);
-  final cdn77Password = getEnvVar('CDN77_PASSWORD', env);
   final home = Platform.environment['HOME'];
   final videosBaseDirectory = Directory('$home/web/videos');
   final feedsBaseDirectory = Directory('$home/web/feeds');
@@ -43,7 +42,7 @@ void main(List<String> arguments) async {
   final downloader = LocalDownloader();
 
   // final sourceCollection =
-  // YoutubeChannelSourceCollection(youtube_channel_ids[feedName]);
+  //     YoutubeChannelSourceCollection(youtube_channel_ids[feedName]);
   final sourceCollection = LocalSourceCollection(
       p.join(videosBaseDirectory.path, downloader.platform.id, feedName));
 
@@ -55,11 +54,17 @@ void main(List<String> arguments) async {
   final uploader = Cdn77Uploader();
 
   // Save the feed to a json file
-  final jsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');
-  final feedManager = await JsonFileFeedManager.createOrOpen(jsonFilePath);
+  // final jsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');
+  // final feedManager = await JsonFileFeedManager.createOrOpen(jsonFilePath);
+  final feedManager = Cdn77FeedManager('$feedName.json');
 
   // Create the Cloner
   final cloner = Cloner(downloader, uploader, feedManager);
+
+  // Get the latest feed data, or create an empty feed if necessary
+  if (!await feedManager.populate()) {
+    feedManager.feed = downloader.createEmptyFeed(sourceCollection);
+  }
 
   if (downloader is LocalDownloader) {
     // Special case for LocalDownloader, where we always "download" everything.
@@ -88,5 +93,6 @@ void main(List<String> arguments) async {
   }
 
   downloader.close();
+  feedManager.close();
   uploader.close();
 }

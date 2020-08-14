@@ -7,7 +7,6 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
 import '../../downloader.dart';
 import '../../source_collection.dart';
 import 'channel_source_collection.dart';
-import 'source_collection.dart';
 import 'package:path/path.dart' as p;
 
 final memoryFileSystem = MemoryFileSystem();
@@ -130,4 +129,12 @@ class YoutubeDownloader extends Downloader {
   @override
   String getSourceUniqueId(Video video) =>
       yt_explode.VideoId.parseVideoId(video.source.uri.toString());
+
+  @override
+  Feed createEmptyFeed(SourceCollection sourceCollection) {
+    // TODO: implement createEmptyFeed with actual data from youtube
+    return Examples.emptyFeed.rebuild((b) => b
+      ..title = sourceCollection.identifier
+      ..subtitle = '${sourceCollection.identifier} feed)');
+  }
 }

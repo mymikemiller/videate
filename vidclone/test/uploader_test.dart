@@ -11,6 +11,7 @@ import '../bin/uploader.dart';
 import '../bin/integrations/rsync/rsync_uploader.dart';
 import 'mock_uploaders/mock_rsync_uploader.dart';
 import 'mock_uploaders/mock_s3_uploader.dart';
+import 'test_utilities.dart';
 
 final memoryFileSystem = MemoryFileSystem();
 
@@ -19,9 +20,6 @@ class UploaderTest {
   UploaderTest(this.uploader);
 }
 
-final noopProcess =
-    (String executable, List<String> arguments) => ProcessResult(0, 0, '', '');
-
 final successMockClient = (VideoFile videoFile) => MockClient((request) async {
       return Response('', 200, headers: {
         'etag': 'a1b2c3',
@@ -29,15 +27,11 @@ final successMockClient = (VideoFile videoFile) => MockClient((request) async {
       });
     });
 
-final failureMockClient = MockClient((request) async {
-  return Response('', 404);
-});
-
 void main() {
   final uploaderTests = [
     UploaderTest(SaveToDiskUploader(MemoryFileSystem().systemTempDirectory)),
     UploaderTest(MockS3Uploader()),
-    UploaderTest(MockRsyncUploader(rsyncRunner: noopProcess)),
+    UploaderTest(MockRsyncUploader()),
   ];
 
   for (var uploaderTest in uploaderTests) {
@@ -68,5 +62,7 @@ void main() {
         expect(finalServedVideo, servedVideo);
       });
     });
+
+    uploaderTest.uploader.close();
   }
 }

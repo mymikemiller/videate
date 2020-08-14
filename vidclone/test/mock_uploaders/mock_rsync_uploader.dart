@@ -1,12 +1,17 @@
-import 'package:http/http.dart';
+import 'dart:io';
+
 import '../../bin/integrations/rsync/rsync_uploader.dart';
+import '../test_utilities.dart';
 
 class MockRsyncUploader extends RsyncUploader {
-  MockRsyncUploader({rsyncRunner, Client client})
-      : super(rsyncRunner: rsyncRunner);
+  MockRsyncUploader();
 
   @override
   String get id => 'rsync';
+
+  @override
+  ProcessResult Function(String executable, List<String> arguments)
+      get processRunner => noopProcess;
 
   @override
   String get endpointUrl => 'http://example.com';

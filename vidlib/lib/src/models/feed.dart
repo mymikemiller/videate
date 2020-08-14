@@ -1,4 +1,6 @@
 // Contains all the metadata associated with a video feed
+import 'dart:convert';
+
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:vidlib/src/models/served_video.dart';
@@ -19,7 +21,8 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
   // The builder pattern is required by built_value, which we use for serialization
   Feed._();
   factory Feed([Function(FeedBuilder b) updates]) = _$Feed;
-  factory Feed.fromJson(Map<String, dynamic> data) {
+  factory Feed.fromJson(String json) {
+    final data = jsonDecode(json);
     return jsonSerializers.deserialize(data) as Feed;
   }
 
@@ -29,6 +32,11 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
   @override
   String toString() {
     return '$title';
+  }
+
+  String toJson() {
+    final serialized = jsonSerializers.serialize(this);
+    return jsonEncode(serialized);
   }
 
   Feed withVideoAdded(ServedVideo video) {

@@ -1,15 +1,19 @@
-import 'dart:io';
+import 'package:http/http.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import '../../uploader.dart';
+import 'rsync.dart';
 
 // Base class for uploaders that use the rsync command to upload.
-abstract class RsyncUploader extends Uploader {
-  String get endpointUrl;
-  final dynamic rsyncRunner;
+abstract class RsyncUploader extends Uploader with Rsync {
+  // Use the Uploader's client for rsync requests
+  @override
+  Client get rsyncClient => client;
 
-  // We use dependency injection to allow for mocking the rsync command when
-  // uploading
-  RsyncUploader({this.rsyncRunner = Process.run});
+  // Use the Uploader's processRunner to run the rsync process
+  @override
+  dynamic get rsyncProcessRunner => processRunner;
+
+  RsyncUploader();
 
   String getKey(Video video, [String extension = 'mp4']) {
     return 'videos/${video.source.platform.id}/${video.source.id}.$extension';
@@ -17,28 +21,10 @@ abstract class RsyncUploader extends Uploader {
 
   @override
   Future<ServedVideo> upload(VideoFile videoFile) async {
-    final path = videoFile.file.path;
     final key = getKey(videoFile.video);
-    final destinationFolderPath = key.substring(0, key.lastIndexOf('/') + 1);
+    final destinationPath = key.substring(0, key.lastIndexOf('/') + 1);
 
-    // rsync -e "ssh -i ~/.ssh/cdn77_id_rsa" /path/to/file user_amhl64ul@push-24.cdn77.com:/www/...
-    final output = await rsyncRunner('rsync', [
-      '-e',
-      'ssh -i ~/.ssh/cdn77_id_rsa',
-      path,
-      'user_amhl64ul@push-24.cdn77.com:/www/$destinationFolderPath',
-    ]);
-
-    if (output.stderr.isNotEmpty) {
-      if (output.stderr.toString().contains('connection unexpectedly closed') &&
-          output.stderr
-              .toString()
-              .contains('error in rsync protocol data stream')) {
-        print(
-            'rsync error may imply a missing directory structure at the destination. Try creating the "$destinationFolderPath" directory.');
-      }
-      throw 'process rsync error: ${output.stderr}';
-    }
+    await push(videoFile.file, destinationPath);
 
     return ServedVideo((b) => b
       ..uri = getDestinationUri(videoFile.video)
@@ -70,11 +56,5 @@ abstract class RsyncUploader extends Uploader {
       ..video = video.toBuilder()
       ..etag = etag
       ..lengthInBytes = length);
-  }
-
-  @override
-  void close() {
-    client.close();
-    // Do nothing
   }
 }

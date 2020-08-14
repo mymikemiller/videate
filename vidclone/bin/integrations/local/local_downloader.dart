@@ -117,4 +117,11 @@ class LocalDownloader extends Downloader {
   void close() {
     // do nothing
   }
+
+  @override
+  Feed createEmptyFeed(SourceCollection sourceCollection) {
+    return Examples.emptyFeed.rebuild((b) => b
+      ..title = sourceCollection.identifier
+      ..subtitle = '${sourceCollection.identifier} feed)');
+  }
 }

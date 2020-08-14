@@ -169,5 +169,7 @@ void main() async {
         expect(videoHash, testVideoFileHash);
       });
     });
+
+    downloaderTest.downloader.close();
   }
 }

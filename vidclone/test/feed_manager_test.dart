@@ -1,44 +1,113 @@
+import 'package:file/file.dart';
 import 'package:file/memory.dart';
+import 'package:http/http.dart';
+import 'package:http/testing.dart';
 import 'package:test/test.dart';
 import 'package:vidlib/vidlib.dart';
 import '../bin/integrations/local/json_file_feed_manager.dart';
 import 'package:path/path.dart' as p;
 import '../bin/feed_manager.dart';
+import 'package:meta/meta.dart';
+import 'mock_feed_manager.dart/mock_rsync_feed_manager.dart';
+import 'test_utilities.dart';
 
 final memoryFileSystem = MemoryFileSystem();
 
 class FeedManagerTest {
   final FeedManager feedManager;
+  final Function(FeedManager feedManager, Feed feed) mockValidSourceFeed;
+  final Function(FeedManager feedManager) mockInvalidSourceFeed;
 
-  FeedManagerTest(this.feedManager);
+  FeedManagerTest(
+      {@required this.feedManager,
+      @required this.mockValidSourceFeed,
+      @required this.mockInvalidSourceFeed});
 }
 
+final successMockClient = (Feed feed) => MockClient((request) async {
+      final json = feed.toJson().toString();
+      return Response(json, 200, headers: {
+        'etag': 'a1b2c3',
+        'content-length': json.length.toString()
+      });
+    });
+
 void main() async {
-  final feedManagerTests = [
-    FeedManagerTest(await JsonFileFeedManager.createOrOpen(
-        p.join(memoryFileSystem.systemTempDirectory.path, 'feed.json'),
-        fileSystem: memoryFileSystem)),
-  ];
+  final feedName = 'feed.json';
+  final feedPath = p.join(memoryFileSystem.systemTempDirectory.path, feedName);
+
+  final createSourceFeed = (FileSystem fileSystem, Feed feed) {
+    final file = fileSystem.file(feedPath);
+    file.createSync(recursive: true);
+    file.writeAsStringSync(feed.toJson());
+  };
+  final deleteSourceFeed = (FileSystem fileSystem) {
+    final file = fileSystem.file(feedPath);
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
+  };
+
+  List<FeedManagerTest> generateFeedManagerTests() => [
+        FeedManagerTest(
+            feedManager:
+                JsonFileFeedManager(feedPath, fileSystem: memoryFileSystem),
+            mockValidSourceFeed: (feedManager, feed) =>
+                createSourceFeed(memoryFileSystem, feed),
+            mockInvalidSourceFeed: (feedManager) =>
+                deleteSourceFeed(memoryFileSystem)),
+        FeedManagerTest(
+            feedManager: MockRsyncFeedManager(feedName),
+            mockValidSourceFeed: (feedManager, feed) =>
+                feedManager.client = successMockClient(feed),
+            mockInvalidSourceFeed: (feedManager) =>
+                feedManager.client = failureMockClient),
+      ];
+
+  var feedManagerTests = generateFeedManagerTests();
+  setUp(() async {
+    feedManagerTests = generateFeedManagerTests();
+  });
+
+  tearDown(() async {
+    for (var feedManagerTest in feedManagerTests) {
+      feedManagerTest.feedManager.close();
+    }
+  });
 
   for (var feedManagerTest in feedManagerTests) {
     group('${feedManagerTest.feedManager.id} feed manager', () {
-      test('adds to feed', () async {
-        // Verify that we start with no videos in the feed
+      test('throws error when accessing null feed', () async {
+        feedManagerTest.feedManager.feed = null;
+        // Trying to access the feed should throw a StateError with a helpful
+        // message
+        expect(() => feedManagerTest.feedManager.feed, throwsStateError);
+      });
+
+      test('recognizes invalid source', () async {
+        feedManagerTest.mockInvalidSourceFeed(feedManagerTest.feedManager);
+        var populatedSuccessfully =
+            await feedManagerTest.feedManager.populate();
+        expect(populatedSuccessfully, false);
+        expect(() => feedManagerTest.feedManager.feed, throwsStateError);
+      });
+
+      test('populates from source', () async {
+        feedManagerTest.mockValidSourceFeed(
+            feedManagerTest.feedManager, Examples.feed1);
+        final populatedSuccessfully =
+            await feedManagerTest.feedManager.populate();
+        expect(populatedSuccessfully, true);
+        expect(feedManagerTest.feedManager.feed, Examples.feed1);
+      });
+
+      test('adds videos', () async {
+        feedManagerTest.feedManager.feed = Examples.emptyFeed;
         expect(feedManagerTest.feedManager.feed.videos.length, 0);
-
-        // Add a video
         await feedManagerTest.feedManager.add(Examples.servedVideo1);
-
-        // Verify that the new video was added
         expect(feedManagerTest.feedManager.feed.videos.length, 1);
-        expect(
-            feedManagerTest.feedManager.feed.videos[0], Examples.servedVideo1);
-
-        // Add a couple more videos
         await feedManagerTest.feedManager
             .addAll([Examples.servedVideo2, Examples.servedVideo3]);
-
-        // Verify that the videos were added
         expect(feedManagerTest.feedManager.feed.videos.length, 3);
         expect(feedManagerTest.feedManager.feed.videos.toList(), [
           Examples.servedVideo1,
@@ -46,6 +115,20 @@ void main() async {
           Examples.servedVideo3
         ]);
       });
+
+      test('writes feed', () async {
+        feedManagerTest.feedManager.feed = Examples.feed1;
+        await feedManagerTest.feedManager.write();
+
+        feedManagerTest.feedManager.feed = Examples.emptyFeed;
+        expect(feedManagerTest.feedManager.feed, Examples.emptyFeed);
+
+        // Populate should bring back the feed we wrote
+        await feedManagerTest.feedManager.populate();
+        expect(feedManagerTest.feedManager.feed, Examples.feed1);
+      });
     });
+
+    feedManagerTest.feedManager.close();
   }
 }

@@ -1,3 +1,4 @@
+import 'package:http/src/client.dart';
 import 'package:mockito/mockito.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
 import 'package:youtube_explode_dart/src/videos/streams/streams_client.dart';
@@ -131,6 +132,20 @@ class MockYoutubeDownloader implements YoutubeDownloader {
 
   @override
   int get slidingWindowSize => 1;
+
+  @override
+  Feed createEmptyFeed(SourceCollection sourceCollection) =>
+      _delegate.createEmptyFeed(sourceCollection);
+
+  @override
+  Client get client => _delegate.client;
+  @override
+  set client(Client _client) => _delegate.client = _client;
+
+  @override
+  dynamic get processRunner => _delegate.processRunner;
+  @override
+  set processRunner(_processRunner) => _delegate.processRunner = _processRunner;
 }
 
 class MockYoutubeExplode extends Mock implements yt_explode.YoutubeExplode {}

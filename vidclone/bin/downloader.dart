@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'package:vidlib/vidlib.dart';
+import 'cloner_task.dart';
 import 'source_collection.dart';
 
 /// Base class for downloaders, which turn [Video]s on a platform into
 /// [VideoFile]s that can be passed to any [Uploader]
-abstract class Downloader {
+abstract class Downloader extends ClonerTask {
   // The platform this downloader downloads from, e.g. the Youtube platform.
   Platform get platform;
-
-  // final int slidingWindowSize;
 
   // The size of window used to ensure [Video]s come back in order.
   //
@@ -118,7 +117,7 @@ abstract class Downloader {
   // from the cloner's platform
   String getSourceUniqueId(Video video);
 
-  // Perform any cleanup. This downloader should no longer be used after this
-  // is called.
-  void close();
+  // Creates a feed with no videos, but with all the basic information, such as
+  // author, from the specified source collection.
+  Feed createEmptyFeed(SourceCollection sourceCollection);
 }

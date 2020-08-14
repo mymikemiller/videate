@@ -94,8 +94,7 @@ Future main(List<String> args) async {
       final file = File('$feedsBaseDirectoryPath/$name.json');
       if (file.existsSync()) {
         final json = await file.readAsString();
-        final data = jsonDecode(json);
-        final feed = Feed.fromJson(data);
+        final feed = Feed.fromJson(json);
         serve(feed, feedFormatter, request.response);
       } else {
         request.response.write('No feed with the name "$name" found.');

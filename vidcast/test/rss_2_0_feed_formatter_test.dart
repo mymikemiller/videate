@@ -14,8 +14,7 @@ void main() async {
     test('generate properly', () async {
       final testMetadataFile = File('test/resources/test_feed_metadata.json');
       final testJson = await testMetadataFile.readAsString();
-      final data = jsonDecode(testJson);
-      final feed = Feed.fromJson(data);
+      final feed = Feed.fromJson(testJson);
       final testFeed = feedFormatter.format(feed);
       final expectedFile = File('test/resources/rss_2_0_feed_expected.xml');
 

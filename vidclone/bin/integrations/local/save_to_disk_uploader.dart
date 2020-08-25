@@ -25,7 +25,7 @@ class SaveToDiskUploader extends Uploader {
   Future<ServedVideo> upload(VideoFile videoFile) async {
     final uri = getDestinationUri(videoFile.video);
 
-    copyToFileSystem(videoFile.file, uri);
+    await copyToFileSystem(videoFile.file, fileSystem, uri);
 
     final servedVideo = ServedVideo((b) => b
       ..video = videoFile.video.toBuilder()
@@ -64,27 +64,5 @@ class SaveToDiskUploader extends Uploader {
       ..video = video.toBuilder()
       ..etag = _generateEtag(VideoFile(video, file))
       ..lengthInBytes = file.lengthSync());
-  }
-
-  // Copies the contents of 'file' into a new file at 'path' on this
-  // SaveToDiskUploader's fileSystem. This function can be used to copy files
-  // from a file system other than the LocalFileSystem, such as the File
-  // library's MemoryFileSystem, where the file.copy() function fails.
-  file.File copyToFileSystem(io.File file, Uri uri) {
-    final newFile = fileSystem.file(uri);
-    newFile.createSync(recursive: true);
-
-    // TODO: Don't read the whole file all at once. See:
-    // https://stackoverflow.com/questions/20815913/how-to-read-a-file-line-by-line-in-dart
-    // https://github.com/google/file.dart/issues/134
-    List bytes = file.readAsBytesSync();
-
-    newFile.writeAsBytesSync(bytes);
-    return newFile;
-  }
-
-  @override
-  void close() {
-    // do nothing
   }
 }

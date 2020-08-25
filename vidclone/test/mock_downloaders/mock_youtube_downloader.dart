@@ -2,13 +2,11 @@ import 'package:http/src/client.dart';
 import 'package:mockito/mockito.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
 import 'package:youtube_explode_dart/src/videos/streams/streams_client.dart';
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:mockito/mockito.dart';
 import 'package:vidlib/vidlib.dart';
 import '../../bin/integrations/youtube/youtube_downloader.dart';
-import '../../bin/source_collection.dart';
 
 // MockYoutubeDownloader implements, not extends, YoutubeDownloader because
 // YoutubeDownloader's only constructors are factory constructors which can't
@@ -127,7 +125,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
 
   @override
   void close() {
-    // do nothing
+    _delegate.close();
   }
 
   @override

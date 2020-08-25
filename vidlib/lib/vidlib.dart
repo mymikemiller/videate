@@ -1,6 +1,7 @@
 /// Support for Videate projects
 export 'src/models/video.dart';
 export 'src/models/source.dart';
+export 'src/models/source_collection.dart';
 export 'src/models/platform.dart';
 export 'src/models/video_file.dart';
 export 'src/models/served_video.dart';

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file/local.dart';
 import 'package:file/memory.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
@@ -37,7 +38,8 @@ void main() {
   for (var uploaderTest in uploaderTests) {
     group('${uploaderTest.uploader.id} uploader', () {
       test('uploads', () async {
-        final file = File('test/resources/videos/video_1.mp4');
+        final file =
+            LocalFileSystem().file('test/resources/videos/video_1.mp4');
 
         final videoFile = VideoFile(Examples.video1, file);
 

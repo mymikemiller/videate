@@ -6,7 +6,6 @@ import 'package:mockito/mockito.dart';
 import 'package:vidlib/src/models/video.dart';
 import 'package:vidlib/vidlib.dart';
 import '../../bin/integrations/youtube/youtube_downloader.dart';
-import '../../bin/source_collection.dart';
 
 // This file is no longer used since we're using YoutubeExplode, but is left
 // here for easy testing in case we add API calls back in.

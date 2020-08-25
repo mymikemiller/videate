@@ -5,20 +5,29 @@ import 'dart:async';
 import 'package:vidlib/vidlib.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
 import '../../downloader.dart';
-import '../../source_collection.dart';
-import 'channel_source_collection.dart';
 import 'package:path/path.dart' as p;
 
 final memoryFileSystem = MemoryFileSystem();
 
 class YoutubeDownloader extends Downloader {
+  static const channelIdIdentifierMeaning = 'YouTube Channel ID';
+
   static Platform getPlatform() => Platform(
         (p) => p
           ..id = 'youtube'
           ..uri = Uri.parse('https://www.youtube.com'),
       );
+
   @override
   Platform get platform => getPlatform();
+
+  @override
+  int get slidingWindowSize => 1;
+
+  static SourceCollection createChannelIdSourceCollection(
+          String displayName, String identifier) =>
+      Downloader.createSourceCollection(
+          displayName, getPlatform(), channelIdIdentifierMeaning, identifier);
 
   final yt_explode.YoutubeExplode _youtubeExplode;
 
@@ -102,8 +111,11 @@ class YoutubeDownloader extends Downloader {
 
   @override
   Stream<Video> allVideos(SourceCollection sourceCollection) {
-    if (!(sourceCollection is YoutubeChannelSourceCollection)) {
-      throw 'The Youtube downloader currently only supports YoutubeChannelSourceCollection';
+    if (sourceCollection.platform != getPlatform()) {
+      throw 'sourceCollection platform mismatch';
+    }
+    if (sourceCollection.identifierMeaning != channelIdIdentifierMeaning) {
+      throw 'The Youtube downloader currently only supports ChannelId SourceCollections';
     }
     final channelId = yt_explode.ChannelId(sourceCollection.identifier);
     final stream = _youtubeExplode.channels.getUploads(channelId);
@@ -116,7 +128,7 @@ class YoutubeDownloader extends Downloader {
         (s) => s
           ..id = upload.id.toString()
           ..uri = Uri.parse('https://www.youtube.com/watch?v=${upload.id}')
-          ..platform = platform.toBuilder()
+          ..platform = getPlatform().toBuilder()
           ..releaseDate = upload.uploadDate.toUtc(),
       ).toBuilder()));
   }
@@ -124,6 +136,7 @@ class YoutubeDownloader extends Downloader {
   @override
   void close() {
     _youtubeExplode.close();
+    super.close();
   }
 
   @override

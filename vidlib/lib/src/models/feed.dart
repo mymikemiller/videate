@@ -1,11 +1,10 @@
 // Contains all the metadata associated with a video feed
 import 'dart:convert';
-
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:vidlib/src/models/served_video.dart';
 import 'package:built_collection/built_collection.dart';
-import '../../vidlib.dart';
+import '../serializers.dart';
 part 'feed.g.dart';
 
 abstract class Feed implements Built<Feed, FeedBuilder> {
@@ -47,5 +46,5 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
     return rebuild((b) => b.videos.addAll(videos));
   }
 
-  ServedVideo get mostRecentVideo => videos.isEmpty ? null : videos[0];
+  ServedVideo get mostRecentVideo => videos.isEmpty ? null : videos.last;
 }

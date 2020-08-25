@@ -22,9 +22,7 @@ abstract class RsyncUploader extends Uploader with Rsync {
   @override
   Future<ServedVideo> upload(VideoFile videoFile) async {
     final key = getKey(videoFile.video);
-    final destinationPath = key.substring(0, key.lastIndexOf('/') + 1);
-
-    await push(videoFile.file, destinationPath);
+    await push(videoFile.file, key);
 
     return ServedVideo((b) => b
       ..uri = getDestinationUri(videoFile.video)
@@ -46,6 +44,9 @@ abstract class RsyncUploader extends Uploader with Rsync {
     if (response.statusCode == 404) {
       // Video not found
       return null;
+    }
+    if (response.statusCode != 200) {
+      throw 'received unexpected status code: ${response.statusCode}';
     }
 
     final etag = response.headers['etag'];

@@ -5,12 +5,12 @@ import 'package:vidlib/vidlib.dart';
 import 'dart:io';
 import '../../downloader.dart';
 import 'package:path/path.dart';
-import '../../source_collection.dart';
-import 'local_source_collection.dart';
 
 // Doesn't actually download anything, instead constructs Video objects based
 // on files in a folder.
 class LocalDownloader extends Downloader {
+  static const filePathIdentifierMeaning = 'Local File Path';
+
   static Platform getPlatform() => Platform(
         (p) => p
           ..id = 'local'
@@ -19,6 +19,11 @@ class LocalDownloader extends Downloader {
 
   @override
   Platform get platform => getPlatform();
+
+  static SourceCollection createFilePathSourceCollection(
+          String displayName, String identifier) =>
+      Downloader.createSourceCollection(
+          displayName, getPlatform(), filePathIdentifierMeaning, identifier);
 
   // An arbitrarily large slidingWindowSize will ensure we return [Video]s in a
   // predictable order
@@ -32,10 +37,9 @@ class LocalDownloader extends Downloader {
   // collectionIdentifier is unused for this Downloader
   @override
   Stream<Video> allVideos(SourceCollection sourceCollection) async* {
-    if (!(sourceCollection is LocalSourceCollection)) {
-      throw 'sourceCollection must be a LocalSourceCollection';
+    if (sourceCollection.platform != platform) {
+      throw 'sourceCollection platform mismatch';
     }
-    final localSourceCollection = sourceCollection as LocalSourceCollection;
     final files = Directory(sourceCollection.identifier)
         .listSync(recursive: false)
         .whereType<File>()
@@ -111,11 +115,6 @@ class LocalDownloader extends Downloader {
   @override
   String getSourceUniqueId(Video video) {
     return video.source.uri.toString();
-  }
-
-  @override
-  void close() {
-    // do nothing
   }
 
   @override

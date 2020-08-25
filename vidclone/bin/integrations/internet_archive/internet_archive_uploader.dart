@@ -17,9 +17,4 @@ class InternetArchiveUploader extends S3Uploader {
 
   @override
   String get endpointUrl => 's3.us.archive.org';
-
-  @override
-  void close() {
-    // do nothing
-  }
 }

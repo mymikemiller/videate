@@ -3,7 +3,6 @@ import 'package:vidlib/vidlib.dart';
 import 'package:file/memory.dart';
 import 'downloader.dart';
 import 'feed_manager.dart';
-import 'source_collection.dart';
 import 'uploader.dart';
 import 'package:console/console.dart';
 
@@ -131,5 +130,11 @@ class Cloner {
       SourceCollection sourceCollection) async {
     final video = await _downloader.mostRecentVideo(sourceCollection);
     return clone(video);
+  }
+
+  void close() {
+    _downloader.close();
+    _uploader.close();
+    _feedManager.close();
   }
 }

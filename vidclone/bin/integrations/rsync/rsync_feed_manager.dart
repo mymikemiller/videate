@@ -29,7 +29,7 @@ abstract class RsyncFeedManager extends FeedManager with Rsync {
     String json;
     try {
       json = await pull(path);
-    } catch (ClientException) {
+    } on ClientException {
       // 404 errors end up here
       return false;
     }
@@ -43,8 +43,9 @@ abstract class RsyncFeedManager extends FeedManager with Rsync {
     final fileName = basename(path);
 
     // Create a temporary file for rsync to upload
-    final tempDir = LocalFileSystem().systemTempDirectory.createTempSync();
-    final file = File('${tempDir.path}/$fileName');
+    final fs = LocalFileSystem();
+    final tempDir = fs.systemTempDirectory.createTempSync();
+    final file = fs.file('${tempDir.path}/$fileName');
     file.createSync();
 
     final json = feed.toJson();

@@ -1,14 +1,11 @@
-// Contains all the metadata associated with a source
 import 'dart:convert';
-
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:vidlib/vidlib.dart';
+import '../serializers.dart';
 import 'platform.dart';
 part 'source.g.dart';
 
-// Represents the original source platform a video was originally sourced from,
-// e.g. Youtube
+// Represents the original source of a video, e.g. the video's page on YouTube
 abstract class Source implements Built<Source, SourceBuilder> {
   // The source platform, e.g. youtube
   Platform get platform;

@@ -10,14 +10,14 @@ import 'integrations/cdn77/cdn77_uploader.dart';
 import 'integrations/internet_archive/internet_archive_uploader.dart';
 import 'integrations/local/json_file_feed_manager.dart';
 import 'integrations/local/local_downloader.dart';
-import 'integrations/local/local_source_collection.dart';
 import 'integrations/local/save_to_disk_uploader.dart';
-import 'integrations/youtube/channel_source_collection.dart';
 import 'integrations/youtube/youtube_downloader.dart';
 import 'package:file/file.dart' as file;
 import 'dart:convert';
 
-const feedName = 'test';
+final forcedCloneStartDate =
+    null; // DateTime.parse('2020-07-22T00:00:00.000Z');
+const feedName = 'tdts';
 const youtube_channel_ids = {
   'gamegrumps': 'UC9CuvdOVfMPvKCiwdGKL3cQ',
   'nsp': 'UCs7yDP7KWrh0wd_4qbDP32g',
@@ -38,25 +38,24 @@ void main(List<String> arguments) async {
   final videosBaseDirectory = Directory('$home/web/videos');
   final feedsBaseDirectory = Directory('$home/web/feeds');
 
-  // final downloader = YoutubeDownloader();
-  final downloader = LocalDownloader();
+  final downloader = YoutubeDownloader();
+  // final downloader = LocalDownloader();
 
-  // final sourceCollection =
-  //     YoutubeChannelSourceCollection(youtube_channel_ids[feedName]);
-  final sourceCollection = LocalSourceCollection(
-      p.join(videosBaseDirectory.path, downloader.platform.id, feedName));
+  final sourceCollection = YoutubeDownloader.createChannelIdSourceCollection(
+      youtube_channel_ids[feedName]);
+  // final sourceCollection = LocalDownloader.createFilePathSourceCollection(
+  //     p.join(videosBaseDirectory.path, downloader.platform.id, feedName));
 
   // final uploader = InternetArchiveUploader(internetArchiveAccessKey,
   //     internetArchiveSecretKey);
-  //     final uploader =
-  //     SaveToDiskUploader(LocalFileSystem().directory(p.join(videosBaseDirectory.path,
-  //     downloader.platform.id, feedName)));
+  // final uploader = SaveToDiskUploader(LocalFileSystem().directory(
+  //     p.join(videosBaseDirectory.path, downloader.platform.id, feedName)));
   final uploader = Cdn77Uploader();
 
   // Save the feed to a json file
-  // final jsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');
-  // final feedManager = await JsonFileFeedManager.createOrOpen(jsonFilePath);
-  final feedManager = Cdn77FeedManager('$feedName.json');
+  final jsonFilePath = p.join(feedsBaseDirectory.path, '$feedName.json');
+  final feedManager = await JsonFileFeedManager(jsonFilePath);
+  // final feedManager = Cdn77FeedManager('${feedName}.json');
 
   // Create the Cloner
   final cloner = Cloner(downloader, uploader, feedManager);
@@ -77,14 +76,21 @@ void main(List<String> arguments) async {
     // null if the feed is currently empty.
     final mostRecentVideoAlreadyInFeed = feedManager.feed.mostRecentVideo;
 
-    if (mostRecentVideoAlreadyInFeed == null) {
+    if (forcedCloneStartDate == null && mostRecentVideoAlreadyInFeed == null) {
       // Clone the source's most recent video
       final servedVideo = await cloner.cloneMostRecentVideo(sourceCollection);
       print('(First) Cloned video available at ${servedVideo.uri}');
     } else {
-      // Clone only videos later than the most recent video we already have
-      final cloneStartDate =
-          mostRecentVideoAlreadyInFeed.video.source.releaseDate;
+      // Clone only videos newer than the most recent video we already have
+      var cloneStartDate;
+      if (forcedCloneStartDate != null) {
+        print('Forcing clone to begin at start date $forcedCloneStartDate');
+        cloneStartDate = forcedCloneStartDate;
+      } else {
+        print(
+            'Cloning videos newer than the most recent video in feed (${mostRecentVideoAlreadyInFeed.video.title})');
+        cloneStartDate = mostRecentVideoAlreadyInFeed.video.source.releaseDate;
+      }
       await for (var servedVideo
           in cloner.cloneCollection(sourceCollection, cloneStartDate)) {
         print('(Additional) Cloned video available at ${servedVideo.uri}');
@@ -92,7 +98,5 @@ void main(List<String> arguments) async {
     }
   }
 
-  downloader.close();
-  feedManager.close();
-  uploader.close();
+  cloner.close();
 }

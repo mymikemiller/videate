@@ -3,12 +3,9 @@ import 'package:test/test.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:crypto/crypto.dart';
 import 'package:built_collection/built_collection.dart';
-import '../bin/integrations/youtube/channel_source_collection.dart';
 import '../bin/integrations/local/local_downloader.dart';
-import '../bin/integrations/local/local_source_collection.dart';
 import '../bin/integrations/youtube/youtube_downloader.dart';
 import '../bin/downloader.dart';
-import '../bin/source_collection.dart';
 import 'mock_downloaders/mock_youtube_downloader.dart';
 import 'package:collection/collection.dart';
 
@@ -66,9 +63,10 @@ void main() async {
   List<DownloaderTest> generateDownloaderTests() => [
         DownloaderTest(
             downloader: LocalDownloader(ffprobeRunner: ffprobeStub),
-            sourceCollection: LocalSourceCollection('test/resources/videos'),
-            // The sourceReleaseDate of all LocalDownloader Videos is epoch, so the
-            // videosAfter test for LocalDownloader is not very useful
+            sourceCollection: LocalDownloader.createFilePathSourceCollection(
+                'test/resources/videos'),
+            // The sourceReleaseDate of all LocalDownloader Videos is epoch, so
+            // the videosAfter test for LocalDownloader is not very useful
             videosAfterDate: DateTime.parse('1970-01-01T00:00:00.000Z'),
             testVideo: Examples.video1.rebuild(
               (v) => v
@@ -83,8 +81,8 @@ void main() async {
             )),
         DownloaderTest(
             downloader: MockYoutubeDownloader(testVideoFile),
-            sourceCollection:
-                YoutubeChannelSourceCollection('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+            sourceCollection: YoutubeDownloader.createChannelIdSourceCollection(
+                'UC9CuvdOVfMPvKCiwdGKL3cQ'),
             videosAfterDate: DateTime.parse('2020-01-02 09:37:16.000'),
             testVideo: Examples.video1.rebuild(
               (v) => v

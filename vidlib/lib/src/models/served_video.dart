@@ -1,6 +1,6 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import '../../vidlib.dart';
+import 'video.dart';
 part 'served_video.g.dart';
 
 // Represents a video whose file is available at the specified uri

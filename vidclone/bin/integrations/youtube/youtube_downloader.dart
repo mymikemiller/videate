@@ -24,9 +24,10 @@ class YoutubeDownloader extends Downloader {
   @override
   int get slidingWindowSize => 1;
 
-  static SourceCollection createChannelIdSourceCollection(String identifier) =>
+  static SourceCollection createChannelIdSourceCollection(
+          String displayName, String identifier) =>
       Downloader.createSourceCollection(
-          getPlatform(), channelIdIdentifierMeaning, identifier);
+          displayName, getPlatform(), channelIdIdentifierMeaning, identifier);
 
   final yt_explode.YoutubeExplode _youtubeExplode;
 

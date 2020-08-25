@@ -8,9 +8,10 @@ abstract class Downloader extends ClonerTask {
   // The platform this downloader downloads from, e.g. the Youtube platform.
   Platform get platform;
 
-  static SourceCollection createSourceCollection(
+  static SourceCollection createSourceCollection(String displayName,
       Platform platform, String identifierMeaning, String identifier) {
     return SourceCollection((b) => b
+      ..displayName = displayName
       ..platform = platform.toBuilder()
       ..identifierMeaning = identifierMeaning
       ..identifier = identifier);

@@ -64,7 +64,7 @@ void main() async {
         DownloaderTest(
             downloader: LocalDownloader(ffprobeRunner: ffprobeStub),
             sourceCollection: LocalDownloader.createFilePathSourceCollection(
-                'test/resources/videos'),
+                'Local test videos', 'test/resources/videos'),
             // The sourceReleaseDate of all LocalDownloader Videos is epoch, so
             // the videosAfter test for LocalDownloader is not very useful
             videosAfterDate: DateTime.parse('1970-01-01T00:00:00.000Z'),
@@ -82,7 +82,7 @@ void main() async {
         DownloaderTest(
             downloader: MockYoutubeDownloader(testVideoFile),
             sourceCollection: YoutubeDownloader.createChannelIdSourceCollection(
-                'UC9CuvdOVfMPvKCiwdGKL3cQ'),
+                'Test youtube channel videos', 'UC9CuvdOVfMPvKCiwdGKL3cQ'),
             videosAfterDate: DateTime.parse('2020-01-02 09:37:16.000'),
             testVideo: Examples.video1.rebuild(
               (v) => v

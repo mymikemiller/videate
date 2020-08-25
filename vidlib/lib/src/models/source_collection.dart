@@ -20,6 +20,9 @@ abstract class SourceCollection
   // id")
   String get identifierMeaning;
 
+  // Names the SourceCollection for display purposes
+  String get displayName;
+
   // The builder pattern is required by built_value, which we use for
   // serialization
   SourceCollection._();

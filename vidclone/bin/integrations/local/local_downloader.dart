@@ -20,9 +20,10 @@ class LocalDownloader extends Downloader {
   @override
   Platform get platform => getPlatform();
 
-  static SourceCollection createFilePathSourceCollection(String identifier) =>
+  static SourceCollection createFilePathSourceCollection(
+          String displayName, String identifier) =>
       Downloader.createSourceCollection(
-          getPlatform(), filePathIdentifierMeaning, identifier);
+          displayName, getPlatform(), filePathIdentifierMeaning, identifier);
 
   // An arbitrarily large slidingWindowSize will ensure we return [Video]s in a
   // predictable order

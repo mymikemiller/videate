@@ -15,6 +15,9 @@ part 'serializers.g.dart';
   Video,
   ServedVideo,
   Feed,
+  Platform,
+  Source,
+  SourceCollection,
 ])
 final Serializers standardSerializers = (_$standardSerializers.toBuilder()
       // Serialize dates in a human-readable format instead of ms since epoch

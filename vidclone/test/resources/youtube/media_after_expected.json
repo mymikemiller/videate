@@ -2,7 +2,7 @@
     "$": "list",
     "": [
         {
-            "$": "Video",
+            "$": "Media",
             "title": "Title 3",
             "description": "Description 3",
             "source": {

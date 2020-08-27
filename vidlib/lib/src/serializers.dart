@@ -5,15 +5,19 @@ import 'package:built_value/serializer.dart';
 import 'package:built_value/standard_json_plugin.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/src/models/feed.dart';
-import 'package:vidlib/src/models/video.dart';
+import 'package:vidlib/src/models/media.dart';
+import 'package:vidlib/src/models/served_media.dart';
+import 'package:vidlib/src/models/platform.dart';
+import 'package:vidlib/src/models/source.dart';
+import 'package:vidlib/src/models/source_collection.dart';
 import 'package:vidlib/vidlib.dart';
 import 'duration_serializer.dart';
 part 'serializers.g.dart';
 
 /// Collection of generated serializers for vidlib models.
 @SerializersFor([
-  Video,
-  ServedVideo,
+  Media,
+  ServedMedia,
   Feed,
   Platform,
   Source,

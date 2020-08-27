@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:googleapis/youtube/v3.dart' hide Video;
+import 'package:googleapis/youtube/v3.dart' hide Media;
 import 'package:http/src/client.dart';
 import 'package:mockito/mockito.dart';
-import 'package:vidlib/src/models/video.dart';
+import 'package:vidlib/src/models/media.dart';
 import 'package:vidlib/vidlib.dart';
 import '../../bin/integrations/youtube/youtube_downloader.dart';
 
@@ -68,25 +68,25 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
   int get slidingWindowSize => _delegate.slidingWindowSize;
 
   @override
-  Stream<Video> allVideos(SourceCollection sourceCollection) =>
-      _delegate.allVideos(sourceCollection);
+  Stream<Media> allMedia(SourceCollection sourceCollection) =>
+      _delegate.allMedia(sourceCollection);
 
   @override
-  String getSourceUniqueId(Video video) => _delegate.getSourceUniqueId(video);
+  String getSourceUniqueId(Media media) => _delegate.getSourceUniqueId(media);
 
   @override
-  Future<Video> mostRecentVideo(SourceCollection sourceCollection) =>
-      _delegate.mostRecentVideo(sourceCollection);
+  Future<Media> mostRecentMedia(SourceCollection sourceCollection) =>
+      _delegate.mostRecentMedia(sourceCollection);
 
   @override
-  Stream<Video> reverseChronologicalVideos(SourceCollection sourceCollection,
+  Stream<Media> reverseChronologicalMedia(SourceCollection sourceCollection,
           [DateTime after]) =>
-      _delegate.reverseChronologicalVideos(sourceCollection, after);
+      _delegate.reverseChronologicalMedia(sourceCollection, after);
 
   @override
-  Future<VideoFile> download(Video video,
+  Future<MediaFile> download(Media media,
           [void Function(double progress) progressCallback]) =>
-      _delegate.download(video, progressCallback);
+      _delegate.download(media, progressCallback);
 
   @override
   void close() => _delegate.close();

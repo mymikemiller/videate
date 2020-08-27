@@ -2,8 +2,8 @@
     "$": "list",
     "": [
         {
-            "$": "Video",
-            "title": "Video 1",
+            "$": "Media",
+            "title": "Media 1",
             "description": "Description 1",
             "source": {
                 "platform": {
@@ -18,8 +18,8 @@
             "duration": "0:01:00.000000"
         },
         {
-            "$": "Video",
-            "title": "Video 2",
+            "$": "Media",
+            "title": "Media 2",
             "description": "Description 2",
             "source": {
                 "platform": {

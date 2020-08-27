@@ -2,7 +2,7 @@
     "$": "list",
     "": [
         {
-            "$": "Video",
+            "$": "Media",
             "title": "Title 3",
             "description": "Description 3",
             "source": {
@@ -18,7 +18,7 @@
             "duration": "0:03:33.000000"
         },
         {
-            "$": "Video",
+            "$": "Media",
             "title": "Title 2",
             "description": "Description 2",
             "source": {
@@ -34,7 +34,7 @@
             "duration": "0:02:22.000000"
         },
         {
-            "$": "Video",
+            "$": "Media",
             "title": "Title 1",
             "description": "Description 1",
             "source": {

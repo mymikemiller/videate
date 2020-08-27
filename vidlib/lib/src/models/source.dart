@@ -5,19 +5,19 @@ import '../serializers.dart';
 import 'platform.dart';
 part 'source.g.dart';
 
-// Represents the original source of a video, e.g. the video's page on YouTube
+// Represents the original source of media, e.g. a video's page on YouTube
 abstract class Source implements Built<Source, SourceBuilder> {
   // The source platform, e.g. youtube
   Platform get platform;
 
-  // The Uri where the video can be accessed on the source platform
+  // The Uri where the media can be accessed on the source platform
   Uri get uri;
 
-  // An id unique among all videos on the source platform, likely part of the
+  // An id unique among all media on the source platform, likely part of the
   // uri
   String get id;
 
-  // The date the video was released on the source platform
+  // The date the media was released on the source platform
   DateTime get releaseDate;
 
   // The builder pattern is required by built_value, which we use for

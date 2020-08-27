@@ -1,7 +1,7 @@
 {
-    "$": "ServedVideo",
-    "video": {
-        "title": "Video 1",
+    "$": "ServedMedia",
+    "media": {
+        "title": "Media 1",
         "description": "Description 1",
         "source": {
             "platform": {

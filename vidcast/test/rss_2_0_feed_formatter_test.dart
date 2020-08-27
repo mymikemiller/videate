@@ -8,7 +8,7 @@ void main() async {
   group('RSS feeds', () {
     final uriTransformer = (Uri input) => Uri.parse(input
         .toString()
-        .replaceFirst('test/resources/videos', 'https://example.com'));
+        .replaceFirst('test/resources/media', 'https://example.com'));
 
     final feedFormatter = RSS_2_0_FeedFormatter(uriTransformer);
     test('generate properly', () async {

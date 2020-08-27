@@ -1,6 +1,6 @@
 {
-    "title": "videos",
-    "subtitle": "Feed from 'videos' folder",
+    "title": "mediaList",
+    "subtitle": "Feed from 'media' folder",
     "link": "http://www.videate.org",
     "author": "Mike Miller",
     "email": "mike@videate.org",
@@ -11,7 +11,7 @@
             "title": "nine_second_video.mp4",
             "description": "nine_second_video",
             "source_link": "http://www.videate.org",
-            "file_path": "test/resources/videos/nine_second_video.mp4",
+            "file_path": "test/resources/media/nine_second_video.mp4",
             "creators": [
                 "Mike Miller"
             ],
@@ -22,7 +22,7 @@
             "title": "six_second_video.mp4",
             "description": "six_second_video",
             "source_link": "http://www.videate.org",
-            "file_path": "test/resources/videos/six_second_video.mp4",
+            "file_path": "test/resources/media/six_second_video.mp4",
             "creators": [
                 "Mike Miller"
             ],

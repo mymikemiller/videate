@@ -18,96 +18,95 @@ class Cloner {
 
   Cloner(this._downloader, this._uploader, this._feedManager);
 
-  // Clones the [Video] by downloading it from the source, uploading it to the
+  // Clones the [Media] by downloading it from the source, uploading it to the
   // destination, then updating a feed.
   //
   // Downloading and uploading will be performed according to this Cloner's
   // Downloader and Upoader behavior.
   //
-  // Videos that already exist at the uploader's destination will not be
-  // cloned. Instead, a [ServedVideo] will be immediately returned.
-  Future<ServedVideo> clone(Video video) async {
-    final videoDebugName =
-        '${video.source.platform.id} Video ${video.source.id}';
+  // Media that already exist at the uploader's destination will not be
+  // cloned. Instead, a [ServedMedia] will be immediately returned.
+  Future<ServedMedia> clone(Media media) async {
+    final mediaDebugName =
+        '${media.source.platform.id} Media ${media.source.id}';
     Console.init();
 
     // Existence Check
-    print('=== Clone: Checking if already cloned: $videoDebugName ===');
+    print('=== Clone: Checking if already cloned: $mediaDebugName ===');
     final existenceCheckResult =
-        await time(_uploader.getExistingServedVideo, [video]);
+        await time(_uploader.getExistingServedMedia, [media]);
 
-    var servedVideo;
+    var servedMedia;
 
     // Short-circuit downloading and uploading if the destination exists
     if (existenceCheckResult.returnValue != null) {
       print(
-          'Destination exists. Skipping Download and Upload for ${video.title}.');
+          'Destination exists. Skipping Download and Upload for ${media.title}.');
       print('=== ⏲  ${existenceCheckResult.time} ⏲  ===');
-      servedVideo = existenceCheckResult.returnValue;
+      servedMedia = existenceCheckResult.returnValue;
     } else {
       print('=== ⏲  ${existenceCheckResult.time} ⏲  ===');
 
       // Download
-      print('=== Clone: Download $videoDebugName ===');
+      print('=== Clone: Download $mediaDebugName ===');
       var progressBar = ProgressBar();
       final downloadResult = await time(_downloader.download, [
-        video,
+        media,
         (double progress) {
           updateProgressBar(progressBar, progress);
         }
       ]);
-      final fsVideo = await downloadResult.returnValue;
+      final fsMedia = await downloadResult.returnValue;
       print('=== ⏲ ${downloadResult.time} ⏲ ===');
 
       // Upload
-      print('=== Clone: Upload $videoDebugName ===');
-      final uploadResult = await time(_uploader.upload, [fsVideo]);
-      servedVideo = await uploadResult.returnValue;
+      print('=== Clone: Upload $mediaDebugName ===');
+      final uploadResult = await time(_uploader.upload, [fsMedia]);
+      servedMedia = await uploadResult.returnValue;
       print('=== ⏲ ${uploadResult.time} ⏲ ===');
 
-      print('served video: ${servedVideo.uri}');
+      print('served media: ${servedMedia.uri}');
     }
 
-    // Update the feed to include the new video
-    print('=== Clone: Add $videoDebugName to Feed ===');
-    final feedAddResult = await time(_feedManager.add, [servedVideo]);
+    // Update the feed to include the new media
+    print('=== Clone: Add $mediaDebugName to Feed ===');
+    final feedAddResult = await time(_feedManager.add, [servedMedia]);
     print('=== ⏲${feedAddResult.time} ⏲ ===');
 
-    return servedVideo;
+    return servedMedia;
   }
 
   // This function can be parallelized, but caution should be taken to ensure
   // upload order is maintained if desired, and blocking doesn't occur due to
   // too many simultaneous downloads/uploads.
-  Stream<ServedVideo> _cloneAll(Iterable<Video> videos) async* {
-    for (var video in videos) {
+  Stream<ServedMedia> _cloneAll(Iterable<Media> media) async* {
+    for (var media in media) {
       // This can be parallelized, but for simplicity's sake we're awaiting
       // each one here TODO: parallelize this (a queue allowing up to x
       // downloads to run at once). See https://pub.dev/packages/queue
-      final servedVideo = await clone(video);
-      yield servedVideo;
+      final servedMedia = await clone(media);
+      yield servedMedia;
     }
   }
 
-  // Clones all videos published to the collection. If [after] is specified,
-  // only videos published after the specified date are cloned.
+  // Clones all media published to the collection. If [after] is specified,
+  // only media published after the specified date are cloned.
   //
-  // Videos will be cloned in chronological order (in the same order they were
+  // Media will be cloned in chronological order (in the same order they were
   // originally published at the source).
-  Stream<ServedVideo> cloneCollection(SourceCollection sourceCollection,
+  Stream<ServedMedia> cloneCollection(SourceCollection sourceCollection,
       [DateTime after]) async* {
-    // Because videosAfter returns newest videos first, we must first get the
-    // list of all videos and reverse it before cloning any videos.
-    var stream =
-        _downloader.reverseChronologicalVideos(sourceCollection, after);
-    final videos = (await stream.toList()).reversed;
-    if (videos.isEmpty) {
-      print('No videos found after $after for ${sourceCollection}');
+    // Because reverseChronologicalMedia returns newest media first, we must
+    // first get the list of all media and reverse it before cloning any media.
+    var stream = _downloader.reverseChronologicalMedia(sourceCollection, after);
+    final mediaList = (await stream.toList()).reversed;
+    if (mediaList.isEmpty) {
+      print('No media found after $after for ${sourceCollection}');
     } else {
-      await for (var servedVideo in _cloneAll(videos)) {
-        yield servedVideo;
+      await for (var servedMedia in _cloneAll(mediaList)) {
+        yield servedMedia;
       }
-      // TODO: switch to this? yield* _cloneAll(videos);
+      // TODO: switch to this? yield* _cloneAll(mediaList);
     }
   }
 
@@ -126,10 +125,10 @@ class Cloner {
     }
   }
 
-  Future<ServedVideo> cloneMostRecentVideo(
+  Future<ServedMedia> cloneMostRecentMedia(
       SourceCollection sourceCollection) async {
-    final video = await _downloader.mostRecentVideo(sourceCollection);
-    return clone(video);
+    final media = await _downloader.mostRecentMedia(sourceCollection);
+    return clone(media);
   }
 
   void close() {

@@ -8,9 +8,9 @@ A simple usage example:
 import 'package:vidlib/vidlib.dart';
 
 main() {
-  static Video get video1 => Video(
+  static Media get media => Media(
         (v) => v
-          ..title = 'Video 1'
+          ..title = 'Media 1'
           ..description = 'Description 1'
           ..duration = Duration(minutes: 1)
           ..source = Source(
@@ -25,13 +25,14 @@ main() {
               ..uri = Uri.parse('https://www.example.com/aaa111'),
           ).toBuilder(),
       );
-  print('Video: ${video.title}');
+  print('Media: ${media.title}');
 }
 ```
 
 ## Prerequisites
 
-VidLib uses ffprobe to determine the duration of video media. Ffprobe can be installed along with ffmpeg.
+VidLib uses ffprobe to determine the duration of video media. Ffprobe can be
+installed along with ffmpeg.
 
 Install ffmpeg (mac instructions using homebrew below):
 
@@ -65,13 +66,17 @@ Start Debugging
 
 ### Models
 
-This library uses the json_serializable package to generate code for serializing to and deserializing from json. After modifying a model file (e.g. video.dart) you must run the following command to update the json serialization code file (e.g. video.g.dart):
+This library uses the json_serializable package to generate code for
+serializing to and deserializing from json. After modifying a model file (e.g.
+media.dart) you must run the following command to update the json serialization
+code file (e.g. media.g.dart):
 
 ```dart
 pub run build_runner build
 ```
 
-Alternatively, run this command in the background to have the generated files automatically update when changes are detected:
+Alternatively, run this command in the background to have the generated files
+automatically update when changes are detected:
 
 ```dart
 pub run build_runner watch
@@ -79,4 +84,5 @@ pub run build_runner watch
 
 ## Authors
 
-* **Mike Miller** - *Initial work* - [mymikemiller](https://github.com/mymikemiller)
+* **Mike Miller** - *Initial work* -
+  [mymikemiller](https://github.com/mymikemiller)

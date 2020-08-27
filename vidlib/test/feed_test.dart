@@ -9,8 +9,8 @@ void main() {
       expect(Examples.feed1.title, 'Test Feed 1');
       expect(Examples.feed1.subtitle, 'Subtitle 1');
       expect(Examples.feed1.description, 'Description 1');
-      expect(Examples.feed1.videos,
-          [Examples.servedVideo1, Examples.servedVideo2]);
+      expect(Examples.feed1.mediaList,
+          [Examples.servedMedia1, Examples.servedMedia2]);
     });
 
     test('JSON serialization/deserialization', () {

@@ -1,9 +1,9 @@
-// Uploads videos to archive.org
+// Uploads media to archive.org
 import '../s3/s3_uploader.dart';
 
-/// Uploads the video to archive.org.
+/// Uploads the media to archive.org.
 ///
-/// Note that the video will take some time to process (From experience, ten
+/// Note that the media will take some time to process (From experience, ten
 /// minutes, though the site says it could take up to 24 hours). During this
 /// time, attempting to access the file via the url will produce a 404
 /// "NoSuchKey" error. This is distinct from a 404 NoSuchBucket error, which

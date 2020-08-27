@@ -5,7 +5,7 @@ import '../serializers.dart';
 import 'platform.dart';
 part 'source_collection.g.dart';
 
-// Contains all the information required to find a collection of videos on the
+// Contains all the information required to find a collection of media on the
 // associated source platform.
 abstract class SourceCollection
     implements Built<SourceCollection, SourceCollectionBuilder> {

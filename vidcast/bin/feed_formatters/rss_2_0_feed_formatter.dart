@@ -1,4 +1,4 @@
-// Generates an xml podcast feed given metadata about the videos in the feed.
+// Generates an xml podcast feed given metadata about the media in the feed.
 // Also includes functions to analyze file contents to fill that feed.
 import 'package:xml/xml.dart';
 import 'package:mime/mime.dart';
@@ -40,17 +40,17 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
         });
 
         // Repeat for each episode
-        for (final video in feed.videos) {
-          final uri = transformUri(video.uri);
+        for (final media in feed.mediaList) {
+          final uri = transformUri(media.uri);
 
-          // TODO: Bring back 'creators' // <a href=$baseUrl/tip?creator="${video.video.creators[0]}">Tip \$1</a><br><br>
+          // TODO: Bring back 'creators' // <a href=$baseUrl/tip?creator="${media.media.creators[0]}">Tip \$1</a><br><br>
           final shownotes =
-              '<a href=${video.video.source.releaseDate}>${uri}</a><br><br>${video.video.description}';
+              '<a href=${media.media.source.releaseDate}>${uri}</a><br><br>${media.media.description}';
 
           builder.element('item', nest: () {
-            builder.element('title', nest: video.video.title);
-            builder.element('itunes:summary', nest: video.video.description);
-            builder.element('description', nest: video.video.description);
+            builder.element('title', nest: media.media.title);
+            builder.element('itunes:summary', nest: media.media.description);
+            builder.element('description', nest: media.media.description);
             builder.element('content:encoded', nest: () {
               // Use cdata here to avoid having to escape "<", ">" and "&"
               builder.cdata(shownotes);
@@ -58,14 +58,14 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
             builder.element('link', nest: uri);
             builder.element('enclosure', nest: () {
               builder.attribute('url', uri);
-              builder.attribute('type', lookupMimeType(video.uri.path));
-              builder.attribute('length', video.lengthInBytes);
+              builder.attribute('type', lookupMimeType(media.uri.path));
+              builder.attribute('length', media.lengthInBytes);
             });
-            builder.element('pubDate', nest: video.video.source.releaseDate);
+            builder.element('pubDate', nest: media.media.source.releaseDate);
             builder.element('itunes:author',
-                nest: video.video.creators.join(', '));
+                nest: media.media.creators.join(', '));
             builder.element('itunes:duration',
-                nest: video.video.duration.toString());
+                nest: media.media.duration.toString());
             builder.element('itunes:explicit', nest: 'no');
             builder.element('guid', nest: uri);
           });

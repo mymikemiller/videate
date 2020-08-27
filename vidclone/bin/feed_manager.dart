@@ -28,15 +28,15 @@ abstract class FeedManager extends ClonerTask {
   // existing feed at the source.
   Future<void> write();
 
-  Future<void> add(ServedVideo video, {bool write = true}) async {
-    feed = feed.withVideoAdded(video);
+  Future<void> add(ServedMedia media, {bool write = true}) async {
+    feed = feed.withMediaAdded(media);
     if (write) {
       return this.write();
     }
   }
 
-  Future<void> addAll(List<ServedVideo> videos, {bool write = true}) async {
-    feed = feed.withAllVideosAdded(videos);
+  Future<void> addAll(List<ServedMedia> mediaList, {bool write = true}) async {
+    feed = feed.withAllMediaAdded(mediaList);
     if (write) {
       return this.write();
     }

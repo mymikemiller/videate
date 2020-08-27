@@ -14,7 +14,7 @@ class MockS3Uploader extends S3Uploader {
   final Bucket _bucket = FakeS3Bucket();
 
   @override
-  Bucket getBucket(Video video) => _bucket;
+  Bucket getBucket(Media media) => _bucket;
 
   MockS3Uploader() : super('TEST', 'TEST');
 

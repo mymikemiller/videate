@@ -1,7 +1,7 @@
 import 'package:vidlib/vidlib.dart';
 
 void main() {
-  var video = Video(
+  var media = Media(
     (v) => v
       ..title = 'My Title'
       ..description = 'My Description'
@@ -19,5 +19,5 @@ void main() {
       ).toBuilder(),
   );
 
-  print('Video titled ${video.title} from ${video.source.platform.id}');
+  print('Media titled ${media.title} from ${media.source.platform.id}');
 }

@@ -14,7 +14,7 @@ import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:path/path.dart' as p;
 
 final home = Platform.environment['HOME'];
-final videosBaseDirectoryPath = '$home/web/videos';
+final mediaBaseDirectoryPath = '$home/web/media';
 final feedsBaseDirectoryPath = '$home/web/feeds';
 
 // Writes the specified feed data as rss to the specified response object
@@ -45,7 +45,7 @@ Future main(List<String> args) async {
       : vidcastBaseUrl;
 
   final UriTransformer uriTransformer = (Uri input) =>
-      Uri.parse(input.path.replaceFirst(videosBaseDirectoryPath, baseUrl));
+      Uri.parse(input.path.replaceFirst(mediaBaseDirectoryPath, baseUrl));
 
   final feedFormatter = RSS_2_0_FeedFormatter(uriTransformer);
 
@@ -54,18 +54,18 @@ Future main(List<String> args) async {
   final feedFiles = feedsBaseDirectory
       .listSync(recursive: false)
       .where((file) => path.extension(file.path) == '.json');
-  final videosBaseDirectory = Directory(videosBaseDirectoryPath);
-  final videoFolders = videosBaseDirectory
+  final mediaBaseDirectory = Directory(mediaBaseDirectoryPath);
+  final mediaFolders = mediaBaseDirectory
       .listSync(recursive: false)
       .where((entity) => entity is Directory);
-  final validFeedNames = [...feedFiles, ...videoFolders]
+  final validFeedNames = [...feedFiles, ...mediaFolders]
       .map((entity) => path.basenameWithoutExtension(entity.uri.path))
       .toSet();
   validFeedNames
       .forEach((feedName) => print('$feedName Feed: $baseUrl/$feedName'));
 
-  // Make all media under /web/videos accessible.
-  var staticFiles = VirtualDirectory(videosBaseDirectoryPath);
+  // Make all media under /web/media accessible.
+  var staticFiles = VirtualDirectory(mediaBaseDirectoryPath);
   staticFiles.allowDirectoryListing = true;
   staticFiles.directoryHandler = (dir, request) {
     var indexUri = Uri.file(dir.path).resolve('index.html');

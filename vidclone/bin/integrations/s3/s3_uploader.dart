@@ -15,18 +15,18 @@ abstract class S3Uploader extends Uploader {
 
   // Get the s3 key (The "file name". The latter part of the url; does not
   // include the bucket name)
-  String getKey(Video video, [String extension = 'mp4']) {
+  String getKey(Media media, [String extension = 'mp4']) {
     final test = '4';
-    return 'videate${test}/${video.source.platform.id}/${video.source.id}.$extension';
+    return 'videate${test}/${media.source.platform.id}/${media.source.id}.$extension';
   }
 
-  String getBucketName(Video video) {
-    // All videos are currently in the same bucket. This is likely to change.
+  String getBucketName(Media media) {
+    // All media are currently in the same bucket. This is likely to change.
     return 'videate';
   }
 
-  Bucket getBucket(Video video) {
-    final bucketName = getBucketName(video);
+  Bucket getBucket(Media media) {
+    final bucketName = getBucketName(media);
 
     return Bucket(
         region: region,
@@ -36,69 +36,69 @@ abstract class S3Uploader extends Uploader {
   }
 
   @override
-  Future<ServedVideo> upload(VideoFile videoFile) async {
-    // _uploadStream currently fails due to authentication issues. return
-    // _uploadStream(videoFile);
+  Future<ServedMedia> upload(MediaFile mediaFile) async {
+    // _uploadStream currently fails due to authentication issues.
+    // return _uploadStream(mediaFile);
 
-    return _uploadFile(videoFile);
+    return _uploadFile(mediaFile);
   }
 
   // Uploads the entire file at once
-  Future<ServedVideo> _uploadFile(VideoFile videoFile) async {
-    final bucket = getBucket(videoFile.video);
-    final key = getKey(videoFile.video);
-    final length = videoFile.file.lengthSync();
-    final uri = getDestinationUri(videoFile.video);
+  Future<ServedMedia> _uploadFile(MediaFile mediaFile) async {
+    final bucket = getBucket(mediaFile.media);
+    final key = getKey(mediaFile.media);
+    final length = mediaFile.file.lengthSync();
+    final uri = getDestinationUri(mediaFile.media);
 
     final etag = await bucket.uploadFile(
-        key, videoFile.file.path, 'video/mp4', Permissions.public);
+        key, mediaFile.file.path, 'video/mp4', Permissions.public);
 
-    final servedVideo = ServedVideo((b) => b
-      ..video = videoFile.video.toBuilder()
+    final servedMedia = ServedMedia((b) => b
+      ..media = mediaFile.media.toBuilder()
       ..uri = uri
       ..etag = etag
       ..lengthInBytes = length);
 
-    return servedVideo;
+    return servedMedia;
   }
 
   // Uploads the file in chunks. This is useful so the entire file does not
   // need to be read into memory all at once.
-  Future<ServedVideo> _uploadStream(VideoFile videoFile) async {
-    final bucket = getBucket(videoFile.video);
-    final key = getKey(videoFile.video);
-    final length = videoFile.file.lengthSync();
+  Future<ServedMedia> _uploadStream(MediaFile mediaFile) async {
+    final bucket = getBucket(mediaFile.media);
+    final key = getKey(mediaFile.media);
+    final length = mediaFile.file.lengthSync();
 
     // Dart complains about type mismatches unless we explicitly convert each
     // entry into a List<int> type, not Uint8List
     final Stream<List<int>> fileStream =
-        videoFile.file.openRead().map((uInt8List) => List<int>.from(uInt8List));
+        mediaFile.file.openRead().map((uInt8List) => List<int>.from(uInt8List));
 
     final etag = await bucket.uploadFileStream(
         key, fileStream, length, 'video/mp4', Permissions.public);
 
-    final uri = getDestinationUri(videoFile.video);
+    final uri = getDestinationUri(mediaFile.media);
 
-    final servedVideo = ServedVideo((b) => b
-      ..video = videoFile.video.toBuilder()
+    final servedMedia = ServedMedia((b) => b
+      ..media = mediaFile.media.toBuilder()
       ..uri = uri
       ..etag = etag
-      ..lengthInBytes = videoFile.file.lengthSync());
+      ..lengthInBytes = mediaFile.file.lengthSync());
 
-    return servedVideo;
+    return servedMedia;
   }
 
   @override
-  Uri getDestinationUri(Video video) {
-    final bucketName = getBucketName(video);
-    final key = getKey(video);
+  Uri getDestinationUri(Media media) {
+    final bucketName = getBucketName(media);
+    final key = getKey(media);
     return Uri.parse('http://$bucketName.$endpointUrl/$key');
   }
 
   @override
-  Future<ServedVideo> getExistingServedVideo(Video video) async {
-    final key = getKey(video);
-    final bucket = getBucket(video);
+  Future<ServedMedia> getExistingServedMedia(Media media) async {
+    final key = getKey(media);
+    final bucket = getBucket(media);
     // var contents = await bucket.listContents(prefix: key, delimiter: '/');
     var contents = await bucket.listContents();
     final list = await contents.toList();
@@ -114,9 +114,9 @@ abstract class S3Uploader extends Uploader {
 
     final match = list[0];
 
-    return ServedVideo((b) => b
-      ..uri = getDestinationUri(video)
-      ..video = video.toBuilder()
+    return ServedMedia((b) => b
+      ..uri = getDestinationUri(media)
+      ..media = media.toBuilder()
       ..etag = match.eTag
       ..lengthInBytes = match.size);
   }

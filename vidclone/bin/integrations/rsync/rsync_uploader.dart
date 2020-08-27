@@ -15,34 +15,34 @@ abstract class RsyncUploader extends Uploader with Rsync {
 
   RsyncUploader();
 
-  String getKey(Video video, [String extension = 'mp4']) {
-    return 'videos/${video.source.platform.id}/${video.source.id}.$extension';
+  String getKey(Media media, [String extension = 'mp4']) {
+    return 'media/${media.source.platform.id}/${media.source.id}.$extension';
   }
 
   @override
-  Future<ServedVideo> upload(VideoFile videoFile) async {
-    final key = getKey(videoFile.video);
-    await push(videoFile.file, key);
+  Future<ServedMedia> upload(MediaFile mediaFile) async {
+    final key = getKey(mediaFile.media);
+    await push(mediaFile.file, key);
 
-    return ServedVideo((b) => b
-      ..uri = getDestinationUri(videoFile.video)
-      ..video = videoFile.video.toBuilder()
+    return ServedMedia((b) => b
+      ..uri = getDestinationUri(mediaFile.media)
+      ..media = mediaFile.media.toBuilder()
       ..etag = 'a1b2c3'
-      ..lengthInBytes = videoFile.file.lengthSync());
+      ..lengthInBytes = mediaFile.file.lengthSync());
   }
 
   @override
-  Uri getDestinationUri(Video video) {
-    final key = getKey(video);
+  Uri getDestinationUri(Media media) {
+    final key = getKey(media);
     return Uri.parse('$endpointUrl/$key');
   }
 
   @override
-  Future<ServedVideo> getExistingServedVideo(Video video) async {
-    final uri = getDestinationUri(video);
+  Future<ServedMedia> getExistingServedMedia(Media media) async {
+    final uri = getDestinationUri(media);
     var response = await client.head(uri);
     if (response.statusCode == 404) {
-      // Video not found
+      // Media not found
       return null;
     }
     if (response.statusCode != 200) {
@@ -52,9 +52,9 @@ abstract class RsyncUploader extends Uploader with Rsync {
     final etag = response.headers['etag'];
     final length = int.parse(response.headers['content-length']);
 
-    return ServedVideo((b) => b
-      ..uri = getDestinationUri(video)
-      ..video = video.toBuilder()
+    return ServedMedia((b) => b
+      ..uri = getDestinationUri(media)
+      ..media = media.toBuilder()
       ..etag = etag
       ..lengthInBytes = length);
   }

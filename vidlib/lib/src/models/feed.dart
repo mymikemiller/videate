@@ -1,8 +1,8 @@
-// Contains all the metadata associated with a video feed
+// Contains all the metadata associated with a media feed
 import 'dart:convert';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:vidlib/src/models/served_video.dart';
+import 'package:vidlib/src/models/served_media.dart';
 import 'package:built_collection/built_collection.dart';
 import '../serializers.dart';
 part 'feed.g.dart';
@@ -15,7 +15,7 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
   String get author;
   String get email;
   String get imageUrl;
-  BuiltList<ServedVideo> get videos;
+  BuiltList<ServedMedia> get mediaList;
 
   // The builder pattern is required by built_value, which we use for serialization
   Feed._();
@@ -38,13 +38,13 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
     return jsonEncode(serialized);
   }
 
-  Feed withVideoAdded(ServedVideo video) {
-    return rebuild((b) => b.videos.add(video));
+  Feed withMediaAdded(ServedMedia media) {
+    return rebuild((b) => b.mediaList.add(media));
   }
 
-  Feed withAllVideosAdded(List<ServedVideo> videos) {
-    return rebuild((b) => b.videos.addAll(videos));
+  Feed withAllMediaAdded(List<ServedMedia> mediaList) {
+    return rebuild((b) => b.mediaList.addAll(mediaList));
   }
 
-  ServedVideo get mostRecentVideo => videos.isEmpty ? null : videos.last;
+  ServedMedia get mostRecentMedia => mediaList.isEmpty ? null : mediaList.last;
 }

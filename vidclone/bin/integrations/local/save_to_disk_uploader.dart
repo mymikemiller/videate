@@ -22,47 +22,47 @@ class SaveToDiskUploader extends Uploader {
   }
 
   @override
-  Future<ServedVideo> upload(VideoFile videoFile) async {
-    final uri = getDestinationUri(videoFile.video);
+  Future<ServedMedia> upload(MediaFile mediaFile) async {
+    final uri = getDestinationUri(mediaFile.media);
 
-    await copyToFileSystem(videoFile.file, fileSystem, uri);
+    await copyToFileSystem(mediaFile.file, fileSystem, uri);
 
-    final servedVideo = ServedVideo((b) => b
-      ..video = videoFile.video.toBuilder()
+    final servedMedia = ServedMedia((b) => b
+      ..media = mediaFile.media.toBuilder()
       ..uri = uri
-      ..etag = _generateEtag(videoFile)
-      ..lengthInBytes = videoFile.file.lengthSync());
+      ..etag = _generateEtag(mediaFile)
+      ..lengthInBytes = mediaFile.file.lengthSync());
 
-    return servedVideo;
+    return servedMedia;
   }
 
-  String _generateEtag(VideoFile videoFile) {
+  String _generateEtag(MediaFile mediaFile) {
     // Assume a file has not been changed if its size exactly matches. Using a
     // crypto checksum shoudn't be necessary.
-    return videoFile.file.lengthSync().toString();
+    return mediaFile.file.lengthSync().toString();
   }
 
   @override
-  Uri getDestinationUri(Video video, [extension = 'mp4']) {
-    // The video's source id is guaranteed to be unique among all videos on that
+  Uri getDestinationUri(Media media, [extension = 'mp4']) {
+    // The media's source id is guaranteed to be unique among all media on that
     // source, so we use that as the filename. We won't have collisions across
-    // sources because we also put each video into a folder named after its
+    // sources because we also put each media into a folder named after its
     // source platform.
-    return Uri.file(p.join(directory.path, '${video.source.id}.$extension'));
+    return Uri.file(p.join(directory.path, '${media.source.id}.$extension'));
   }
 
   @override
-  Future<ServedVideo> getExistingServedVideo(Video video) async {
-    final uri = getDestinationUri(video);
+  Future<ServedMedia> getExistingServedMedia(Media media) async {
+    final uri = getDestinationUri(media);
     final file = fileSystem.file(Uri.decodeFull(uri.path));
     if (!file.existsSync()) {
       return null;
     }
 
-    return ServedVideo((b) => b
+    return ServedMedia((b) => b
       ..uri = uri
-      ..video = video.toBuilder()
-      ..etag = _generateEtag(VideoFile(video, file))
+      ..media = media.toBuilder()
+      ..etag = _generateEtag(MediaFile(media, file))
       ..lengthInBytes = file.lengthSync());
   }
 }

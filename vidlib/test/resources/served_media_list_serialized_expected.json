@@ -2,9 +2,9 @@
     "$": "list",
     "": [
         {
-            "$": "ServedVideo",
-            "video": {
-                "title": "Video 1",
+            "$": "ServedMedia",
+            "media": {
+                "title": "Media 1",
                 "description": "Description 1",
                 "source": {
                     "platform": {
@@ -23,9 +23,9 @@
             "lengthInBytes": 100000
         },
         {
-            "$": "ServedVideo",
-            "video": {
-                "title": "Video 2",
+            "$": "ServedMedia",
+            "media": {
+                "title": "Media 2",
                 "description": "Description 2",
                 "source": {
                     "platform": {

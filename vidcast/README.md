@@ -1,6 +1,7 @@
 # VidCast
 
-A video podcast host and RSS feed generator incorporating viewer feedback to automatically download recommended videos.
+A video (and other media) podcast host and RSS feed generator incorporating
+consumer feedback to automatically download recommended media.
 
 ## Usage
 
@@ -29,8 +30,12 @@ cd vidcast
 pub get
 ```
 
-Set up environment variables:
-The machine's environment variables are used as expected when running the application from the terminal, but VSCode does not pick up the machine's environment variables when debugging. Values can be specified in the launch.json file for each configuration, but since we have that file in source control but need different values per machine, we use the dotenv package and put the environment variables in a local .env file.
+Set up environment variables: The machine's environment variables are used as
+expected when running the application from the terminal, but VSCode does not
+pick up the machine's environment variables when debugging. Values can be
+specified in the launch.json file for each configuration, but since we have
+that file in source control but need different values per machine, we use the
+dotenv package and put the environment variables in a local .env file.
 
 Variable | Definition | Examples
 --- | --- | ---

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:file/memory.dart';
-import 'package:vidlib/src/models/video.dart';
+import 'package:vidlib/src/models/media.dart';
 import 'dart:async';
 import 'package:vidlib/vidlib.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
@@ -36,16 +36,16 @@ class YoutubeDownloader extends Downloader {
         super();
 
   @override
-  Future<VideoFile> download(Video video,
+  Future<MediaFile> download(Media media,
       [void Function(double progress) callback]) async {
-    final videoId = getSourceUniqueId(video);
+    final videoId = getSourceUniqueId(media);
 
     // Set up a temporary file to hold the contents of the download
     final path = p.join(memoryFileSystem.systemTempDirectory.path, videoId);
     final file = memoryFileSystem.file(path);
 
     await _download(videoId, file, callback);
-    return VideoFile(video, file);
+    return MediaFile(media, file);
   }
 
   // Download the video with the specified id to the specified file, which will
@@ -110,7 +110,7 @@ class YoutubeDownloader extends Downloader {
   }
 
   @override
-  Stream<Video> allVideos(SourceCollection sourceCollection) {
+  Stream<Media> allMedia(SourceCollection sourceCollection) {
     if (sourceCollection.platform != getPlatform()) {
       throw 'sourceCollection platform mismatch';
     }
@@ -120,7 +120,7 @@ class YoutubeDownloader extends Downloader {
     final channelId = yt_explode.ChannelId(sourceCollection.identifier);
     final stream = _youtubeExplode.channels.getUploads(channelId);
 
-    return stream.map((upload) => Video((v) => v
+    return stream.map((upload) => Media((v) => v
       ..title = upload.title
       ..description = upload.description
       ..duration = upload.duration
@@ -140,8 +140,8 @@ class YoutubeDownloader extends Downloader {
   }
 
   @override
-  String getSourceUniqueId(Video video) =>
-      yt_explode.VideoId.parseVideoId(video.source.uri.toString());
+  String getSourceUniqueId(Media media) =>
+      yt_explode.VideoId.parseVideoId(media.source.uri.toString());
 
   @override
   Feed createEmptyFeed(SourceCollection sourceCollection) {

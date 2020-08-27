@@ -21,10 +21,10 @@ class UploaderTest {
   UploaderTest(this.uploader);
 }
 
-final successMockClient = (VideoFile videoFile) => MockClient((request) async {
+final successMockClient = (MediaFile mediaFile) => MockClient((request) async {
       return Response('', 200, headers: {
         'etag': 'a1b2c3',
-        'content-length': videoFile.file.lengthSync().toString()
+        'content-length': mediaFile.file.lengthSync().toString()
       });
     });
 
@@ -38,30 +38,29 @@ void main() {
   for (var uploaderTest in uploaderTests) {
     group('${uploaderTest.uploader.id} uploader', () {
       test('uploads', () async {
-        final file =
-            LocalFileSystem().file('test/resources/videos/video_1.mp4');
+        final file = LocalFileSystem().file('test/resources/media/video_1.mp4');
 
-        final videoFile = VideoFile(Examples.video1, file);
+        final mediaFile = MediaFile(Examples.media1, file);
 
         // The file should not exist at the destination yet
         uploaderTest.uploader.client = failureMockClient;
-        final existingServedVideo =
-            await uploaderTest.uploader.getExistingServedVideo(videoFile.video);
-        expect(existingServedVideo == null, true);
+        final existingservedMedia =
+            await uploaderTest.uploader.getExistingServedMedia(mediaFile.media);
+        expect(existingservedMedia == null, true);
 
         // Upload the file
-        final servedVideo = await uploaderTest.uploader.upload(videoFile);
-        expect(servedVideo == null, false);
+        final servedMedia = await uploaderTest.uploader.upload(mediaFile);
+        expect(servedMedia == null, false);
 
         // Verify that the file now exists at the destination
-        uploaderTest.uploader.client = successMockClient(videoFile);
-        final finalServedVideo =
-            await uploaderTest.uploader.getExistingServedVideo(videoFile.video);
-        expect(finalServedVideo == null, false);
+        uploaderTest.uploader.client = successMockClient(mediaFile);
+        final finalservedMedia =
+            await uploaderTest.uploader.getExistingServedMedia(mediaFile.media);
+        expect(finalservedMedia == null, false);
 
-        // Both [upload] and [getExistingServedVideo] should return the same
+        // Both [upload] and [getExistingservedMedia] should return the same
         // object
-        expect(finalServedVideo, servedVideo);
+        expect(finalservedMedia, servedMedia);
       });
     });
 

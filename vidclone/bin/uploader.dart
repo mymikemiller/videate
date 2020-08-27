@@ -14,13 +14,13 @@ abstract class Uploader extends ClonerTask {
 
   /// Uploads the file so it is available at the destination returned by
   /// [getDestinationUri].
-  Future<ServedVideo> upload(VideoFile file);
+  Future<ServedMedia> upload(MediaFile file);
 
-  /// Get a Uri that is guaranteed to be unique to this video among all videos,
+  /// Get a Uri that is guaranteed to be unique to this media among all media,
   /// even across different sources.
-  Uri getDestinationUri(Video video);
+  Uri getDestinationUri(Media media);
 
-  // Returns the [ServedVideo] if it already exists at the destination,
+  // Returns the [ServedMedia] if it already exists at the destination,
   // otherwise returns null.
-  Future<ServedVideo> getExistingServedVideo(Video video);
+  Future<ServedMedia> getExistingServedMedia(Media media);
 }

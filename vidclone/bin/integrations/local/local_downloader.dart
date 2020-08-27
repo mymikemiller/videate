@@ -1,12 +1,12 @@
-import 'package:vidlib/src/models/video_file.dart';
-import 'package:vidlib/src/models/video.dart';
+import 'package:vidlib/src/models/media_file.dart';
+import 'package:vidlib/src/models/media.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/vidlib.dart';
 import 'dart:io';
 import '../../downloader.dart';
 import 'package:path/path.dart';
 
-// Doesn't actually download anything, instead constructs Video objects based
+// Doesn't actually download anything, instead constructs Media objects based
 // on files in a folder.
 class LocalDownloader extends Downloader {
   static const filePathIdentifierMeaning = 'Local File Path';
@@ -25,7 +25,7 @@ class LocalDownloader extends Downloader {
       Downloader.createSourceCollection(
           displayName, getPlatform(), filePathIdentifierMeaning, identifier);
 
-  // An arbitrarily large slidingWindowSize will ensure we return [Video]s in a
+  // An arbitrarily large slidingWindowSize will ensure we return [Media]s in a
   // predictable order
   @override
   int get slidingWindowSize => 99999;
@@ -36,7 +36,7 @@ class LocalDownloader extends Downloader {
 
   // collectionIdentifier is unused for this Downloader
   @override
-  Stream<Video> allVideos(SourceCollection sourceCollection) async* {
+  Stream<Media> allMedia(SourceCollection sourceCollection) async* {
     if (sourceCollection.platform != platform) {
       throw 'sourceCollection platform mismatch';
     }
@@ -63,11 +63,11 @@ class LocalDownloader extends Downloader {
     });
 
     for (var file in files) {
-      // Only 'download' video files
+      // Only 'download' video files for now
       if (isVideo(file)) {
         final duration = await getDuration(file, processRunner: ffprobeRunner);
 
-        final video = Video(
+        final media = Media(
           (b) => b
             ..title = basenameWithoutExtension(file.path)
             ..description = basename(file.path)
@@ -81,7 +81,7 @@ class LocalDownloader extends Downloader {
                 ..id = basenameWithoutExtension(file.path)
                 // We don't know the source release date, so we set it to
                 // epoch. Setting it to the file's modified date
-                // (file.statSync().modified.toUtc()) would ensure the videos
+                // (file.statSync().modified.toUtc()) would ensure the media
                 // show up in a somewhat desirable order, but this causes
                 // issues with testing because the test files end up with
                 // different modified dates on the CI server.
@@ -93,28 +93,28 @@ class LocalDownloader extends Downloader {
             ..duration = duration,
         );
 
-        yield video;
+        yield media;
       }
     }
   }
 
-  /// "Downloads" the specified [Video] by simply creating a [VideoFile] from
-  /// the [File] at the [Video]'s uri
+  /// "Downloads" the specified [Media] by simply creating a [MediaFile] from
+  /// the [File] at the [Media]'s uri
   @override
-  Future<VideoFile> download(Video video,
+  Future<MediaFile> download(Media media,
       [void Function(double progress) callback]) {
-    final path = Uri.decodeFull(video.source.uri.path.toString());
+    final path = Uri.decodeFull(media.source.uri.path.toString());
     final sourceFile = File(path);
     if (!sourceFile.existsSync()) {
       throw 'Could not download local file. File not found: $path';
     }
-    final videoFile = VideoFile(video, sourceFile);
-    return Future.value(videoFile);
+    final mediaFile = MediaFile(media, sourceFile);
+    return Future.value(mediaFile);
   }
 
   @override
-  String getSourceUniqueId(Video video) {
-    return video.source.uri.toString();
+  String getSourceUniqueId(Media media) {
+    return media.source.uri.toString();
   }
 
   @override

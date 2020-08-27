@@ -36,7 +36,7 @@ void main(List<String> arguments) async {
   final internetArchiveSecretKey =
       getEnvVar('INTERNET_ARCHIVE_SECRET_KEY', env);
   final home = Platform.environment['HOME'];
-  final videosBaseDirectory = Directory('$home/web/videos');
+  final mediaBaseDirectory = Directory('$home/web/media');
   final feedsBaseDirectory = Directory('$home/web/feeds');
   final sourceCollectionsFile = File('$home/videate/source_collections.json');
 
@@ -53,16 +53,16 @@ void main(List<String> arguments) async {
   // final sourceCollection = YoutubeDownloader.createChannelIdSourceCollection(
   //     youtube_channel_ids[feedName]);
   // final sourceCollection = LocalDownloader.createFilePathSourceCollection(
-  //     p.join(videosBaseDirectory.path, downloader.platform.id, feedName));
+  //     p.join(mediaBaseDirectory.path, downloader.platform.id, feedName));
   // final list =
   //     BuiltList<SourceCollection>([sourceCollection, sourceCollection2]);
   // final listJson = jsonSerializers.serialize(list);
   // final listString = json.encode(listJson);
 
   // final uploader = InternetArchiveUploader(internetArchiveAccessKey,
-  //     internetArchiveSecretKey);
-  // final uploader = SaveToDiskUploader(LocalFileSystem().directory(
-  //     p.join(videosBaseDirectory.path, downloader.platform.id, feedName)));
+  //     internetArchiveSecretKey); final uploader =
+  //     SaveToDiskUploader(LocalFileSystem().directory(p.join(mediaBaseDirectory.path,
+  //     downloader.platform.id, feedName)));
   final uploader = Cdn77Uploader();
 
   final feedManager = await JsonFileFeedManager(
@@ -82,36 +82,37 @@ void main(List<String> arguments) async {
     }
 
     if (downloader is LocalDownloader) {
-      // Special case for LocalDownloader, where we always "download" everything.
-      // This is necessary because all local videos have the same releaseDate.
-      await for (var servedVideo in cloner.cloneCollection(sourceCollection)) {
-        print('(Local) Cloned video available at ${servedVideo.uri}');
+      // Special case for LocalDownloader, where we always "download"
+      // everything. This is necessary because all local files have the same
+      // hard-coded releaseDate.
+      await for (var servedMedia in cloner.cloneCollection(sourceCollection)) {
+        print('(Local) Cloned media available at ${servedMedia.uri}');
       }
     } else {
       // Figure out how far back in time we need to clone. This value will be
       // null if the feed is currently empty.
-      final mostRecentVideoAlreadyInFeed = feedManager.feed.mostRecentVideo;
+      final mostRecentMediaAlreadyInFeed = feedManager.feed.mostRecentMedia;
 
       if (forcedCloneStartDate == null &&
-          mostRecentVideoAlreadyInFeed == null) {
-        // Clone the source's most recent video
-        final servedVideo = await cloner.cloneMostRecentVideo(sourceCollection);
-        print('(First) Cloned video available at ${servedVideo.uri}');
+          mostRecentMediaAlreadyInFeed == null) {
+        // Clone the source's most recent media
+        final servedMedia = await cloner.cloneMostRecentMedia(sourceCollection);
+        print('(First) Cloned media available at ${servedMedia.uri}');
       } else {
-        // Clone only videos newer than the most recent video we already have
+        // Clone only media newer than the most recent media we already have
         var cloneStartDate;
         if (forcedCloneStartDate != null) {
           print('Forcing clone to begin at start date $forcedCloneStartDate');
           cloneStartDate = forcedCloneStartDate;
         } else {
           print(
-              'Cloning videos newer than the most recent video in feed (${mostRecentVideoAlreadyInFeed.video.title})');
+              'Cloning media newer than the most recent media in feed (${mostRecentMediaAlreadyInFeed.media.title})');
           cloneStartDate =
-              mostRecentVideoAlreadyInFeed.video.source.releaseDate;
+              mostRecentMediaAlreadyInFeed.media.source.releaseDate;
         }
-        await for (var servedVideo
+        await for (var servedMedia
             in cloner.cloneCollection(sourceCollection, cloneStartDate)) {
-          print('(Additional) Cloned video available at ${servedVideo.uri}');
+          print('(Additional) Cloned media available at ${servedMedia.uri}');
         }
       }
     }

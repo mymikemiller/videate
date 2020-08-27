@@ -3,7 +3,7 @@ import 'package:vidlib/vidlib.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('VidInfo', () {
+  group('VideoUtilities', () {
     test('parses duration', () async {
       expect(
           parseDuration('11:22:33.456789'),

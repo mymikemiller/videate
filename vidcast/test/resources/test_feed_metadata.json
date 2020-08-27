@@ -8,9 +8,9 @@
     "email": "john.doe@example.com",
     "imageUrl": "http://example.com/example.jpg",
     "image": "https://example.com/image.jpg",
-    "videos": [
+    "mediaList": [
         {
-            "video": {
+            "media": {
                 "title": "Six Second Video",
                 "description": "A six second video.",
                 "source": {
@@ -28,12 +28,12 @@
                 ],
                 "duration": "0:06:00.00000"
             },
-            "uri": "test/resources/videos/six_second_video.mp4",
+            "uri": "test/resources/media/six_second_video.mp4",
             "etag": "abc111xyz",
             "lengthInBytes": 56120
         },
         {
-            "video": {
+            "media": {
                 "title": "Nine Second Video",
                 "description": "A nine second video.",
                 "source": {
@@ -51,7 +51,7 @@
                 ],
                 "duration": "0:09:00.00000"
             },
-            "uri": "test/resources/videos/nine_second_video.mp4",
+            "uri": "test/resources/media/nine_second_video.mp4",
             "etag": "abc111xyz",
             "lengthInBytes": 74929
         }

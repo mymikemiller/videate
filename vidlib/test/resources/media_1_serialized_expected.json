@@ -1,6 +1,6 @@
 {
-    "$": "Video",
-    "title": "Video 1",
+    "$": "Media",
+    "title": "Media 1",
     "description": "Description 1",
     "source": {
         "platform": {

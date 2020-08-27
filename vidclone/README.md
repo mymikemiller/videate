@@ -1,6 +1,7 @@
 # VidClone
 
-With permission from a user, automatically clones their video content into a format VidCast can host as a podcast
+With permission from a user, automatically clones their media content into a
+format VidCast can host as a podcast
 
 ## Usage
 ```

@@ -2,7 +2,7 @@ import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 part 'platform.g.dart';
 
-// Represents the platform where videos were originally released, e.g. youtube
+// Represents the platform where the media was originally released, e.g. youtube
 abstract class Platform implements Built<Platform, PlatformBuilder> {
   // The Uri to the platform's main page, e.g. 'http://www.youtube.com'
   Uri get uri;

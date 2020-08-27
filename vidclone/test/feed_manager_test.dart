@@ -101,18 +101,18 @@ void main() async {
         expect(feedManagerTest.feedManager.feed, Examples.feed1);
       });
 
-      test('adds videos', () async {
+      test('adds media', () async {
         feedManagerTest.feedManager.feed = Examples.emptyFeed;
-        expect(feedManagerTest.feedManager.feed.videos.length, 0);
-        await feedManagerTest.feedManager.add(Examples.servedVideo1);
-        expect(feedManagerTest.feedManager.feed.videos.length, 1);
+        expect(feedManagerTest.feedManager.feed.mediaList.length, 0);
+        await feedManagerTest.feedManager.add(Examples.servedMedia1);
+        expect(feedManagerTest.feedManager.feed.mediaList.length, 1);
         await feedManagerTest.feedManager
-            .addAll([Examples.servedVideo2, Examples.servedVideo3]);
-        expect(feedManagerTest.feedManager.feed.videos.length, 3);
-        expect(feedManagerTest.feedManager.feed.videos.toList(), [
-          Examples.servedVideo1,
-          Examples.servedVideo2,
-          Examples.servedVideo3
+            .addAll([Examples.servedMedia2, Examples.servedMedia3]);
+        expect(feedManagerTest.feedManager.feed.mediaList.length, 3);
+        expect(feedManagerTest.feedManager.feed.mediaList.toList(), [
+          Examples.servedMedia1,
+          Examples.servedMedia2,
+          Examples.servedMedia3
         ]);
       });
 

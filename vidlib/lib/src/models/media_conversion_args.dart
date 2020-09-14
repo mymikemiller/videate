@@ -6,8 +6,8 @@ part 'media_conversion_args.g.dart';
 
 abstract class MediaConversionArgs
     implements Built<MediaConversionArgs, MediaConversionArgsBuilder> {
-  // Uniquely identifies the type of media conversion these args apply to, e.g.
-  // 'HEVC' for conversions of videos into H.265
+  // Matches the `id` in the MediaConverter these args apply to, e.g. 'HEVC'
+  // for conversions of videos into H.265
   String get id;
 
   // A list of arguments to configure the conversion. The format for these args

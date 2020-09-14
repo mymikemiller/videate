@@ -11,7 +11,7 @@ class MockRsyncUploader extends RsyncUploader {
 
   @override
   ProcessResult Function(String executable, List<String> arguments)
-      get processRunner => noopProcess;
+      get processRunner => noopProcessRun;
 
   @override
   String get endpointUrl => 'http://example.com';

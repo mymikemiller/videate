@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:file/local.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:file/memory.dart';
 import 'downloader.dart';
 import 'feed_manager.dart';
+import 'media_converter.dart';
 import 'uploader.dart';
 import 'package:console/console.dart';
 
@@ -13,20 +15,23 @@ final memoryFileSystem = MemoryFileSystem();
 
 class Cloner {
   final Downloader _downloader;
+  final MediaConverter _mediaConverter;
   final Uploader _uploader;
   final FeedManager _feedManager;
 
-  Cloner(this._downloader, this._uploader, this._feedManager);
+  Cloner(this._downloader, this._mediaConverter, this._uploader,
+      this._feedManager);
 
-  // Clones the [Media] by downloading it from the source, uploading it to the
-  // destination, then updating a feed.
+  // Clones the [Media] by downloading it from the source, converting the file
+  // if necessary, uploading it to the destination, then updating a feed.
   //
   // Downloading and uploading will be performed according to this Cloner's
   // Downloader and Upoader behavior.
   //
-  // Media that already exist at the uploader's destination will not be
-  // cloned. Instead, a [ServedMedia] will be immediately returned.
-  Future<ServedMedia> clone(Media media) async {
+  // Media that already exist at the uploader's destination will not be cloned.
+  // Instead, a [ServedMedia] will be immediately returned.
+  Future<ServedMedia> clone(
+      Media media, MediaConversionArgs conversionArgs) async {
     final mediaDebugName =
         '${media.source.platform.id} Media ${media.source.id}';
     Console.init();
@@ -49,23 +54,24 @@ class Cloner {
 
       // Download
       print('=== Clone: Download $mediaDebugName ===');
-      var progressBar = ProgressBar();
-      final downloadResult = await time(_downloader.download, [
-        media,
-        (double progress) {
-          updateProgressBar(progressBar, progress);
-        }
-      ]);
-      final fsMedia = await downloadResult.returnValue;
-      print('=== ⏲ ${downloadResult.time} ⏲ ===');
+      final downloadResult =
+          await time(_downloader.download, [media], {}, 'callback');
+      final downloadedMedia = await downloadResult.returnValue;
+      print('=== ⏲  ${downloadResult.time} ⏲ ===');
+
+      // Convert
+      print('=== Clone: Convert $mediaDebugName ===');
+      final conversionResult = await time(_mediaConverter.convert,
+          [downloadedMedia, conversionArgs], {}, 'callback');
+      final convertedMedia = await conversionResult.returnValue;
+      print('=== ⏲${conversionResult.time} ⏲===');
 
       // Upload
       print('=== Clone: Upload $mediaDebugName ===');
-      final uploadResult = await time(_uploader.upload, [fsMedia]);
+      final uploadResult = await time(_uploader.upload, [convertedMedia]);
       servedMedia = await uploadResult.returnValue;
-      print('=== ⏲ ${uploadResult.time} ⏲ ===');
-
-      print('served media: ${servedMedia.uri}');
+      print('=== ⏲${uploadResult.time} ⏲ ===');
+      print('served media:${servedMedia.uri}');
     }
 
     // Update the feed to include the new media
@@ -79,12 +85,13 @@ class Cloner {
   // This function can be parallelized, but caution should be taken to ensure
   // upload order is maintained if desired, and blocking doesn't occur due to
   // too many simultaneous downloads/uploads.
-  Stream<ServedMedia> _cloneAll(Iterable<Media> media) async* {
+  Stream<ServedMedia> _cloneAll(
+      Iterable<Media> media, MediaConversionArgs conversionArgs) async* {
     for (var media in media) {
       // This can be parallelized, but for simplicity's sake we're awaiting
       // each one here TODO: parallelize this (a queue allowing up to x
       // downloads to run at once). See https://pub.dev/packages/queue
-      final servedMedia = await clone(media);
+      final servedMedia = await clone(media, conversionArgs);
       yield servedMedia;
     }
   }
@@ -94,7 +101,8 @@ class Cloner {
   //
   // Media will be cloned in chronological order (in the same order they were
   // originally published at the source).
-  Stream<ServedMedia> cloneCollection(SourceCollection sourceCollection,
+  Stream<ServedMedia> cloneCollection(
+      SourceCollection sourceCollection, MediaConversionArgs conversionArgs,
       [DateTime after]) async* {
     // Because reverseChronologicalMedia returns newest media first, we must
     // first get the list of all media and reverse it before cloning any media.
@@ -103,36 +111,22 @@ class Cloner {
     if (mediaList.isEmpty) {
       print('No media found after $after for ${sourceCollection}');
     } else {
-      await for (var servedMedia in _cloneAll(mediaList)) {
+      await for (var servedMedia in _cloneAll(mediaList, conversionArgs)) {
         yield servedMedia;
       }
-      // TODO: switch to this? yield* _cloneAll(mediaList);
+      // TODO: switch to this? yield* _cloneAll(mediaList, conversionArgs);
     }
   }
 
-  void updateProgressBar(ProgressBar progressBar, double progress) {
-    final progressInt = (progress * 100).round();
-    try {
-      progressBar.update(progressInt);
-    } on StdoutException catch (e) {
-      if (e.message == 'Could not get terminal size') {
-        print(
-            'If using VSCode, make sure you\'re using the Integrated Terminal,'
-            ' as the Debug Console does not support cursor positioning '
-            'necessary to display the progress bar. Set `"console": '
-            '"terminal"` in launch.json.');
-      }
-    }
-  }
-
-  Future<ServedMedia> cloneMostRecentMedia(
-      SourceCollection sourceCollection) async {
+  Future<ServedMedia> cloneMostRecentMedia(SourceCollection sourceCollection,
+      MediaConversionArgs conversionArgs) async {
     final media = await _downloader.mostRecentMedia(sourceCollection);
-    return clone(media);
+    return clone(media, conversionArgs);
   }
 
   void close() {
     _downloader.close();
+    _mediaConverter.close();
     _uploader.close();
     _feedManager.close();
   }

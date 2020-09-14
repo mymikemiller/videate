@@ -37,7 +37,8 @@ installed along with ffmpeg.
 Install ffmpeg (mac instructions using homebrew below):
 
 ```
-brew install ffmpeg
+brew tap homebrew-ffmpeg/ffmpeg
+
 ```
 
 ## Development (VSCode)

@@ -1,5 +1,9 @@
 import 'dart:io' as io;
+import 'dart:io';
 import 'package:file/file.dart' as f;
+import 'package:file/local.dart';
+import 'package:path/path.dart';
+import 'package:console/console.dart';
 
 class TimeResult {
   final dynamic returnValue;
@@ -7,17 +11,53 @@ class TimeResult {
   TimeResult(this.returnValue, this.time);
 }
 
-// Time the given function, returning an object containing the function's return
-// value and the execution time
+// Time the given function, returning an object containing the function's
+// return value and the execution time
 //
-// To time function call: foo(1, 2, 3, f: 4, g: 5); Use: time(foo, [1,2,3], {#f:
-//   4, #g: 5});
-Future<TimeResult> time(Function function,
-    [List positionalArguments, Map<Symbol, dynamic> namedArguments]) async {
+// To time function call: foo(1, 2, 3, f: 4, g: 5); Use: time(foo, [1,2,3],
+//   {#f: 4, #g: 5});
+//
+// `progressCallbackName`, if set, will display a progress bar by passing in a
+// callback to the named parameter of the specified name. This callback is
+// expected to have the following signature: void Function(double progress)
+Future<TimeResult> time(
+  Function function, [
+  List positionalArguments,
+  Map<Symbol, dynamic> namedArguments,
+  String progressCallbackName,
+]) async {
+  final progressCallbackSymbol = Symbol(progressCallbackName);
+  // If the user specified that the function to time accepts a progress
+  // callback (by specifying progressCallbackName), this function handles
+  // creating and displaying the progress bar while the function is timed. If
+  // the callback is already specified in namedArguments, no progress bar will
+  // be created.
+  if (progressCallbackName != null &&
+      !namedArguments.containsKey(progressCallbackSymbol)) {
+    final progressBar = ProgressBar();
+    final progressCallback = (double progress) {
+      updateProgressBar(progressBar, progress);
+    };
+    namedArguments[progressCallbackSymbol] = progressCallback;
+  }
   final stopwatch = Stopwatch()..start();
   final result =
       await Function.apply(function, positionalArguments, namedArguments);
   return TimeResult(result, stopwatch.elapsed);
+}
+
+void updateProgressBar(ProgressBar progressBar, double progress) {
+  final progressInt = (progress * 100).round();
+  try {
+    progressBar.update(progressInt);
+  } on StdoutException catch (e) {
+    if (e.message == 'Could not get terminal size') {
+      print('If using VSCode, make sure you\'re using the Integrated Terminal,'
+          ' as the Debug Console does not support cursor positioning '
+          'necessary to display the progress bar. Set `"console": '
+          '"terminal"` in launch.json.');
+    }
+  }
 }
 
 // Copies the contents of `file` into a new file at the given `uri` on the
@@ -35,4 +75,14 @@ Future<io.File> copyToFileSystem(
   List bytes = file.readAsBytesSync();
 
   return newFile.writeAsBytes(bytes);
+}
+
+Future<io.File> ensureLocal(f.File file) async {
+  if (file.fileSystem != LocalFileSystem()) {
+    final tempDir = LocalFileSystem().systemTempDirectory.createTempSync();
+    final outputPath = '${tempDir.path}/${basename(file.path)}';
+    final uri = Uri.parse(outputPath);
+    file = await copyToFileSystem(file, LocalFileSystem(), uri);
+  }
+  return file;
 }

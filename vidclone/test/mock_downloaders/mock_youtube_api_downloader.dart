@@ -85,8 +85,8 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
 
   @override
   Future<MediaFile> download(Media media,
-          [void Function(double progress) progressCallback]) =>
-      _delegate.download(media, progressCallback);
+          {Function(double progress) callback}) =>
+      _delegate.download(media, callback: callback);
 
   @override
   void close() => _delegate.close();
@@ -104,6 +104,12 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
   dynamic get processRunner => _delegate.processRunner;
   @override
   set processRunner(_processRunner) => _delegate.processRunner = _processRunner;
+
+  @override
+  dynamic get processStarter => _delegate.processStarter;
+  @override
+  set processStarter(_processStarter) =>
+      _delegate.processStarter = _processStarter;
 }
 
 Future<PlaylistItemListResponse> responseWithJson(String filePath) async {

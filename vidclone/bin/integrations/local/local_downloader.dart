@@ -1,3 +1,4 @@
+import 'package:file/local.dart';
 import 'package:vidlib/src/models/media_file.dart';
 import 'package:vidlib/src/models/media.dart';
 import 'package:built_collection/built_collection.dart';
@@ -40,7 +41,8 @@ class LocalDownloader extends Downloader {
     if (sourceCollection.platform != platform) {
       throw 'sourceCollection platform mismatch';
     }
-    final files = Directory(sourceCollection.identifier)
+    final files = LocalFileSystem()
+        .directory(sourceCollection.identifier)
         .listSync(recursive: false)
         .whereType<File>()
         .toList();
@@ -102,7 +104,7 @@ class LocalDownloader extends Downloader {
   /// the [File] at the [Media]'s uri
   @override
   Future<MediaFile> download(Media media,
-      [void Function(double progress) callback]) {
+      {Function(double progress) callback}) {
     final path = Uri.decodeFull(media.source.uri.path.toString());
     final sourceFile = File(path);
     if (!sourceFile.existsSync()) {

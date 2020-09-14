@@ -6,6 +6,7 @@ import 'package:built_value/standard_json_plugin.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/src/models/feed.dart';
 import 'package:vidlib/src/models/media.dart';
+import 'package:vidlib/src/models/media_conversion_args.dart';
 import 'package:vidlib/src/models/served_media.dart';
 import 'package:vidlib/src/models/platform.dart';
 import 'package:vidlib/src/models/source.dart';
@@ -17,11 +18,13 @@ part 'serializers.g.dart';
 /// Collection of generated serializers for vidlib models.
 @SerializersFor([
   Media,
+  MediaConversionArgs,
   ServedMedia,
   Feed,
   Platform,
   Source,
   SourceCollection,
+  BuiltMap,
 ])
 final Serializers standardSerializers = (_$standardSerializers.toBuilder()
       // Serialize dates in a human-readable format instead of ms since epoch
@@ -31,7 +34,10 @@ final Serializers standardSerializers = (_$standardSerializers.toBuilder()
     .build();
 final Serializers jsonSerializers = (standardSerializers.toBuilder()
       // Serialize as json for easy readability
-      ..addPlugin(StandardJsonPlugin()))
+      ..addPlugin(StandardJsonPlugin())
+      ..addBuilderFactory(
+          FullType(BuiltMap, [FullType(String), FullType(SourceCollection)]),
+          () => MapBuilder<String, SourceCollection>()))
     .build();
 
 T standardDeserialize<T>(dynamic value) => standardSerializers

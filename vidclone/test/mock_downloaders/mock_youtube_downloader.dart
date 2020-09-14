@@ -36,7 +36,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
         18,
         Uri.parse(
             'https://r4---sn-bvvbax4pcxg-naje.googlevideo.com/videoplayback?expire=1593062474&ei=6t_zXu7OJ5mHkgagxp_4BQ&ip=2605%3Aa601%3Aa9b3%3Af900%3A7c9e%3A2092%3A2934%3A8bd9&id=o-AIDNpzWbjS0BJtVrHOU-dOdheDdhWDlDT3CDAD77NZEZ&itag=18&source=youtube&requiressl=yes&mh=ee&mm=31%2C29&mn=sn-bvvbax4pcxg-naje%2Csn-vgqskned&ms=au%2Crdu&mv=m&mvi=3&pl=42&initcwndbps=1463750&vprv=1&mime=video%2Fmp4&gir=yes&clen=6513153&ratebypass=yes&dur=85.542&lmt=1573895279325191&mt=1593040836&fvip=4&c=WEB&txp=5531432&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&sig=AOq0QJ8wRQIgIC2xPHSeTb9gu9EPpbkOV9eH8dIfFarXEF7obiKv_mMCIQD9n5qLVBa6hzVJfLBd66deMS7gDw60IbJ8aN2i7y4uQw%3D%3D&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgIo2Oq8fk3bbzfB9FbtIpFTNDaLxEbGs5qaIJhjW5Pb8CIQC0t2RjdE1U0PxcWPwCOnI6DBVwjKEO9Q3Zx1XxOU4iTA%3D%3D'),
-        yt_explode.Container.mp4,
+        yt_explode.StreamContainer.mp4,
         yt_explode.FileSize(6211426),
         yt_explode.Bitrate(595238),
         'mp4a.40.2',
@@ -117,7 +117,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
 
   @override
   Future<MediaFile> download(Media media,
-          [void Function(double progress) progressCallback]) =>
+          {Function(double progress) callback}) =>
       _delegate.download(media);
 
   @override
@@ -141,6 +141,12 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   dynamic get processRunner => _delegate.processRunner;
   @override
   set processRunner(_processRunner) => _delegate.processRunner = _processRunner;
+
+  @override
+  dynamic get processStarter => _delegate.processStarter;
+  @override
+  set processStarter(_processStarter) =>
+      _delegate.processStarter = _processStarter;
 }
 
 class MockYoutubeExplode extends Mock implements yt_explode.YoutubeExplode {}

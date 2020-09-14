@@ -70,7 +70,7 @@ void main(List<String> arguments) async {
 
   final mediaConverter = HevcMediaConverter();
   final mediaConversionArgs =
-      MediaConverter.createArgs('HEVC', ['height', '240', 'crf', '30']);
+      HevcMediaConverter.createArgs(height: 240, crf: 30);
 
   // The uploader depends on the downloader, so it's created in the loop below
   var uploader;

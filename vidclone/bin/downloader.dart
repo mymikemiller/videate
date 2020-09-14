@@ -9,13 +9,12 @@ abstract class Downloader extends ClonerTask {
   Platform get platform;
 
   static SourceCollection createSourceCollection(String displayName,
-      Platform platform, String identifierMeaning, String identifier) {
-    return SourceCollection((b) => b
-      ..displayName = displayName
-      ..platform = platform.toBuilder()
-      ..identifierMeaning = identifierMeaning
-      ..identifier = identifier);
-  }
+          Platform platform, String identifierMeaning, String identifier) =>
+      SourceCollection((b) => b
+        ..displayName = displayName
+        ..platform = platform.toBuilder()
+        ..identifierMeaning = identifierMeaning
+        ..identifier = identifier);
 
   // The size of window used to ensure [Media]s come back in order.
   //

@@ -38,9 +38,7 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
     return jsonEncode(serialized);
   }
 
-  Feed withMediaAdded(ServedMedia media) {
-    return rebuild((b) => b.mediaList.add(media));
-  }
+  Feed withMediaAdded(ServedMedia media) => withAllMediaAdded([media]);
 
   Feed withAllMediaAdded(List<ServedMedia> mediaList) {
     return rebuild((b) => b.mediaList.addAll(mediaList));

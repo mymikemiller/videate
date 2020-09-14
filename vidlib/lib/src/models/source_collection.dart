@@ -12,8 +12,8 @@ abstract class SourceCollection
   // The source Platform this collection is on, e.g. YouTube
   Platform get platform;
 
-  // identifier will mean a different thing for each collection, but it's
-  // usually a user id, channel id, playlist id or something similar
+  // The value of `identifier` will mean a different thing for each collection,
+  // but it's usually a user id, channel id, playlist id or something similar
   String get identifier;
 
   // Describes what the identifier refers to within the Platform (e.g. "user

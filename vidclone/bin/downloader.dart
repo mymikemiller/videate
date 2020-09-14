@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:vidlib/vidlib.dart';
 import 'cloner_task.dart';
 
-/// Base class for downloaders, which turn [Media]s on a platform into
+/// Base class for downloaders, which turn [Media] on a platform into
 /// [MediaFile]s that can be passed to any [Uploader]
 abstract class Downloader extends ClonerTask {
   // The platform this downloader downloads from, e.g. the Youtube platform.
@@ -27,8 +27,7 @@ abstract class Downloader extends ClonerTask {
   Downloader();
 
   // Downloads the specified media.
-  Future<MediaFile> download(Media media,
-      [void Function(double progress) callback]);
+  Future<MediaFile> download(Media media, {Function(double progress) callback});
 
   // Returns a stream containing all media in the collection. The order of
   // [Media] is not guaranteed, but because reverseChronologicalMedia uses this
@@ -45,7 +44,8 @@ abstract class Downloader extends ClonerTask {
     var slidingWindow = <Media>[];
     Media previouslyYielded;
 
-    // Essentially this acts like "is after", 1=yes, -1=no, 0=same
+    // Essentially this acts like "was released more recently than", 1=yes,
+    // -1=no, 0=same
     final dateComparator = (Media a, Media b) {
       // Sort first on releaseDate...
       var cmp = a.source.releaseDate.compareTo(b.source.releaseDate);
@@ -56,17 +56,17 @@ abstract class Downloader extends ClonerTask {
       return cmp;
     };
 
-    // Do the best to ensure the meida are returned in the order expected
+    // Do the best to ensure the media are returned in the order expected
     await for (var media in allMedia(sourceCollection)) {
-      // We want the media in slidingWindow to be in reverse date order. As an
-      // example of why the slidingWindow is necesary, media generally are
-      // returned by the YouTube API in this order (and assumably ALWAYS in
-      // this order by YoutubeExplode), but often media may come back slightly
-      // out of order (with the Youtube API they're returned in upload order
-      // not publish order), so find the first media in the window that has a
-      // date older than this media and add this media right before it
-      // (otherwise add this media at the end if we don't find any out of order
-      // media)
+      // We want the media in slidingWindow to be in reverse date order
+      // (slidingWindow[0] should be the most recent media). As an example of
+      // why the slidingWindow is necesary, media generally are returned by the
+      // YouTube API in this order (and assumably ALWAYS in this order by
+      // YoutubeExplode), but often media may come back slightly out of order
+      // (with the Youtube API they're returned in upload order not publish
+      // order), so find the first media in the window that has a date older
+      // than this media and add this media right before it (otherwise add this
+      // media at the end if we don't find any out of order media)
       var i = 0;
       while (i < slidingWindow.length &&
           dateComparator(media, slidingWindow[i]) < 0) {

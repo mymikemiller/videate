@@ -14,17 +14,7 @@ mixin Rsync {
   dynamic get rsyncProcessRunner;
 
   Future<void> push(File file, String destinationPath) async {
-    if (file.fileSystem is! LocalFileSystem) {
-      // Set `file` to a new temporary file with `file`'s contents. We have to
-      // do this because the rsync command requires an actual file on the local
-      // file system
-      // TODO: figure out how to upload bytes instead of requiring a file
-      final fs = LocalFileSystem();
-      final fileName = basename(destinationPath);
-      final tempDir = fs.systemTempDirectory.createTempSync();
-      file = await copyToFileSystem(
-          file, fs, Uri.parse('${tempDir.path}/$fileName'));
-    }
+    file = await ensureLocal(file);
 
     // rsync -e "ssh -i ~/.ssh/cdn77_id_rsa" /path/to/source.txt
     // user_amhl64ul@push-24.cdn77.com:/www/path/to/destination.txt

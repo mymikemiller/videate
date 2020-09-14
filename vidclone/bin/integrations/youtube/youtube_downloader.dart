@@ -21,8 +21,12 @@ class YoutubeDownloader extends Downloader {
   @override
   Platform get platform => getPlatform();
 
+  // TODO: switch back to 1 once we can get the publishDate instead of the
+  // uploadDate from youtube_explode. This will make sure the ordering in
+  // slidingWindow will be correct, and the assert won't fail. See
+  // https://github.com/Hexer10/youtube_explode_dart/issues/68
   @override
-  int get slidingWindowSize => 1;
+  int get slidingWindowSize => 10;
 
   static SourceCollection createChannelIdSourceCollection(
           String displayName, String identifier) =>
@@ -37,11 +41,12 @@ class YoutubeDownloader extends Downloader {
 
   @override
   Future<MediaFile> download(Media media,
-      [void Function(double progress) callback]) async {
+      {Function(double progress) callback}) async {
     final videoId = getSourceUniqueId(media);
 
     // Set up a temporary file to hold the contents of the download
-    final path = p.join(memoryFileSystem.systemTempDirectory.path, videoId);
+    final path =
+        p.join(memoryFileSystem.systemTempDirectory.path, '$videoId.mp4');
     final file = memoryFileSystem.file(path);
 
     await _download(videoId, file, callback);
@@ -51,7 +56,7 @@ class YoutubeDownloader extends Downloader {
   // Download the video with the specified id to the specified file, which will
   // be opened for write and when finished, closed and returned.
   Future<File> _download(
-      String id, File file, void Function(double progress) callback) async {
+      String id, File file, Function(double progress) callback) async {
     // Get the video media stream.
     var manifest = await _youtubeExplode.videos.streamsClient.getManifest(id);
 
@@ -60,7 +65,7 @@ class YoutubeDownloader extends Downloader {
     // never be the best quality. To achieve that, we'd need to merge the audio
     // and video streams.
     var videoStreamInfo = manifest.muxed.firstWhere(
-        (streamInfo) => streamInfo.container == yt_explode.Container.mp4);
+        (streamInfo) => streamInfo.container == yt_explode.StreamContainer.mp4);
 
     // Track the file download status.
     var len = videoStreamInfo.size.totalBytes;

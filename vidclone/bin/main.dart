@@ -20,14 +20,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 import 'media_converter.dart';
 
-final forcedCloneStartDate =
-    null; // DateTime.parse('2020-07-22T00:00:00.000Z');
-const feedName = 'tdts';
-const youtube_channel_ids = {
-  'gamegrumps': 'UC9CuvdOVfMPvKCiwdGKL3cQ',
-  'nsp': 'UCs7yDP7KWrh0wd_4qbDP32g',
-  'tdts': 'UCNl_4FD4qQdZZJMzAM7LJqQ',
-};
+final forcedCloneStartDate = null;
+// null; // DateTime.parse('2020-07-22T00:00:00.000Z');
 
 void main(List<String> arguments) async {
   // Load environment variables from local .env file
@@ -49,7 +43,8 @@ void main(List<String> arguments) async {
   // Generate a map to the downloaders keyed on the downloader's id.
   final downloaderMap = {for (var e in downloaders) e.platform.id: e};
 
-  // Get the list of sourceCollections to clone
+  // Get the map of sourceCollections to clone. This can hopefully be cleaned
+  // up a bit. See https://github.com/google/built_collection.dart/issues/217
   final sourceCollectionsString = sourceCollectionsFile.readAsStringSync();
   final sourceCollectionsObj = json.decode(sourceCollectionsString);
   Map<String, SourceCollection> sourceCollectionMap =
@@ -72,15 +67,18 @@ void main(List<String> arguments) async {
   final mediaConversionArgs =
       HevcMediaConverter.createArgs(height: 240, crf: 30);
 
-  // The uploader depends on the downloader, so it's created in the loop below
+  // The uploader and feedManager depend on the source collection, so they're
+  // created in the loop below
   var uploader;
+  var feedManager;
 
-  final feedManager = await JsonFileFeedManager(
-      p.join(feedsBaseDirectory.path, '$feedName.json'));
   // final feedManager = Cdn77FeedManager('${feedName}.json');
 
   for (var entry in sourceCollectionMap.entries) {
     final feedName = entry.key;
+    feedManager = await JsonFileFeedManager(
+        p.join(feedsBaseDirectory.path, '$feedName.json'));
+
     final sourceCollection = entry.value;
     print(
         'Processing "$feedName" source collection: ${sourceCollection.displayName}');

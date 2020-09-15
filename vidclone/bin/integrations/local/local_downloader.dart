@@ -106,7 +106,7 @@ class LocalDownloader extends Downloader {
   Future<MediaFile> download(Media media,
       {Function(double progress) callback}) {
     final path = Uri.decodeFull(media.source.uri.path.toString());
-    final sourceFile = File(path);
+    final sourceFile = LocalFileSystem().file(path);
     if (!sourceFile.existsSync()) {
       throw 'Could not download local file. File not found: $path';
     }

@@ -142,8 +142,8 @@ void main(List<String> arguments) async {
     downloader.close();
   }
   mediaConverter.close();
-  uploader.close();
-  feedManager.close();
+  uploader?.close();
+  feedManager?.close();
 
   // This exit statement is only necessary because youtubeExplode has a timer
   //that isn't properly closed. This can be removed once the following issue is

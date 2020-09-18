@@ -10,7 +10,7 @@ void main() async {
         .toString()
         .replaceFirst('test/resources/media', 'https://example.com'));
 
-    final feedFormatter = RSS_2_0_FeedFormatter(uriTransformer);
+    final feedFormatter = RSS_2_0_FeedFormatter([uriTransformer]);
     test('generate properly', () async {
       final testMetadataFile = File('test/resources/test_feed_metadata.json');
       final testJson = await testMetadataFile.readAsString();

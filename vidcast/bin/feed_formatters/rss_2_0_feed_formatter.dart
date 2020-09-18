@@ -7,8 +7,8 @@ import 'feed_formatter.dart';
 
 // See test resources for expected output
 class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
-  RSS_2_0_FeedFormatter([UriTransformer uriTransformer])
-      : super(uriTransformer);
+  RSS_2_0_FeedFormatter(List<UriTransformer> uriTransformers)
+      : super(uriTransformers);
 
   XmlDocument format(Feed feed) {
     var builder = new XmlBuilder();

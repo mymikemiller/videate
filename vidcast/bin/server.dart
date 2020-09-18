@@ -29,6 +29,8 @@ Future main(List<String> args) async {
   // Load environment variables from local .env file
   load();
   final vidcastBaseUrl = getEnvVar('VIDCAST_BASE_URL', env);
+  final cdn77VidtechBaseUrl = getEnvVar('CDN77_VIDTECH_BASE_URL', env);
+  final cdn77BaseUrl = getEnvVar('CDN77_BASE_URL', env);
 
   // Parse command line args
   var parser = ArgParser()
@@ -44,10 +46,13 @@ Future main(List<String> args) async {
       ? (await LocalhostExposer.expose()).hostname
       : vidcastBaseUrl;
 
-  final UriTransformer uriTransformer = (Uri input) =>
-      Uri.parse(input.path.replaceFirst(mediaBaseDirectoryPath, baseUrl));
+  final UriTransformer localFileUriTransformer = (Uri input) =>
+      Uri.parse(input.toString().replaceFirst(mediaBaseDirectoryPath, baseUrl));
+  final UriTransformer cdn77UriTransformer = (Uri input) => Uri.parse(
+      input.toString().replaceFirst(cdn77BaseUrl, cdn77VidtechBaseUrl));
 
-  final feedFormatter = RSS_2_0_FeedFormatter(uriTransformer);
+  final feedFormatter =
+      RSS_2_0_FeedFormatter([localFileUriTransformer, cdn77UriTransformer]);
 
   // Print out the url to each valid feed
   final feedsBaseDirectory = Directory(feedsBaseDirectoryPath);

@@ -12,7 +12,7 @@ import 'integrations/internet_archive/internet_archive_uploader.dart';
 import 'integrations/local/json_file_feed_manager.dart';
 import 'integrations/local/local_downloader.dart';
 import 'integrations/local/save_to_disk_uploader.dart';
-import 'integrations/media_converters/hevc_media_converter.dart';
+import 'integrations/media_converters/ffmpeg_media_converter.dart';
 import 'integrations/youtube/youtube_downloader.dart';
 import 'package:file/file.dart' as file;
 import 'dart:convert';
@@ -63,9 +63,9 @@ void main(List<String> arguments) async {
   // final listJson = jsonSerializers.serialize(list);
   // final listString = json.encode(listJson);
 
-  final mediaConverter = HevcMediaConverter();
+  final mediaConverter = FfmpegMediaConverter();
   final mediaConversionArgs =
-      HevcMediaConverter.createArgs(height: 240, crf: 30);
+      FfmpegMediaConverter.createArgs(vcodec: 'libx264', height: 240, crf: 30);
 
   // The uploader and feedManager depend on the source collection, so they're
   // created in the loop below
@@ -85,11 +85,11 @@ void main(List<String> arguments) async {
 
     final downloader = downloaderMap[sourceCollection.platform.id];
 
-    // final uploader = InternetArchiveUploader(internetArchiveAccessKey,
+    // uploader = InternetArchiveUploader(internetArchiveAccessKey,
     //     internetArchiveSecretKey);
-    uploader = SaveToDiskUploader(LocalFileSystem().directory(
-        p.join(mediaBaseDirectory.path, downloader.platform.id, feedName)));
-    // final uploader = Cdn77Uploader();
+    // uploader = SaveToDiskUploader(LocalFileSystem().directory(
+    //     p.join(mediaBaseDirectory.path, downloader.platform.id, feedName)));
+    uploader = Cdn77Uploader();
 
     // Create the Cloner
     final cloner = Cloner(downloader, mediaConverter, uploader, feedManager);
@@ -147,6 +147,6 @@ void main(List<String> arguments) async {
 
   // This exit statement is only necessary because youtubeExplode has a timer
   //that isn't properly closed. This can be removed once the following issue is
-  //fixed: https://github.com/Hexer10/youtube_explode_dart/issues/61
-  // throw ('\nDONE - IGNORE THIS EXCEPTION');
+  //fixed: https://github.com/Hexer10/youtube_explode_dart/issues/61 throw
+  //('\nDONE - IGNORE THIS EXCEPTION');
 }

@@ -37,7 +37,8 @@ class Cloner {
     Console.init();
 
     // Existence Check
-    print('=== Clone: Checking if already cloned: $mediaDebugName ===');
+    print(
+        '=== Clone: Checking if already cloned: $mediaDebugName (${media.source.releaseDate})===');
     final existenceCheckResult =
         await time(_uploader.getExistingServedMedia, [media]);
 
@@ -111,10 +112,7 @@ class Cloner {
     if (mediaList.isEmpty) {
       print('No media found after $after for ${sourceCollection}');
     } else {
-      await for (var servedMedia in _cloneAll(mediaList, conversionArgs)) {
-        yield servedMedia;
-      }
-      // TODO: switch to this? yield* _cloneAll(mediaList, conversionArgs);
+      yield* _cloneAll(mediaList, conversionArgs);
     }
   }
 

@@ -1,7 +1,7 @@
 import 'package:file/local.dart';
 import 'package:test/test.dart';
 import 'package:vidlib/vidlib.dart';
-import '../bin/integrations/media_converters/hevc_media_converter.dart';
+import '../bin/integrations/media_converters/ffmpeg_media_converter.dart';
 import '../bin/media_converter.dart';
 
 import 'test_utilities.dart';
@@ -20,9 +20,9 @@ void main() async {
 
   List<MediaConverterTest> generateMediaConverterTests() => [
         MediaConverterTest(
-            mediaConverter: HevcMediaConverter(),
-            mediaConversionArgs:
-                HevcMediaConverter.createArgs(height: 240, crf: 30))
+            mediaConverter: FfmpegMediaConverter(),
+            mediaConversionArgs: FfmpegMediaConverter.createArgs(
+                vcodec: 'libx256', height: 240, crf: 30))
       ];
 
   var mediaConverterTests = generateMediaConverterTests();

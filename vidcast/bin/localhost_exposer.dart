@@ -22,8 +22,8 @@ Future<ExposerProcess> expose() async {
   // expected format for 'output':
   // "Connect to http://mikem-abcd.localhost.run or https://mikem-abcd.localhost.run"
   RegExp exp = new RegExp(
-      r"Connect to http://.*.localhost.run or (https://.*.localhost.run)");
-  final hostname = exp.firstMatch(output)[1];
+      r"Connect to http://.*.localhost.run"); // or (https://.*.localhost.run)");
+  final hostname = exp.firstMatch(output)[0];
   if (hostname == null) {
     throw ('Error getting hostname from localhost.run. Output: $output');
   }

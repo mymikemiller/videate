@@ -129,7 +129,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   int get slidingWindowSize => 1;
 
   @override
-  Feed createEmptyFeed(SourceCollection sourceCollection) =>
+  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) =>
       _delegate.createEmptyFeed(sourceCollection);
 
   @override

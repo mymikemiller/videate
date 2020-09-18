@@ -6,12 +6,14 @@ description: With permission from a user, downloads YouTube videos as they're re
 environment:
   sdk: '>=2.7.0 <3.0.0'
 
-
 dependencies:
   googleapis: ^0.54.0
   googleapis_auth: ^0.2.11+1
   http: ^0.12.1
-  youtube_explode_dart: ^1.5.1
+  youtube_explode_dart: 
+    git:
+      url: https://github.com/mymikemiller/youtube_explode_dart.git
+      ref: channel-description
   dotenv: ^2.0.0
   file: ^5.1.0
   aws_s3_client:

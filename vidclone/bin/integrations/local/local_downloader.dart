@@ -120,9 +120,9 @@ class LocalDownloader extends Downloader {
   }
 
   @override
-  Feed createEmptyFeed(SourceCollection sourceCollection) {
-    return Examples.emptyFeed.rebuild((b) => b
+  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) {
+    return Future.value(Examples.emptyFeed.rebuild((b) => b
       ..title = sourceCollection.identifier
-      ..subtitle = '${sourceCollection.identifier} feed)');
+      ..subtitle = '${sourceCollection.identifier} feed)'));
   }
 }

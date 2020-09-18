@@ -149,10 +149,16 @@ class YoutubeDownloader extends Downloader {
       yt_explode.VideoId.parseVideoId(media.source.uri.toString());
 
   @override
-  Feed createEmptyFeed(SourceCollection sourceCollection) {
-    // TODO: implement createEmptyFeed with actual data from youtube
+  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) async {
+    final metadata =
+        await _youtubeExplode.channels.get(sourceCollection.identifier);
     return Examples.emptyFeed.rebuild((b) => b
-      ..title = sourceCollection.identifier
-      ..subtitle = '${sourceCollection.identifier} feed)');
+      ..title = metadata.title
+      ..description = metadata.description
+      ..imageUrl = metadata.logoUrl
+      ..subtitle = ''
+      ..link = metadata.url
+      ..author = ''
+      ..email = '');
   }
 }

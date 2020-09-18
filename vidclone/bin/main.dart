@@ -96,7 +96,7 @@ void main(List<String> arguments) async {
 
     // Get the latest feed data, or create an empty feed if necessary
     if (!await feedManager.populate()) {
-      feedManager.feed = downloader.createEmptyFeed(sourceCollection);
+      feedManager.feed = await downloader.createEmptyFeed(sourceCollection);
     }
 
     if (downloader is LocalDownloader) {

@@ -126,5 +126,5 @@ abstract class Downloader extends ClonerTask {
 
   // Creates a feed with no media, but with all the basic information, such as
   // author, from the specified source collection.
-  Feed createEmptyFeed(SourceCollection sourceCollection);
+  Future<Feed> createEmptyFeed(SourceCollection sourceCollection);
 }

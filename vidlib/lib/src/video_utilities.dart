@@ -55,15 +55,18 @@ Future<Duration> getDuration(File videoFile,
 
 // Converts a video file to one of lower quality/filesize. Specify a mock
 // processStarter for testing on machines that may not have ffprobe installed.
-class VideoConverter extends Converter<File, Future<File>> {
+class FfmpegVideoConverter extends Converter<File, Future<File>> {
   final processStarter;
-  const VideoConverter({this.processStarter = io.Process.start});
+  const FfmpegVideoConverter({this.processStarter = io.Process.start});
 
-  // Default for crf (Constant Rate Factor) is 28 for x256; higher numbers
+  // Default for crf (Constant Rate Factor) is 28 for x265; higher numbers
   // result in lower quality and lower file sizes
   @override
   Future<File> convert(File input,
-      {int height, int crf = 28, Function(double progress) callback}) async {
+      {String vcodec,
+      int height,
+      int crf = 28,
+      Function(double progress) callback}) async {
     if (!isVideo(input)) {
       throw 'input must be a File object representing a video file';
     }
@@ -85,15 +88,17 @@ class VideoConverter extends Converter<File, Future<File>> {
       '-vf',
       // Specify the width/height of the resulting video. A negative value for
       // width tells ffmpeg to use an appropriate width that preserves the
-      // aspect ratio. We use '-2' because the libx256 encoder requires the
+      // aspect ratio. We use '-2' because the libx265 encoder requires the
       // width to be a multiple of 2.
       'scale=-2:$height',
       '-vcodec',
-      'libx265',
+      '$vcodec', // mpeg4, libx264, libx265
       '-qscale',
       '3',
       '-crf',
       '$crf',
+      '-movflags',
+      '+faststart',
       outputPath,
     ]).then((p) async {
       p.stderr.transform(Utf8Decoder()).listen((String data) {

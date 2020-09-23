@@ -43,16 +43,13 @@ void main(List<String> arguments) async {
   // Generate a map to the downloaders keyed on the downloader's id.
   final downloaderMap = {for (var e in downloaders) e.platform.id: e};
 
-  // Get the map of sourceCollections to clone. This can hopefully be cleaned
-  // up a bit. See https://github.com/google/built_collection.dart/issues/217
+  // Get the map of sourceCollections to clone.
   final sourceCollectionsString = sourceCollectionsFile.readAsStringSync();
   final sourceCollectionsObj = json.decode(sourceCollectionsString);
-  Map<String, SourceCollection> sourceCollectionMap =
-      sourceCollectionsObj.map<String, SourceCollection>((String k, dynamic v) {
-    final sourceCollection = jsonSerializers.deserializeWith<SourceCollection>(
-        SourceCollection.serializer, v);
-    return MapEntry<String, SourceCollection>(k, sourceCollection);
-  });
+  BuiltMap<String, SourceCollection> sourceCollectionMap =
+      jsonSerializers.deserialize(sourceCollectionsObj,
+          specifiedType: FullType(
+              BuiltMap, [FullType(String), FullType(SourceCollection)]));
 
   // final sourceCollection = YoutubeDownloader.createChannelIdSourceCollection(
   //     youtube_channel_ids[feedName]);

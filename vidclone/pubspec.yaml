@@ -10,10 +10,10 @@ dependencies:
   googleapis: ^0.54.0
   googleapis_auth: ^0.2.11+1
   http: ^0.12.1
-  youtube_explode_dart: 
+  youtube_explode_dart: # Link to 'master' to get the change from my merged PR (https://github.com/Hexer10/youtube_explode_dart/pull/69) that adds access to the channel description. Once that's released to pub, this can be switched back to just reference the new pub version (likely 1.5.2)
     git:
-      url: https://github.com/mymikemiller/youtube_explode_dart.git
-      ref: channel-description
+      url: https://github.com/Hexer10/youtube_explode_dart.git
+      ref: master
   dotenv: ^2.0.0
   file: ^5.1.0
   aws_s3_client:

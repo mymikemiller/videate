@@ -92,7 +92,7 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
   void close() => _delegate.close();
 
   @override
-  Feed createEmptyFeed(SourceCollection sourceCollection) =>
+  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) =>
       _delegate.createEmptyFeed(sourceCollection);
 
   @override

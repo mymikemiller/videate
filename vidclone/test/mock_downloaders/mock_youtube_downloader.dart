@@ -53,6 +53,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
               'Author 3`',
               yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
               DateTime.parse('2020-01-03 03:33:00.000Z'),
+              DateTime.parse('2020-01-03 03:33:00.000Z'),
               'Description 3',
               Duration(minutes: 3, seconds: 33),
               yt_explode.ThumbnailSet('33333333333'),

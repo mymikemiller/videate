@@ -125,17 +125,38 @@ class YoutubeDownloader extends Downloader {
     final channelId = yt_explode.ChannelId(sourceCollection.identifier);
     final stream = _youtubeExplode.channels.getUploads(channelId);
 
-    return stream.map((upload) => Media((v) => v
-      ..title = upload.title
-      ..description = upload.description
-      ..duration = upload.duration
-      ..source = Source(
-        (s) => s
+    DateTime previousUploadPublishDate;
+    Media previousMedia;
+
+    return stream.map((upload) {
+      var publishDate = upload.publishDate.toUtc();
+      if (publishDate == previousUploadPublishDate) {
+        // youtube_explode returns the same time (midnight UTC) for all
+        // publishDates, but we need the publishDate to match the order of
+        // videos returned by youtube_expolode. So, if we get multiple videos
+        // in a row with the same publishDate, we modify the publishDate to
+        // decrement the time a little from the last Media we returned (we
+        // decrement the date from the last Media returned becuse it's already
+        // been decremented the correct number of times from the videos before
+        // it if more than two share a publishDate)
+        publishDate = previousMedia.source.releaseDate
+            .subtract(Duration(microseconds: 1));
+      }
+
+      final media = Media((v) => v
+        ..title = upload.title
+        ..description = upload.description
+        ..duration = upload.duration
+        ..source = Source((s) => s
           ..id = upload.id.toString()
           ..uri = Uri.parse('https://www.youtube.com/watch?v=${upload.id}')
           ..platform = getPlatform().toBuilder()
-          ..releaseDate = upload.uploadDate.toUtc(),
-      ).toBuilder()));
+          ..releaseDate = publishDate).toBuilder());
+
+      previousUploadPublishDate = upload.publishDate.toUtc();
+      previousMedia = media;
+      return media;
+    });
   }
 
   @override

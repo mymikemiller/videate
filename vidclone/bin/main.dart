@@ -72,6 +72,19 @@ void main(List<String> arguments) async {
       jsonSerializers.deserialize(clonerConfigurationsObj,
           specifiedType: FullType(BuiltList, [FullType(ClonerConfiguration)]));
 
+  // Verify that all feed names are unique since the file doesn't guarantee it
+  final feedNameCountMap =
+      clonerConfigurations.fold({}, (map, clonerConfiguration) {
+    map.update(clonerConfiguration.feedName, (value) => value + 1,
+        ifAbsent: () => 1);
+    return map;
+  });
+  final duplicatedFeedNames =
+      feedNameCountMap.entries.where((e) => e.value > 0).map((e) => e.key);
+  if (duplicatedFeedNames.isNotEmpty) {
+    throw 'Cloner Configuration file contains duplicate feed names: ${duplicatedFeedNames.join(",")}';
+  }
+
   for (var clonerConfiguration in clonerConfigurations) {
     print(
         'Processing ${clonerConfiguration.displayName} ("${clonerConfiguration.feedName}" feed)');

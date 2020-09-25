@@ -1,6 +1,4 @@
-import 'dart:io' as io;
-import 'dart:io';
-import 'package:file/file.dart' as file;
+import 'package:file/file.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:path/path.dart' as p;
 import '../../uploader.dart';
@@ -10,22 +8,23 @@ class SaveToDiskUploader extends Uploader {
   @override
   String get id => 'save_to_disk';
 
-  final io.Directory directory;
+  final Directory baseDirectory;
+  String sourcePlatformId;
+  String feedName;
 
-  file.FileSystem _fileSystem;
+  SaveToDiskUploader(this.baseDirectory);
+
   @override
-  file.FileSystem get fileSystem => _fileSystem;
-
-  SaveToDiskUploader(this.directory) {
-    final entity = directory as file.FileSystemEntity;
-    _fileSystem = entity.fileSystem;
+  void configure(ClonerConfiguration configuration) {
+    sourcePlatformId = configuration.sourceCollection.platform.id;
+    feedName = configuration.feedName;
   }
 
   @override
   Future<ServedMedia> upload(MediaFile mediaFile) async {
     final uri = getDestinationUri(mediaFile.media);
 
-    await copyToFileSystem(mediaFile.file, fileSystem, uri);
+    await copyToFileSystem(mediaFile.file, baseDirectory.fileSystem, uri);
 
     final servedMedia = ServedMedia((b) => b
       ..media = mediaFile.media.toBuilder()
@@ -48,13 +47,14 @@ class SaveToDiskUploader extends Uploader {
     // source, so we use that as the filename. We won't have collisions across
     // sources because we also put each media into a folder named after its
     // source platform.
-    return Uri.file(p.join(directory.path, '${media.source.id}.$extension'));
+    return Uri.file(
+        p.join(baseDirectory.path, '${media.source.id}.$extension'));
   }
 
   @override
   Future<ServedMedia> getExistingServedMedia(Media media) async {
     final uri = getDestinationUri(media);
-    final file = fileSystem.file(Uri.decodeFull(uri.path));
+    final file = baseDirectory.fileSystem.file(Uri.decodeFull(uri.path));
     if (!file.existsSync()) {
       return null;
     }

@@ -4,7 +4,7 @@ import 'package:vidlib/vidlib.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('servedMedia', () {
+  group('ServedMedia', () {
     test('constructor', () {
       expect(Examples.servedMedia1.media, Examples.media1);
       expect(Examples.servedMedia1.uri, Uri(path: '/test/video1.mp4'));

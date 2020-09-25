@@ -1,4 +1,5 @@
 import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:file/memory.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
@@ -35,6 +36,7 @@ final successMockClient = (Feed feed) => MockClient((request) async {
 void main() async {
   final feedName = 'feed.json';
   final feedPath = p.join(memoryFileSystem.systemTempDirectory.path, feedName);
+  final feedDirectory = memoryFileSystem.directory(feedPath);
 
   final createSourceFeed = (FileSystem fileSystem, Feed feed) {
     final file = fileSystem.file(feedPath);
@@ -50,8 +52,7 @@ void main() async {
 
   List<FeedManagerTest> generateFeedManagerTests() => [
         FeedManagerTest(
-            feedManager:
-                JsonFileFeedManager(feedPath, fileSystem: memoryFileSystem),
+            feedManager: JsonFileFeedManager(feedDirectory),
             mockValidSourceFeed: (feedManager, feed) =>
                 createSourceFeed(memoryFileSystem, feed),
             mockInvalidSourceFeed: (feedManager) =>

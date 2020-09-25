@@ -2,6 +2,7 @@ import 'dart:convert' show json;
 import 'dart:io';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 import 'package:vidlib/vidlib.dart';
 import 'package:test/test.dart';
 import 'package:xml/xml.dart' as xml;
@@ -46,8 +47,14 @@ class TestUtilities {
   }
 
   static Future<void> testJsonSerialization(
-      Object encodableObject, File expectedJson) async {
-    final serialized = jsonSerializers.serialize(encodableObject);
+      Object encodableObject, File expectedJson,
+      {FullType specifiedType = FullType.unspecified}) async {
+    if (autofix) {
+      expectedJson.createSync();
+    }
+
+    final serialized = jsonSerializers.serialize(encodableObject,
+        specifiedType: specifiedType);
     final encoded = json.encode(serialized);
     if (autofix && _needsFixing(encoded, expectedJson)) {
       await expectedJson.writeAsString(encoded + '\n');
@@ -59,8 +66,8 @@ class TestUtilities {
       try {
         // If this line fails for *expected* reasons, try toggling
         // TestUtilities.autofix to modify the expected results.
-        deserializedExpectedResult =
-            jsonSerializers.deserialize(decodedExpectedResult);
+        deserializedExpectedResult = jsonSerializers
+            .deserialize(decodedExpectedResult, specifiedType: specifiedType);
       } catch (e) {
         print(_autofixHint);
         rethrow;
@@ -72,35 +79,43 @@ class TestUtilities {
     }
   }
 
-  static Future<void> _testSerialization(
-      Object object, File expectedJson) async {
+  static Future<void> _testSerialization(Object object, File expectedJson,
+      {FullType specifiedType = FullType.unspecified}) async {
     // Test serialization
-    await TestUtilities.testJsonSerialization(object, expectedJson);
+    await TestUtilities.testJsonSerialization(object, expectedJson,
+        specifiedType: specifiedType);
 
     // Test encoding/decoding serialized object to/from a string
-    final serialized = jsonSerializers.serialize(object);
+    final serialized =
+        jsonSerializers.serialize(object, specifiedType: specifiedType);
     final encoded = json.encode(serialized);
     final decoded = json.decode(encoded);
     expect(decoded, serialized);
 
     // Test deserialization
-    final deserialized = jsonSerializers.deserialize(serialized);
+    final deserialized =
+        jsonSerializers.deserialize(serialized, specifiedType: specifiedType);
     expect(deserialized, object);
   }
 
-  static Future<void> testListSerialization(
-          BuiltList list, File expectedJson) =>
-      _testSerialization(list, expectedJson);
+  static Future<void> testListSerialization(BuiltList list, File expectedJson,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _testSerialization(list, expectedJson, specifiedType: specifiedType);
 
   // Note that to support automatic deserialization of lists no matter where they
   // appear in the json, the built_value/built_collection serializer puts the
   // list inside an object under an empty string key. See
   // https://github.com/google/built_value.dart/issues/404
-  static Future<void> testValueSerialization(Built value, File expectedJson) =>
-      _testSerialization(value, expectedJson);
+  static Future<void> testValueSerialization(Built value, File expectedJson,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _testSerialization(value, expectedJson, specifiedType: specifiedType);
 
   static Future<void> testXml(
       xml.XmlDocument observed, File expectedXml) async {
+    if (autofix) {
+      expectedXml.createSync();
+    }
+
     final formattedObserved = _formatXml(observed);
 
     if (autofix && _needsFixing(formattedObserved, expectedXml)) {

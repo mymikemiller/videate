@@ -8,9 +8,7 @@ import 'test_utilities.dart';
 
 class MediaConverterTest {
   final MediaConverter mediaConverter;
-  final MediaConversionArgs mediaConversionArgs;
-
-  MediaConverterTest({this.mediaConverter, this.mediaConversionArgs});
+  MediaConverterTest({this.mediaConverter});
 }
 
 void main() async {
@@ -20,9 +18,9 @@ void main() async {
 
   List<MediaConverterTest> generateMediaConverterTests() => [
         MediaConverterTest(
-            mediaConverter: FfmpegMediaConverter(),
-            mediaConversionArgs: FfmpegMediaConverter.createArgs(
-                vcodec: 'libx256', height: 240, crf: 30))
+            mediaConverter: FfmpegMediaConverter()
+              ..conversionArgs = FfmpegMediaConverter.createArgs(
+                  vcodec: 'libx256', height: 240, crf: 30))
       ];
 
   var mediaConverterTests = generateMediaConverterTests();
@@ -36,8 +34,7 @@ void main() async {
         mediaConverterTest.mediaConverter.processStarter = noopProcessStart;
         // For now, we just want to make sure we don't get any errors when
         // `convert` is called
-        await mediaConverterTest.mediaConverter
-            .convert(mediaFile, mediaConverterTest.mediaConversionArgs);
+        await mediaConverterTest.mediaConverter.convert(mediaFile);
       });
     });
 

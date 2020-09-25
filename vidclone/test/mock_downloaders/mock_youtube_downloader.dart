@@ -124,6 +124,10 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       _delegate.download(media);
 
   @override
+  void configure(ClonerConfiguration configuration) =>
+      _delegate.configure(configuration);
+
+  @override
   void close() {
     _delegate.close();
   }

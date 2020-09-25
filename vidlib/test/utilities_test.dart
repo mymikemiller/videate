@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import 'package:vidlib/src/utilities.dart';
 
 void main() {
-  group('time', () {
+  group('time()', () {
     test('returns time and value', () async {
       final wait = (int delaySeconds) {
         return Future.delayed(

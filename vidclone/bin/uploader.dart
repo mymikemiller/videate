@@ -1,14 +1,9 @@
-import 'package:file/file.dart';
 import 'package:vidlib/vidlib.dart';
 import 'cloner_task.dart';
 
 abstract class Uploader extends ClonerTask {
   /// An id unique to this uploader, e.g. "internet_archive".
   String get id;
-
-  /// fileSystem must be specified for file-based uploaders (uploaders whose
-  /// destination is a file on a file system, not a file on the web)
-  FileSystem get fileSystem => null;
 
   Uploader();
 

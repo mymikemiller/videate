@@ -17,6 +17,7 @@ part 'serializers.g.dart';
 
 /// Collection of generated serializers for vidlib models.
 @SerializersFor([
+  ClonerConfiguration,
   Media,
   MediaConversionArgs,
   ServedMedia,
@@ -37,7 +38,9 @@ final Serializers jsonSerializers = (standardSerializers.toBuilder()
       ..addPlugin(StandardJsonPlugin())
       ..addBuilderFactory(
           FullType(BuiltMap, [FullType(String), FullType(SourceCollection)]),
-          () => MapBuilder<String, SourceCollection>()))
+          () => MapBuilder<String, SourceCollection>())
+      ..addBuilderFactory(FullType(BuiltList, [FullType(ClonerConfiguration)]),
+          () => ListBuilder<ClonerConfiguration>()))
     .build();
 
 T standardDeserialize<T>(dynamic value) => standardSerializers

@@ -5,6 +5,7 @@ import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:path/path.dart' as p;
+import 'cloner_task.dart';
 import 'downloader.dart';
 import 'integrations/cdn77/cdn77_feed_manager.dart';
 import 'integrations/cdn77/cdn77_uploader.dart';
@@ -34,66 +35,65 @@ void main(List<String> arguments) async {
   final internetArchiveSecretKey =
       getEnvVar('INTERNET_ARCHIVE_SECRET_KEY', env);
   final home = Platform.environment['HOME'];
-  final mediaBaseDirectory = Directory('$home/web/media');
-  final feedsBaseDirectory = Directory('$home/web/feeds');
-  final sourceCollectionsFile = File('$home/videate/source_collections.json');
+  final localFileSystem = LocalFileSystem();
+  final mediaBaseDirectory = localFileSystem.directory('$home/web/media');
+  final feedsBaseDirectory = localFileSystem.directory('$home/web/feeds');
+  final clonerConfigurationsFile =
+      localFileSystem.file('$home/videate/cloner_configs.json');
 
-  final downloaders = [YoutubeDownloader(), LocalDownloader()];
+  final downloaders = [
+    YoutubeDownloader(),
+    LocalDownloader(),
+  ];
+  final mediaConverters = [
+    FfmpegMediaConverter(),
+  ];
+  final uploaders = [
+    Cdn77Uploader(),
+    InternetArchiveUploader(internetArchiveAccessKey, internetArchiveSecretKey),
+    SaveToDiskUploader(mediaBaseDirectory),
+  ];
+  final feedManagers = [
+    JsonFileFeedManager(feedsBaseDirectory),
+    Cdn77FeedManager(),
+  ];
 
   // Generate a map to the downloaders keyed on the downloader's id.
   final downloaderMap = {for (var e in downloaders) e.platform.id: e};
+  final mediaConverterMap = {for (var e in mediaConverters) e.id: e};
+  final uploaderMap = {for (var e in uploaders) e.id: e};
+  final feedManagerMap = {for (var e in feedManagers) e.id: e};
 
-  // Get the map of sourceCollections to clone.
-  final sourceCollectionsString = sourceCollectionsFile.readAsStringSync();
-  final sourceCollectionsObj = json.decode(sourceCollectionsString);
-  BuiltMap<String, SourceCollection> sourceCollectionMap =
-      jsonSerializers.deserialize(sourceCollectionsObj,
-          specifiedType: FullType(
-              BuiltMap, [FullType(String), FullType(SourceCollection)]));
+  // Get the cloner configurations, which tell us what to clone and how
+  final clonerConfigurationsString =
+      clonerConfigurationsFile.readAsStringSync();
+  final clonerConfigurationsObj = json.decode(clonerConfigurationsString);
+  BuiltList<ClonerConfiguration> clonerConfigurations =
+      jsonSerializers.deserialize(clonerConfigurationsObj,
+          specifiedType: FullType(BuiltList, [FullType(ClonerConfiguration)]));
 
-  // final sourceCollection = YoutubeDownloader.createChannelIdSourceCollection(
-  //     youtube_channel_ids[feedName]);
-  // final sourceCollection = LocalDownloader.createFilePathSourceCollection(
-  //     p.join(mediaBaseDirectory.path, downloader.platform.id, feedName));
-  // final list =
-  //     BuiltList<SourceCollection>([sourceCollection, sourceCollection2]);
-  // final listJson = jsonSerializers.serialize(list);
-  // final listString = json.encode(listJson);
-
-  final mediaConverter = FfmpegMediaConverter();
-  final mediaConversionArgs =
-      FfmpegMediaConverter.createArgs(vcodec: 'libx264', height: 240, crf: 30);
-
-  // The uploader and feedManager depend on the source collection, so they're
-  // created in the loop below
-  var uploader;
-  var feedManager;
-
-  // final feedManager = Cdn77FeedManager('${feedName}.json');
-
-  for (var entry in sourceCollectionMap.entries) {
-    final feedName = entry.key;
-    feedManager = await JsonFileFeedManager(
-        p.join(feedsBaseDirectory.path, '$feedName.json'));
-
-    final sourceCollection = entry.value;
+  for (var clonerConfiguration in clonerConfigurations) {
     print(
-        'Processing "$feedName" source collection: ${sourceCollection.displayName}');
+        'Processing ${clonerConfiguration.displayName} ("${clonerConfiguration.feedName}" feed)');
 
-    final downloader = downloaderMap[sourceCollection.platform.id];
-
-    // uploader = InternetArchiveUploader(internetArchiveAccessKey,
-    //     internetArchiveSecretKey);
-    // uploader = SaveToDiskUploader(LocalFileSystem().directory(
-    //     p.join(mediaBaseDirectory.path, downloader.platform.id, feedName)));
-    uploader = Cdn77Uploader();
+    final downloader =
+        downloaderMap[clonerConfiguration.sourceCollection.platform.id]
+          ..configure(clonerConfiguration);
+    final uploader = uploaderMap[clonerConfiguration.uploaderId]
+      ..configure(clonerConfiguration);
+    final mediaConverter =
+        mediaConverterMap[clonerConfiguration.mediaConversionArgs.id]
+          ..configure(clonerConfiguration);
+    final feedManager = feedManagerMap[clonerConfiguration.feedManagerId]
+      ..configure(clonerConfiguration);
 
     // Create the Cloner
     final cloner = Cloner(downloader, mediaConverter, uploader, feedManager);
 
     // Get the latest feed data, or create an empty feed if necessary
     if (!await feedManager.populate()) {
-      feedManager.feed = await downloader.createEmptyFeed(sourceCollection);
+      feedManager.feed = await downloader
+          .createEmptyFeed(clonerConfiguration.sourceCollection);
     }
 
     if (downloader is LocalDownloader) {
@@ -101,7 +101,7 @@ void main(List<String> arguments) async {
       // everything. This is necessary because all local files have the same
       // hard-coded releaseDate.
       await for (var servedMedia
-          in cloner.cloneCollection(sourceCollection, mediaConversionArgs)) {
+          in cloner.cloneCollection(clonerConfiguration)) {
         print('(Local) Cloned media available at ${servedMedia.uri}');
       }
     } else {
@@ -112,8 +112,8 @@ void main(List<String> arguments) async {
       if (forcedCloneStartDate == null &&
           mostRecentMediaAlreadyInFeed == null) {
         // Clone the source's most recent media
-        final servedMedia = await cloner.cloneMostRecentMedia(
-            sourceCollection, mediaConversionArgs);
+        final servedMedia =
+            await cloner.cloneMostRecentMedia(clonerConfiguration);
         print('(First) Cloned media available at ${servedMedia.uri}');
       } else {
         // Clone only media newer than the most recent media we already have
@@ -127,20 +127,20 @@ void main(List<String> arguments) async {
           cloneStartDate =
               mostRecentMediaAlreadyInFeed.media.source.releaseDate;
         }
-        await for (var servedMedia in cloner.cloneCollection(
-            sourceCollection, mediaConversionArgs, cloneStartDate)) {
+        await for (var servedMedia
+            in cloner.cloneCollection(clonerConfiguration, cloneStartDate)) {
           print('(Additional) Cloned media available at ${servedMedia.uri}');
         }
       }
     }
   }
 
-  for (var downloader in downloaders) {
-    downloader.close();
-  }
-  mediaConverter.close();
-  uploader?.close();
-  feedManager?.close();
+  // Close all the ClonerTasks
+  [downloaders, mediaConverters, uploaders, feedManagers]
+      .expand((i) => i)
+      .forEach((clonerTask) {
+    clonerTask.close();
+  });
 
   // This exit statement is only necessary because youtubeExplode has a timer
   //that isn't properly closed. This can be removed once the following issue is

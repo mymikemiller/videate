@@ -16,8 +16,7 @@ class FfmpegMediaConverter extends MediaConverter {
           _id, ['vcodec', '$vcodec', 'height', '$height', 'crf', '$crf']);
 
   @override
-  Future<MediaFile> convert(
-      MediaFile mediaFile, MediaConversionArgs conversionArgs,
+  Future<MediaFile> convert(MediaFile mediaFile,
       {Function(double progress) callback}) async {
     final vcodec = conversionArgs.get('vcodec');
     final height = int.parse(conversionArgs.get('height'));

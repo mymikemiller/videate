@@ -1,6 +1,7 @@
 /// Support for Videate projects
 export 'src/models/media.dart';
 export 'src/models/media_conversion_args.dart';
+export 'src/models/cloner_configuration.dart';
 export 'src/models/source.dart';
 export 'src/models/source_collection.dart';
 export 'src/models/platform.dart';

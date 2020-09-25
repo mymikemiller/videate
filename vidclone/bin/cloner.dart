@@ -102,24 +102,26 @@ class Cloner {
   //
   // Media will be cloned in chronological order (in the same order they were
   // originally published at the source).
-  Stream<ServedMedia> cloneCollection(
-      SourceCollection sourceCollection, MediaConversionArgs conversionArgs,
+  Stream<ServedMedia> cloneCollection(ClonerConfiguration configuration,
       [DateTime after]) async* {
     // Because reverseChronologicalMedia returns newest media first, we must
     // first get the list of all media and reverse it before cloning any media.
-    var stream = _downloader.reverseChronologicalMedia(sourceCollection, after);
+    var stream = _downloader.reverseChronologicalMedia(
+        configuration.sourceCollection, after);
     final mediaList = (await stream.toList()).reversed;
     if (mediaList.isEmpty) {
-      print('No media found after $after for ${sourceCollection}');
+      print(
+          'No media found after $after for ${configuration.sourceCollection}');
     } else {
-      yield* _cloneAll(mediaList, conversionArgs);
+      yield* _cloneAll(mediaList, configuration.mediaConversionArgs);
     }
   }
 
-  Future<ServedMedia> cloneMostRecentMedia(SourceCollection sourceCollection,
-      MediaConversionArgs conversionArgs) async {
-    final media = await _downloader.mostRecentMedia(sourceCollection);
-    return clone(media, conversionArgs);
+  Future<ServedMedia> cloneMostRecentMedia(
+      ClonerConfiguration configuration) async {
+    final media =
+        await _downloader.mostRecentMedia(configuration.sourceCollection);
+    return clone(media, configuration.mediaConversionArgs);
   }
 
   void close() {

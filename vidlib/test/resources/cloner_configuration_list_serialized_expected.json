@@ -1,0 +1,28 @@
+[
+    {
+        "feedName": "testfeed",
+        "displayName": "Test Cloner Config",
+        "sourceCollection": {
+            "platform": {
+                "uri": "http://example.com",
+                "id": "test_platform"
+            },
+            "identifier": "abcdefg",
+            "identifierMeaning": "Test Identifier",
+            "displayName": "Test Display Name"
+        },
+        "mediaConversionArgs": {
+            "id": "ffmpeg",
+            "args": [
+                "vcodec",
+                "libx264",
+                "height",
+                "240",
+                "crf",
+                "30"
+            ]
+        },
+        "uploaderId": "test_uploader_id",
+        "feedManagerId": "test_feed_manager_id"
+    }
+]

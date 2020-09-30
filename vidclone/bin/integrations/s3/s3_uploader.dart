@@ -17,6 +17,10 @@ abstract class S3Uploader extends Uploader {
   // include the bucket name)
   String getKey(Media media, [String extension = 'mp4']) {
     final test = '4';
+    // todo: Maybe this isn't working because archive.org identifiers are not
+    // allowed to have slashes in them. That might be what's tripping the
+    // authentication error. See
+    // https://archive.org/services/docs/api/metadata-schema/#archive-org-identifiers
     return 'videate${test}/${media.source.platform.id}/${media.source.id}.$extension';
   }
 

@@ -30,7 +30,6 @@ bool allMediaAreAfter(List<Media> media, DateTime dateInclusive) {
 
 class DownloaderTest {
   final Downloader downloader;
-  final SourceCollection sourceCollection;
 
   // A date in the middle of the collection so we can test mediaAfter
   final DateTime mediaAfterDate;
@@ -43,7 +42,6 @@ class DownloaderTest {
 
   DownloaderTest(
       {this.downloader,
-      this.sourceCollection,
       this.mediaAfterDate,
       this.testMedia,
       this.testMediaUniqueId});
@@ -61,9 +59,12 @@ void main() async {
 
   List<DownloaderTest> generateDownloaderTests() => [
         DownloaderTest(
-            downloader: LocalDownloader(ffprobeRunner: ffprobeStub),
-            sourceCollection: LocalDownloader.createFilePathSourceCollection(
-                'Local test media', 'test/resources/media'),
+            downloader: LocalDownloader(ffprobeRunner: ffprobeStub)
+              ..configure(ClonerTaskArgs((a) => a
+                ..id = 'local'
+                ..args = ['path', 'test/resources/media']
+                    .toBuiltList()
+                    .toBuilder())),
             // The sourceReleaseDate of all LocalDownloader Media is epoch, so
             // the mediaAfter test for LocalDownloader is not very useful but
             // is here for completeness
@@ -80,9 +81,12 @@ void main() async {
                 ).toBuilder(),
             )),
         DownloaderTest(
-            downloader: MockYoutubeDownloader(testMediaFile),
-            sourceCollection: YoutubeDownloader.createChannelIdSourceCollection(
-                'Test youtube channel videos', 'UC9CuvdOVfMPvKCiwdGKL3cQ'),
+            downloader: MockYoutubeDownloader(testMediaFile)
+              ..configure(ClonerTaskArgs((a) => a
+                ..id = 'youtube'
+                ..args = ['channelId', 'UC9CuvdOVfMPvKCiwdGKL3cQ']
+                    .toBuiltList()
+                    .toBuilder())),
             mediaAfterDate: DateTime.parse('2020-01-02 09:37:16.000'),
             testMedia: Examples.media1.rebuild(
               (v) => v
@@ -108,7 +112,7 @@ void main() async {
     group('${downloaderTest.downloader.platform.id} downloader', () {
       test('gets all media upload metadata for a source collection', () async {
         final result = await downloaderTest.downloader
-            .reverseChronologicalMedia(downloaderTest.sourceCollection)
+            .reverseChronologicalMedia()
             .toList();
 
         // Verify that the results are correctly returned in descending order
@@ -127,22 +131,20 @@ void main() async {
 
       test('gets most recent media', () async {
         final mostRecentExpected = await downloaderTest.downloader
-            .allMedia(downloaderTest.sourceCollection)
+            .allMedia()
             .reduce((previous, element) =>
                 previous.source.releaseDate.isAfter(element.source.releaseDate)
                     ? previous
                     : element);
 
-        final mostRecent = await downloaderTest.downloader
-            .mostRecentMedia(downloaderTest.sourceCollection);
+        final mostRecent = await downloaderTest.downloader.mostRecentMedia();
 
         expect(mostRecent, mostRecentExpected);
       });
 
       test('gets only media uploaded after specified date', () async {
         final result = await downloaderTest.downloader
-            .reverseChronologicalMedia(
-                downloaderTest.sourceCollection, downloaderTest.mediaAfterDate)
+            .reverseChronologicalMedia(downloaderTest.mediaAfterDate)
             .toList();
 
         // Verify that we didn't receive any media outside the expected date

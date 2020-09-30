@@ -6,11 +6,10 @@ import 'package:built_value/standard_json_plugin.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/src/models/feed.dart';
 import 'package:vidlib/src/models/media.dart';
-import 'package:vidlib/src/models/media_conversion_args.dart';
+import 'package:vidlib/src/models/cloner_task_args.dart';
 import 'package:vidlib/src/models/served_media.dart';
 import 'package:vidlib/src/models/platform.dart';
 import 'package:vidlib/src/models/source.dart';
-import 'package:vidlib/src/models/source_collection.dart';
 import 'package:vidlib/vidlib.dart';
 import 'duration_serializer.dart';
 part 'serializers.g.dart';
@@ -19,12 +18,11 @@ part 'serializers.g.dart';
 @SerializersFor([
   ClonerConfiguration,
   Media,
-  MediaConversionArgs,
+  ClonerTaskArgs,
   ServedMedia,
   Feed,
   Platform,
   Source,
-  SourceCollection,
   BuiltMap,
 ])
 final Serializers standardSerializers = (_$standardSerializers.toBuilder()
@@ -36,9 +34,6 @@ final Serializers standardSerializers = (_$standardSerializers.toBuilder()
 final Serializers jsonSerializers = (standardSerializers.toBuilder()
       // Serialize as json for easy readability
       ..addPlugin(StandardJsonPlugin())
-      ..addBuilderFactory(
-          FullType(BuiltMap, [FullType(String), FullType(SourceCollection)]),
-          () => MapBuilder<String, SourceCollection>())
       ..addBuilderFactory(FullType(BuiltList, [FullType(ClonerConfiguration)]),
           () => ListBuilder<ClonerConfiguration>()))
     .build();

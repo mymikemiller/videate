@@ -13,7 +13,7 @@ abstract class ClonerTask {
     processStarter = Process.start;
   }
 
-  void configure(ClonerConfiguration configuration) {
+  void configure(ClonerTaskArgs args) {
     // No configuration by default
   }
 

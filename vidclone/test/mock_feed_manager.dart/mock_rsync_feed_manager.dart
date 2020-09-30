@@ -14,7 +14,7 @@ class MockRsyncFeedManager extends RsyncFeedManager {
   // Store the pushed feed locally instead of pushing it via rsync
   Feed pushedFeed;
 
-  MockRsyncFeedManager(String path) : super('feeds/$path') {
+  MockRsyncFeedManager() : super() {
     // The default client avoids http calls by returning the feed that was most
     // recently pushed, or null if nothing has been pushed this run.
     client = MockClient((request) async {

@@ -103,20 +103,17 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   }
 
   @override
-  Stream<Media> allMedia(SourceCollection sourceCollection) =>
-      _delegate.allMedia(sourceCollection);
+  Stream<Media> allMedia() => _delegate.allMedia();
 
   @override
-  Stream<Media> reverseChronologicalMedia(SourceCollection sourceCollection,
-          [DateTime after]) =>
-      _delegate.reverseChronologicalMedia(sourceCollection, after);
+  Stream<Media> reverseChronologicalMedia([DateTime after]) =>
+      _delegate.reverseChronologicalMedia(after);
 
   @override
   String getSourceUniqueId(Media media) => _delegate.getSourceUniqueId(media);
 
   @override
-  Future<Media> mostRecentMedia(SourceCollection sourceCollection) =>
-      _delegate.mostRecentMedia(sourceCollection);
+  Future<Media> mostRecentMedia() => _delegate.mostRecentMedia();
 
   @override
   Future<MediaFile> download(Media media,
@@ -124,8 +121,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
       _delegate.download(media);
 
   @override
-  void configure(ClonerConfiguration configuration) =>
-      _delegate.configure(configuration);
+  void configure(ClonerTaskArgs args) => _delegate.configure(args);
 
   @override
   void close() {
@@ -136,8 +132,7 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   int get slidingWindowSize => 1;
 
   @override
-  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) =>
-      _delegate.createEmptyFeed(sourceCollection);
+  Future<Feed> createEmptyFeed() => _delegate.createEmptyFeed();
 
   @override
   Client get client => _delegate.client;
@@ -154,6 +149,9 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   @override
   set processStarter(_processStarter) =>
       _delegate.processStarter = _processStarter;
+
+  @override
+  yt_explode.ChannelId channelId;
 }
 
 class MockYoutubeExplode extends Mock implements yt_explode.YoutubeExplode {}

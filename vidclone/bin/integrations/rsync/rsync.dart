@@ -34,7 +34,7 @@ mixin Rsync {
         print(
             'rsync error may imply a missing directory structure at the destination. Try creating the "www/$dir" directory.');
       }
-      throw 'process rsync error: ${output.stderr}';
+      throw 'rsync process error: ${output.stderr}';
     }
   }
 

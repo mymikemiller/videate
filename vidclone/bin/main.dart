@@ -9,11 +9,13 @@ import 'cloner_task.dart';
 import 'downloader.dart';
 import 'integrations/cdn77/cdn77_feed_manager.dart';
 import 'integrations/cdn77/cdn77_uploader.dart';
-import 'integrations/internet_archive/internet_archive_uploader.dart';
+import 'integrations/internet_archive/internet_archive_cli_uploader.dart';
+import 'integrations/internet_archive/internet_archive_s3_uploader.dart';
 import 'integrations/local/json_file_feed_manager.dart';
 import 'integrations/local/local_downloader.dart';
 import 'integrations/local/save_to_disk_uploader.dart';
 import 'integrations/media_converters/ffmpeg_media_converter.dart';
+import 'integrations/media_converters/null_media_converter.dart';
 import 'integrations/youtube/youtube_downloader.dart';
 import 'package:file/file.dart' as file;
 import 'dart:convert';
@@ -46,15 +48,17 @@ void main(List<String> arguments) async {
     LocalDownloader(),
   ];
   final mediaConverters = [
+    NullMediaConverter(),
     FfmpegMediaConverter(),
   ];
   final uploaders = [
     Cdn77Uploader(),
-    InternetArchiveUploader(internetArchiveAccessKey, internetArchiveSecretKey),
+    InternetArchiveCliUploader(
+        internetArchiveAccessKey, internetArchiveSecretKey),
     SaveToDiskUploader(mediaBaseDirectory),
   ];
   final feedManagers = [
-    JsonFileFeedManager(feedsBaseDirectory),
+    JsonFileFeedManager(),
     Cdn77FeedManager(),
   ];
 
@@ -72,61 +76,56 @@ void main(List<String> arguments) async {
       jsonSerializers.deserialize(clonerConfigurationsObj,
           specifiedType: FullType(BuiltList, [FullType(ClonerConfiguration)]));
 
-  // Verify that all feed names are unique since the file doesn't guarantee it
-  final feedNameCountMap =
-      clonerConfigurations.fold({}, (map, clonerConfiguration) {
-    map.update(clonerConfiguration.feedName, (value) => value + 1,
-        ifAbsent: () => 1);
-    return map;
-  });
-  final duplicatedFeedNames =
-      feedNameCountMap.entries.where((e) => e.value > 0).map((e) => e.key);
-  if (duplicatedFeedNames.isNotEmpty) {
-    throw 'Cloner Configuration file contains duplicate feed names: ${duplicatedFeedNames.join(",")}';
+  // Create all the cloners we'll be using
+  final cloners = clonerConfigurations.map((clonerConfiguration) {
+    final feedManager = feedManagerMap[clonerConfiguration.feedManager.id]
+      ..configure(clonerConfiguration.feedManager);
+    final downloader = downloaderMap[clonerConfiguration.downloader.id]
+      ..configure(clonerConfiguration.downloader);
+    final mediaConverter =
+        mediaConverterMap[clonerConfiguration.mediaConverter.id]
+          ..configure(clonerConfiguration.mediaConverter);
+    final uploader = uploaderMap[clonerConfiguration.uploader.id]
+      ..configure(clonerConfiguration.uploader);
+
+    return Cloner(feedManager, downloader, mediaConverter, uploader);
+  }).toList();
+
+  // Verify that all feed names are unique per feedManager since the file
+  // doesn't guarantee it, but we want to avoid writing to the same feed twice.
+  final duplicateFeeds = getDuplicatesByAccessor(
+      cloners,
+      (Cloner cloner) =>
+          '${cloner.feedManager.id}: ${cloner.feedManager.feedName}');
+  if (duplicateFeeds.isNotEmpty) {
+    throw 'Cloner Configuration file contains duplicate feed(s): ${duplicateFeeds.join(",")}';
   }
 
-  for (var clonerConfiguration in clonerConfigurations) {
-    print(
-        'Processing ${clonerConfiguration.displayName} ("${clonerConfiguration.feedName}" feed)');
-
-    final downloader =
-        downloaderMap[clonerConfiguration.sourceCollection.platform.id]
-          ..configure(clonerConfiguration);
-    final uploader = uploaderMap[clonerConfiguration.uploaderId]
-      ..configure(clonerConfiguration);
-    final mediaConverter =
-        mediaConverterMap[clonerConfiguration.mediaConversionArgs.id]
-          ..configure(clonerConfiguration);
-    final feedManager = feedManagerMap[clonerConfiguration.feedManagerId]
-      ..configure(clonerConfiguration);
-
-    // Create the Cloner
-    final cloner = Cloner(downloader, mediaConverter, uploader, feedManager);
+  for (var cloner in cloners) {
+    print('Processing ${cloner.feedManager.id} ${cloner.feedManager.feedName}');
 
     // Get the latest feed data, or create an empty feed if necessary
-    if (!await feedManager.populate()) {
-      feedManager.feed = await downloader
-          .createEmptyFeed(clonerConfiguration.sourceCollection);
+    if (!await cloner.feedManager.populate()) {
+      cloner.feedManager.feed = await cloner.downloader.createEmptyFeed();
     }
 
-    if (downloader is LocalDownloader) {
+    if (cloner.downloader is LocalDownloader) {
       // Special case for LocalDownloader, where we always "download"
-      // everything. This is necessary because all local files have the same
-      // hard-coded releaseDate.
-      await for (var servedMedia
-          in cloner.cloneCollection(clonerConfiguration)) {
+      // everything regardless of date. This is necessary because all local
+      // files have the same hard-coded releaseDate.
+      await for (var servedMedia in cloner.cloneCollection()) {
         print('(Local) Cloned media available at ${servedMedia.uri}');
       }
     } else {
       // Figure out how far back in time we need to clone. This value will be
       // null if the feed is currently empty.
-      final mostRecentMediaAlreadyInFeed = feedManager.feed.mostRecentMedia;
+      final mostRecentMediaAlreadyInFeed =
+          cloner.feedManager.feed.mostRecentMedia;
 
       if (forcedCloneStartDate == null &&
           mostRecentMediaAlreadyInFeed == null) {
         // Clone the source's most recent media
-        final servedMedia =
-            await cloner.cloneMostRecentMedia(clonerConfiguration);
+        final servedMedia = await cloner.cloneMostRecentMedia();
         print('(First) Cloned media available at ${servedMedia.uri}');
       } else {
         // Clone only media newer than the most recent media we already have
@@ -140,8 +139,7 @@ void main(List<String> arguments) async {
           cloneStartDate =
               mostRecentMediaAlreadyInFeed.media.source.releaseDate;
         }
-        await for (var servedMedia
-            in cloner.cloneCollection(clonerConfiguration, cloneStartDate)) {
+        await for (var servedMedia in cloner.cloneCollection(cloneStartDate)) {
           print('(Additional) Cloned media available at ${servedMedia.uri}');
         }
       }

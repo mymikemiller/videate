@@ -36,26 +36,4 @@ abstract class RsyncUploader extends Uploader with Rsync {
     final key = getKey(media);
     return Uri.parse('$endpointUrl/$key');
   }
-
-  @override
-  Future<ServedMedia> getExistingServedMedia(Media media) async {
-    final uri = getDestinationUri(media);
-    var response = await client.head(uri);
-    if (response.statusCode == 404) {
-      // Media not found
-      return null;
-    }
-    if (response.statusCode != 200) {
-      throw 'received unexpected status code: ${response.statusCode}';
-    }
-
-    final etag = response.headers['etag'];
-    final length = int.parse(response.headers['content-length']);
-
-    return ServedMedia((b) => b
-      ..uri = getDestinationUri(media)
-      ..media = media.toBuilder()
-      ..etag = etag
-      ..lengthInBytes = length);
-  }
 }

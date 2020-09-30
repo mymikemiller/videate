@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 // Doesn't actually download anything, instead constructs Media objects based
 // on files in a folder.
 class LocalDownloader extends Downloader {
-  static const filePathIdentifierMeaning = 'Local File Path';
+  Directory sourceDirectory;
 
   static Platform getPlatform() => Platform(
         (p) => p
@@ -21,10 +21,12 @@ class LocalDownloader extends Downloader {
   @override
   Platform get platform => getPlatform();
 
-  static SourceCollection createFilePathSourceCollection(
-          String displayName, String identifier) =>
-      Downloader.createSourceCollection(
-          displayName, getPlatform(), filePathIdentifierMeaning, identifier);
+  @override
+  void configure(ClonerTaskArgs downloaderArgs) {
+    super.configure(downloaderArgs);
+    final path = downloaderArgs.get('path');
+    sourceDirectory = LocalFileSystem().directory(path);
+  }
 
   // An arbitrarily large slidingWindowSize will ensure we return [Media]s in a
   // predictable order
@@ -37,15 +39,9 @@ class LocalDownloader extends Downloader {
 
   // collectionIdentifier is unused for this Downloader
   @override
-  Stream<Media> allMedia(SourceCollection sourceCollection) async* {
-    if (sourceCollection.platform != platform) {
-      throw 'sourceCollection platform mismatch';
-    }
-    final files = LocalFileSystem()
-        .directory(sourceCollection.identifier)
-        .listSync(recursive: false)
-        .whereType<File>()
-        .toList();
+  Stream<Media> allMedia() async* {
+    final files =
+        sourceDirectory.listSync(recursive: false).whereType<File>().toList();
 
     // Sort by path for consistency, since we don't know the release date for
     // local files
@@ -105,12 +101,14 @@ class LocalDownloader extends Downloader {
   @override
   Future<MediaFile> download(Media media,
       {Function(double progress) callback}) {
+    callback?.call(0);
     final path = Uri.decodeFull(media.source.uri.path.toString());
     final sourceFile = LocalFileSystem().file(path);
     if (!sourceFile.existsSync()) {
       throw 'Could not download local file. File not found: $path';
     }
     final mediaFile = MediaFile(media, sourceFile);
+    callback?.call(1);
     return Future.value(mediaFile);
   }
 
@@ -120,9 +118,13 @@ class LocalDownloader extends Downloader {
   }
 
   @override
-  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) {
-    return Future.value(Examples.emptyFeed.rebuild((b) => b
-      ..title = sourceCollection.identifier
-      ..subtitle = '${sourceCollection.identifier} feed)'));
+  Future<Feed> createEmptyFeed() {
+    return Future.value(Examples.emptyFeed.rebuild((b) {
+      // Name the feed the same as the folder's name
+      final feedName = basename(sourceDirectory.path);
+      return b
+        ..title = feedName
+        ..subtitle = '$feedName feed';
+    }));
   }
 }

@@ -4,6 +4,7 @@ import 'package:file/memory.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
 import 'package:mockito/mockito.dart';
+import 'package:built_collection/built_collection.dart';
 import 'package:test/test.dart';
 import 'package:vidlib/vidlib.dart';
 import '../bin/integrations/local/save_to_disk_uploader.dart';
@@ -30,7 +31,12 @@ final successMockClient = (MediaFile mediaFile) => MockClient((request) async {
 
 void main() {
   final uploaderTests = [
-    UploaderTest(SaveToDiskUploader(MemoryFileSystem().systemTempDirectory)),
+    UploaderTest(SaveToDiskUploader(MemoryFileSystem().systemTempDirectory)
+      ..configure(ClonerTaskArgs((a) => a
+        ..id = 'save_to_disk'
+        ..args = ['feedName', 'test_feed', 'platformId', 'test_platform']
+            .toBuiltList()
+            .toBuilder()))),
     UploaderTest(MockS3Uploader()),
     UploaderTest(MockRsyncUploader()),
   ];

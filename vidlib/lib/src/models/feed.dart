@@ -40,8 +40,11 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
 
   Feed withMediaAdded(ServedMedia media) => withAllMediaAdded([media]);
 
-  Feed withAllMediaAdded(List<ServedMedia> mediaList) {
-    return rebuild((b) => b.mediaList.addAll(mediaList));
+  Feed withAllMediaAdded(List<ServedMedia> allMediaToAdd) {
+    // Discard any media already in our list
+    final nonDuplicatedMediaToAdd = List<ServedMedia>.from(allMediaToAdd)
+      ..removeWhere((mediaToAdd) => mediaList.contains(mediaToAdd));
+    return rebuild((b) => b.mediaList.addAll(nonDuplicatedMediaToAdd));
   }
 
   ServedMedia get mostRecentMedia => mediaList.isEmpty ? null : mediaList.last;

@@ -10,7 +10,7 @@ class FfmpegMediaConverter extends MediaConverter {
   String get id => _id;
 
   // Expected conversionArgs format: ['vcodec', 'X', 'height', 'Y', 'crf', 'Z']
-  static MediaConversionArgs createArgs(
+  static ClonerTaskArgs createArgs(
           {@required String vcodec, @required int height, @required int crf}) =>
       MediaConverter.createArgs(
           _id, ['vcodec', '$vcodec', 'height', '$height', 'crf', '$crf']);

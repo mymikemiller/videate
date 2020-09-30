@@ -15,9 +15,9 @@ class SaveToDiskUploader extends Uploader {
   SaveToDiskUploader(this.baseDirectory);
 
   @override
-  void configure(ClonerConfiguration configuration) {
-    sourcePlatformId = configuration.sourceCollection.platform.id;
-    feedName = configuration.feedName;
+  void configure(ClonerTaskArgs uploaderArgs) {
+    feedName = uploaderArgs.get('feedName');
+    sourcePlatformId = uploaderArgs.get('platformId');
   }
 
   @override
@@ -47,8 +47,8 @@ class SaveToDiskUploader extends Uploader {
     // source, so we use that as the filename. We won't have collisions across
     // sources because we also put each media into a folder named after its
     // source platform.
-    return Uri.file(
-        p.join(baseDirectory.path, '${media.source.id}.$extension'));
+    return Uri.file(p.join(
+        baseDirectory.path, sourcePlatformId, '${media.source.id}.$extension'));
   }
 
   @override

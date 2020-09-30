@@ -1,5 +1,6 @@
 import 'package:file/file.dart';
 import 'package:file/local.dart';
+import 'package:built_collection/built_collection.dart';
 import 'package:file/memory.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
@@ -52,13 +53,20 @@ void main() async {
 
   List<FeedManagerTest> generateFeedManagerTests() => [
         FeedManagerTest(
-            feedManager: JsonFileFeedManager(feedDirectory),
+            feedManager: JsonFileFeedManager()
+              ..fileSystem = memoryFileSystem
+              ..configure(ClonerTaskArgs((a) => a
+                ..id = 'json_file'
+                ..args = ['path', feedPath].toBuiltList().toBuilder())),
             mockValidSourceFeed: (feedManager, feed) =>
                 createSourceFeed(memoryFileSystem, feed),
             mockInvalidSourceFeed: (feedManager) =>
                 deleteSourceFeed(memoryFileSystem)),
         FeedManagerTest(
-            feedManager: MockRsyncFeedManager(feedName),
+            feedManager: MockRsyncFeedManager()
+              ..configure(ClonerTaskArgs((a) => a
+                ..id = 'rsync'
+                ..args = ['path', feedPath].toBuiltList().toBuilder())),
             mockValidSourceFeed: (feedManager, feed) =>
                 feedManager.client = successMockClient(feed),
             mockInvalidSourceFeed: (feedManager) =>

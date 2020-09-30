@@ -17,5 +17,24 @@ abstract class Uploader extends ClonerTask {
 
   // Returns the [ServedMedia] if it already exists at the destination,
   // otherwise returns null.
-  Future<ServedMedia> getExistingServedMedia(Media media);
+  Future<ServedMedia> getExistingServedMedia(Media media) async {
+    final uri = getDestinationUri(media);
+    var response = await client.head(uri);
+    if ([404, 403].contains(response.statusCode)) {
+      // Media not found
+      return null;
+    }
+    if (response.statusCode != 200) {
+      throw 'received unexpected status code: ${response.statusCode}';
+    }
+
+    final etag = response.headers['etag'];
+    final length = int.parse(response.headers['content-length']);
+
+    return ServedMedia((b) => b
+      ..uri = getDestinationUri(media)
+      ..media = media.toBuilder()
+      ..etag = etag
+      ..lengthInBytes = length);
+  }
 }

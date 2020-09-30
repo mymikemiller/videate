@@ -3,29 +3,24 @@ import 'package:http/http.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import '../../feed_manager.dart';
 import 'rsync.dart';
-import 'package:path/path.dart' as p;
+import 'package:path/path.dart';
 
 // Base class for FeedManagers that use the rsync command to persist feeds.
 abstract class RsyncFeedManager extends FeedManager with Rsync {
-  RsyncFeedManager(this.feedDirectoryPath);
+  RsyncFeedManager();
 
-  // The path to the feed directory where the feed files are located. This path
-  // appears directly after the endpoint url. For example, for the file hosted
-  // at https://1928422091.rsc.cdn77.org/feeds/myfeed.json, the
-  // feedDirectoryPath is 'feeds/'
-  final String feedDirectoryPath;
-
-  // The feed file's name. For example, for the file hosted at
-  // https://1928422091.rsc.cdn77.org/feeds/myfeed.json, the feedFileName is
-  // myfeed.json
-  String feedFileName;
-
-  String get feedFilePath => p.join(feedDirectoryPath, feedFileName);
+  // The path to the feed. This path appears directly after the endpoint url.
+  // For example, for the file hosted at
+  // https://1928422091.rsc.cdn77.org/feeds/myfeed.json, the feedPath is
+  // 'feeds/myfeed.json'
+  String feedPath;
 
   @override
-  void configure(ClonerConfiguration configuration) {
-    super.configure(configuration);
-    feedFileName = configuration.feedName;
+  String get feedName => basename(feedPath);
+
+  @override
+  void configure(ClonerTaskArgs feedManagerArgs) {
+    feedPath = feedManagerArgs.get('path');
   }
 
   // Use the FeedManager's client for rsync requests
@@ -40,7 +35,7 @@ abstract class RsyncFeedManager extends FeedManager with Rsync {
   Future<bool> populate() async {
     String json;
     try {
-      json = await pull(feedFilePath);
+      json = await pull(feedPath);
     } on ClientException {
       // 404 errors end up here
       return false;
@@ -55,13 +50,13 @@ abstract class RsyncFeedManager extends FeedManager with Rsync {
     // Create a temporary file for rsync to upload
     final fs = LocalFileSystem();
     final tempDir = fs.systemTempDirectory.createTempSync();
-    final file = fs.file('${tempDir.path}/$feedFileName');
-    file.createSync();
+    final file = fs.file('${tempDir.path}/$feedPath');
+    file.createSync(recursive: true);
 
     final json = feed.toJson();
     file.writeAsStringSync(json);
 
-    await push(file, feedFilePath);
+    await push(file, feedPath);
 
     tempDir.deleteSync(recursive: true);
   }

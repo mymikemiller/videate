@@ -10,21 +10,21 @@ abstract class MediaConverter extends ClonerTask {
   // the ffmpeg tool
   String get id;
 
-  MediaConversionArgs conversionArgs;
+  ClonerTaskArgs conversionArgs;
 
   MediaConverter();
 
   @override
-  void configure(ClonerConfiguration configuration) {
-    conversionArgs = configuration.mediaConversionArgs;
+  void configure(ClonerTaskArgs mediaConversionArgs) {
+    conversionArgs = mediaConversionArgs;
   }
 
   // Converts the specified media.
   Future<MediaFile> convert(MediaFile mediaFile,
       {Function(double progress) callback});
 
-  static MediaConversionArgs createArgs(String id, List<String> args) =>
-      MediaConversionArgs((b) => b
+  static ClonerTaskArgs createArgs(String id, List<String> args) =>
+      ClonerTaskArgs((b) => b
         ..id = id
         ..args = BuiltList.of(args).toBuilder());
 }

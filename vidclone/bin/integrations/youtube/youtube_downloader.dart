@@ -10,7 +10,15 @@ import 'package:path/path.dart' as p;
 final memoryFileSystem = MemoryFileSystem();
 
 class YoutubeDownloader extends Downloader {
-  static const channelIdIdentifierMeaning = 'YouTube Channel ID';
+  // The channelId of the user whose videos to download, e.g.
+  // UC9CuvdOVfMPvKCiwdGKL3cQ
+  yt_explode.ChannelId channelId;
+
+  @override
+  void configure(ClonerTaskArgs downloaderArgs) {
+    final channelIdString = downloaderArgs.get('channelId');
+    channelId = yt_explode.ChannelId(channelIdString);
+  }
 
   static Platform getPlatform() => Platform(
         (p) => p
@@ -27,11 +35,6 @@ class YoutubeDownloader extends Downloader {
   // https://github.com/Hexer10/youtube_explode_dart/issues/68
   @override
   int get slidingWindowSize => 10;
-
-  static SourceCollection createChannelIdSourceCollection(
-          String displayName, String identifier) =>
-      Downloader.createSourceCollection(
-          displayName, getPlatform(), channelIdIdentifierMeaning, identifier);
 
   final yt_explode.YoutubeExplode _youtubeExplode;
 
@@ -115,14 +118,10 @@ class YoutubeDownloader extends Downloader {
   }
 
   @override
-  Stream<Media> allMedia(SourceCollection sourceCollection) {
-    if (sourceCollection.platform != getPlatform()) {
-      throw 'sourceCollection platform mismatch';
-    }
-    if (sourceCollection.identifierMeaning != channelIdIdentifierMeaning) {
+  Stream<Media> allMedia() {
+    if (channelId == null) {
       throw 'The Youtube downloader currently only supports ChannelId SourceCollections';
     }
-    final channelId = yt_explode.ChannelId(sourceCollection.identifier);
     final stream = _youtubeExplode.channels.getUploads(channelId);
 
     DateTime previousUploadPublishDate;
@@ -170,9 +169,8 @@ class YoutubeDownloader extends Downloader {
       yt_explode.VideoId.parseVideoId(media.source.uri.toString());
 
   @override
-  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) async {
-    final metadata =
-        await _youtubeExplode.channels.get(sourceCollection.identifier);
+  Future<Feed> createEmptyFeed() async {
+    final metadata = await _youtubeExplode.channels.get(channelId);
     return Examples.emptyFeed.rebuild((b) => b
       ..title = metadata.title
       ..description = metadata.description

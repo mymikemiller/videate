@@ -1,24 +1,30 @@
 import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:vidlib/vidlib.dart';
 import '../../feed_manager.dart';
+import 'package:path/path.dart';
 
 class JsonFileFeedManager extends FeedManager {
+  FileSystem fileSystem = LocalFileSystem();
+
   @override
   String get id => 'json_file';
 
-  Directory baseDirectory;
-  String jsonFileName;
-
-  JsonFileFeedManager(this.baseDirectory);
+  String path;
 
   @override
-  void configure(ClonerConfiguration configuration) {
-    jsonFileName = '${configuration.feedName}.json';
+  String get feedName => basenameWithoutExtension(path);
+
+  JsonFileFeedManager();
+
+  @override
+  void configure(ClonerTaskArgs feedManagerArgs) {
+    path = feedManagerArgs.get('path');
   }
 
   @override
   Future<bool> populate() async {
-    final file = baseDirectory.childFile(jsonFileName);
+    final file = fileSystem.file(path);
     if (!file.existsSync()) {
       return false;
     }
@@ -30,7 +36,7 @@ class JsonFileFeedManager extends FeedManager {
 
   @override
   Future<void> write() async {
-    final file = baseDirectory.childFile(jsonFileName);
+    final file = fileSystem.file(path);
 
     // Create the file if necessary (this is a no-op if the file already
     // exists)

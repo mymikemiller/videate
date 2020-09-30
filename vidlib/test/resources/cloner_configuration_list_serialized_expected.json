@@ -1,28 +1,32 @@
 [
     {
-        "feedName": "testfeed",
-        "displayName": "Test Cloner Config",
-        "sourceCollection": {
-            "platform": {
-                "uri": "http://example.com",
-                "id": "test_platform"
-            },
-            "identifier": "abcdefg",
-            "identifierMeaning": "Test Identifier",
-            "displayName": "Test Display Name"
-        },
-        "mediaConversionArgs": {
-            "id": "ffmpeg",
+        "feedManager": {
+            "id": "test_feed_manager",
             "args": [
-                "vcodec",
-                "libx264",
-                "height",
-                "240",
-                "crf",
-                "30"
+                "test_arg",
+                "test_value"
             ]
         },
-        "uploaderId": "test_uploader_id",
-        "feedManagerId": "test_feed_manager_id"
+        "downloader": {
+            "id": "test_downloader",
+            "args": [
+                "test_arg",
+                "test_value"
+            ]
+        },
+        "mediaConverter": {
+            "id": "test_media_converter",
+            "args": [
+                "test_arg",
+                "test_value"
+            ]
+        },
+        "uploader": {
+            "id": "test_uploader",
+            "args": [
+                "test_arg",
+                "test_value"
+            ]
+        }
     }
 ]

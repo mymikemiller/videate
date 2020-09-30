@@ -5,6 +5,9 @@ abstract class FeedManager extends ClonerTask {
   // An id unique to this feed manager, e.g. "json_file".
   String get id;
 
+  // The feed's name, for display purposes
+  String get feedName;
+
   // Initialize this feed with the contents from the source by calling
   // `populate()`. Write its contents back to the source with write(). Thus,
   // the feed may be out if sync with the source until write() is called.

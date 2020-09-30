@@ -1,5 +1,4 @@
 import 'dart:io' as io;
-import 'dart:io';
 import 'package:file/file.dart' as f;
 import 'package:file/local.dart';
 import 'package:path/path.dart';
@@ -50,7 +49,7 @@ void updateProgressBar(ProgressBar progressBar, double progress) {
   final progressInt = (progress * 100).round();
   try {
     progressBar.update(progressInt);
-  } on StdoutException catch (e) {
+  } on io.StdoutException catch (e) {
     if (e.message == 'Could not get terminal size') {
       print('If using VSCode, make sure you\'re using the Integrated Terminal,'
           ' as the Debug Console does not support cursor positioning '
@@ -85,4 +84,28 @@ Future<io.File> ensureLocal(f.File file) async {
     file = await copyToFileSystem(file, LocalFileSystem(), uri);
   }
   return file;
+}
+
+// Return a map where the keys are results of calling valueAccessor on an item,
+// and the values are lists of all items that match that value
+Map<Value, List<Item>> reverseMap<Item, Value>(
+    List<Item> list, Value Function(Item) valueAccessor) {
+  return list.fold({}, (map, item) {
+    final value = valueAccessor(item);
+    map.update(value, (existingList) => [...existingList, item],
+        ifAbsent: () => <Item>[item]);
+    return map;
+  });
+}
+
+// Get any values that are duplicated among the items in `list`.
+// `valueAccessor` can be any function that operates on an item in the list,
+// such as accessing one of its property values.
+List<Value> getDuplicatesByAccessor<Item, Value>(
+    Iterable<Item> list, Value Function(Item) valueAccessor) {
+  final reversedMap = reverseMap(list, valueAccessor);
+  // Remove all unique values so we're left with only values that are
+  // duplicated
+  final nonUnique = reversedMap..removeWhere((key, value) => value.length == 1);
+  return nonUnique.keys.toList();
 }

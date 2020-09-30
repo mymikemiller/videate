@@ -8,14 +8,6 @@ abstract class Downloader extends ClonerTask {
   // The platform this downloader downloads from, e.g. the Youtube platform.
   Platform get platform;
 
-  static SourceCollection createSourceCollection(String displayName,
-          Platform platform, String identifierMeaning, String identifier) =>
-      SourceCollection((b) => b
-        ..displayName = displayName
-        ..platform = platform.toBuilder()
-        ..identifierMeaning = identifierMeaning
-        ..identifier = identifier);
-
   // The size of window used to ensure [Media]s come back in order.
   //
   // With a default value of 1, we essentially don't use the sliding window.
@@ -32,14 +24,13 @@ abstract class Downloader extends ClonerTask {
   // [Media] is not guaranteed, but because reverseChronologicalMedia uses this
   // function, [Downloader]s should aim to return them in as close to reverse
   // chronological order as possible so the slidingWindowSize can remain small.
-  Stream<Media> allMedia(SourceCollection sourceCollection);
+  Stream<Media> allMedia();
 
   // Returns a stream that does its best to yield all media in the collection
   // in reverse order of date released (most recently released media first).
   // The [slidingWindowSize] property of this Downloader can be used to
   // increase the size of the sliding window used to better ensure order.
-  Stream<Media> reverseChronologicalMedia(SourceCollection sourceCollection,
-      [DateTime after]) async* {
+  Stream<Media> reverseChronologicalMedia([DateTime after]) async* {
     var slidingWindow = <Media>[];
     Media previouslyYielded;
 
@@ -56,7 +47,7 @@ abstract class Downloader extends ClonerTask {
     };
 
     // Do the best to ensure the media are returned in the order expected
-    await for (var media in allMedia(sourceCollection)) {
+    await for (var media in allMedia()) {
       // We want the media in slidingWindow to be in reverse date order
       // (slidingWindow[0] should be the most recent media). As an example of
       // why the slidingWindow is necesary, media generally are returned by the
@@ -116,8 +107,8 @@ abstract class Downloader extends ClonerTask {
   }
 
   // Returns the most recently released media in the collection.
-  Future<Media> mostRecentMedia(SourceCollection sourceCollection) async {
-    return reverseChronologicalMedia(sourceCollection).first;
+  Future<Media> mostRecentMedia() async {
+    return reverseChronologicalMedia().first;
   }
 
   // Returns a string that is guaranteed to be unique among all media sourced
@@ -126,5 +117,5 @@ abstract class Downloader extends ClonerTask {
 
   // Creates a feed with no media, but with all the basic information, such as
   // author, from the specified source collection.
-  Future<Feed> createEmptyFeed(SourceCollection sourceCollection);
+  Future<Feed> createEmptyFeed();
 }

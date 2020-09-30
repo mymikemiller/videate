@@ -5,6 +5,7 @@ import 'package:http/src/client.dart';
 import 'package:mockito/mockito.dart';
 import 'package:vidlib/src/models/media.dart';
 import 'package:vidlib/vidlib.dart';
+import 'package:youtube_explode_dart/src/channels/channel_id.dart';
 import '../../bin/integrations/youtube/youtube_downloader.dart';
 
 // This file is no longer used since we're using YoutubeExplode, but is left
@@ -68,20 +69,17 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
   int get slidingWindowSize => _delegate.slidingWindowSize;
 
   @override
-  Stream<Media> allMedia(SourceCollection sourceCollection) =>
-      _delegate.allMedia(sourceCollection);
+  Stream<Media> allMedia() => _delegate.allMedia();
 
   @override
   String getSourceUniqueId(Media media) => _delegate.getSourceUniqueId(media);
 
   @override
-  Future<Media> mostRecentMedia(SourceCollection sourceCollection) =>
-      _delegate.mostRecentMedia(sourceCollection);
+  Future<Media> mostRecentMedia() => _delegate.mostRecentMedia();
 
   @override
-  Stream<Media> reverseChronologicalMedia(SourceCollection sourceCollection,
-          [DateTime after]) =>
-      _delegate.reverseChronologicalMedia(sourceCollection, after);
+  Stream<Media> reverseChronologicalMedia([DateTime after]) =>
+      _delegate.reverseChronologicalMedia(after);
 
   @override
   Future<MediaFile> download(Media media,
@@ -89,15 +87,13 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
       _delegate.download(media, callback: callback);
 
   @override
-  void configure(ClonerConfiguration configuration) =>
-      _delegate.configure(configuration);
+  void configure(ClonerTaskArgs args) => _delegate.configure(args);
 
   @override
   void close() => _delegate.close();
 
   @override
-  Future<Feed> createEmptyFeed(SourceCollection sourceCollection) =>
-      _delegate.createEmptyFeed(sourceCollection);
+  Future<Feed> createEmptyFeed() => _delegate.createEmptyFeed();
 
   @override
   Client get client => _delegate.client;
@@ -114,6 +110,9 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
   @override
   set processStarter(_processStarter) =>
       _delegate.processStarter = _processStarter;
+
+  @override
+  ChannelId channelId;
 }
 
 Future<PlaylistItemListResponse> responseWithJson(String filePath) async {

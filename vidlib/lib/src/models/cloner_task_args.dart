@@ -47,6 +47,6 @@ abstract class ClonerTaskArgs
   // Used only for debug purposes
   @override
   String toString() {
-    return '$id: [${args.join(",")}]';
+    return 'id: $id, args: [${args.join(", ")}]';
   }
 }

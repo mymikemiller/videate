@@ -87,13 +87,14 @@ Future<io.File> ensureLocal(f.File file) async {
 }
 
 // Return a map where the keys are results of calling valueAccessor on an item,
-// and the values are lists of all items that match that value
-Map<Value, List<Item>> reverseMap<Item, Value>(
-    List<Item> list, Value Function(Item) valueAccessor) {
+// and the values are lists of all items with the same value
+Map<Value, Iterable<Item>> mapByValue<Item, Value>(
+    Iterable<Item> list, Value Function(Item) valueAccessor) {
   return list.fold({}, (map, item) {
     final value = valueAccessor(item);
-    map.update(value, (existingList) => [...existingList, item],
-        ifAbsent: () => <Item>[item]);
+    map.update(value, (existingList) {
+      return [...existingList, item];
+    }, ifAbsent: () => <Item>[item]);
     return map;
   });
 }
@@ -103,7 +104,7 @@ Map<Value, List<Item>> reverseMap<Item, Value>(
 // such as accessing one of its property values.
 List<Value> getDuplicatesByAccessor<Item, Value>(
     Iterable<Item> list, Value Function(Item) valueAccessor) {
-  final reversedMap = reverseMap(list, valueAccessor);
+  final reversedMap = mapByValue(list, valueAccessor);
   // Remove all unique values so we're left with only values that are
   // duplicated
   final nonUnique = reversedMap..removeWhere((key, value) => value.length == 1);

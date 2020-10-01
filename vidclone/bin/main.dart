@@ -82,8 +82,7 @@ void main(List<String> arguments) async {
     throw 'Cloner Configuration file contains duplicate feed(s): [${duplicateFeeds.join(", ")}]';
   }
 
-  // Create all the cloners we'll be using
-  final cloners = clonerConfigurations.map((clonerConfiguration) {
+  for (var clonerConfiguration in clonerConfigurations) {
     final feedManager = feedManagerMap[clonerConfiguration.feedManager.id]
       ..configure(clonerConfiguration.feedManager);
     final downloader = downloaderMap[clonerConfiguration.downloader.id]
@@ -94,10 +93,8 @@ void main(List<String> arguments) async {
     final uploader = uploaderMap[clonerConfiguration.uploader.id]
       ..configure(clonerConfiguration.uploader);
 
-    return Cloner(feedManager, downloader, mediaConverter, uploader);
-  }).toList();
+    final cloner = Cloner(feedManager, downloader, mediaConverter, uploader);
 
-  for (var cloner in cloners) {
     print('Processing ${cloner.feedManager.id} ${cloner.feedManager.feedName}');
 
     // Get the latest feed data, or create an empty feed if necessary

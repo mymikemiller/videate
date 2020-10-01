@@ -4,24 +4,18 @@ import 'package:file/local.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
 import 'package:dotenv/dotenv.dart' show load, env;
-import 'package:path/path.dart' as p;
-import 'cloner_task.dart';
-import 'downloader.dart';
 import 'integrations/cdn77/cdn77_feed_manager.dart';
 import 'integrations/cdn77/cdn77_uploader.dart';
 import 'integrations/internet_archive/internet_archive_cli_uploader.dart';
-import 'integrations/internet_archive/internet_archive_s3_uploader.dart';
 import 'integrations/local/json_file_feed_manager.dart';
 import 'integrations/local/local_downloader.dart';
 import 'integrations/local/save_to_disk_uploader.dart';
 import 'integrations/media_converters/ffmpeg_media_converter.dart';
 import 'integrations/media_converters/null_media_converter.dart';
 import 'integrations/youtube/youtube_downloader.dart';
-import 'package:file/file.dart' as file;
 import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
-import 'media_converter.dart';
 
 final forcedCloneStartDate = null;
 // null; // DateTime.parse('2020-07-22T00:00:00.000Z');
@@ -76,8 +70,19 @@ void main(List<String> arguments) async {
       jsonSerializers.deserialize(clonerConfigurationsObj,
           specifiedType: FullType(BuiltList, [FullType(ClonerConfiguration)]));
 
-  // Create all the cloners we'll be using
-  final cloners = clonerConfigurations.map((clonerConfiguration) {
+  // Verify that all feed destinations are unique since the file doesn't
+  // guarantee it, but we want to avoid writing to the same feed twice. We
+  // naively assume two feed destinations are unique only if all feedManager
+  // args are identical and thus the feedManagers compare as equal.
+  final duplicateFeeds = getDuplicatesByAccessor(
+      clonerConfigurations,
+      (ClonerConfiguration clonerConfiguration) =>
+          clonerConfiguration.feedManager);
+  if (duplicateFeeds.isNotEmpty) {
+    throw 'Cloner Configuration file contains duplicate feed(s): [${duplicateFeeds.join(", ")}]';
+  }
+
+  for (var clonerConfiguration in clonerConfigurations) {
     final feedManager = feedManagerMap[clonerConfiguration.feedManager.id]
       ..configure(clonerConfiguration.feedManager);
     final downloader = downloaderMap[clonerConfiguration.downloader.id]
@@ -88,20 +93,8 @@ void main(List<String> arguments) async {
     final uploader = uploaderMap[clonerConfiguration.uploader.id]
       ..configure(clonerConfiguration.uploader);
 
-    return Cloner(feedManager, downloader, mediaConverter, uploader);
-  }).toList();
+    final cloner = Cloner(feedManager, downloader, mediaConverter, uploader);
 
-  // Verify that all feed names are unique per feedManager since the file
-  // doesn't guarantee it, but we want to avoid writing to the same feed twice.
-  final duplicateFeeds = getDuplicatesByAccessor(
-      cloners,
-      (Cloner cloner) =>
-          '${cloner.feedManager.id}: ${cloner.feedManager.feedName}');
-  if (duplicateFeeds.isNotEmpty) {
-    throw 'Cloner Configuration file contains duplicate feed(s): ${duplicateFeeds.join(",")}';
-  }
-
-  for (var cloner in cloners) {
     print('Processing ${cloner.feedManager.id} ${cloner.feedManager.feedName}');
 
     // Get the latest feed data, or create an empty feed if necessary

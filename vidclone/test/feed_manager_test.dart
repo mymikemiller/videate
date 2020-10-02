@@ -36,7 +36,8 @@ final successMockClient = (Feed feed) => MockClient((request) async {
 
 void main() async {
   final feedName = 'feed.json';
-  final feedPath = p.join(memoryFileSystem.systemTempDirectory.path, feedName);
+  final tempDirectory = createTempDirectory(memoryFileSystem);
+  final feedPath = p.join(tempDirectory.path, feedName);
   final feedDirectory = memoryFileSystem.directory(feedPath);
 
   final createSourceFeed = (FileSystem fileSystem, Feed feed) {

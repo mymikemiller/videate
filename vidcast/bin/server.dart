@@ -46,8 +46,8 @@ Future main(List<String> args) async {
       ? (await LocalhostExposer.expose()).hostname
       : vidcastBaseUrl;
 
-  final UriTransformer localFileUriTransformer = (Uri input) =>
-      Uri.parse(input.toString().replaceFirst(mediaBaseDirectoryPath, baseUrl));
+  final UriTransformer localFileUriTransformer = (Uri input) => Uri.parse(
+      input.toString().replaceFirst('file://$mediaBaseDirectoryPath', baseUrl));
   final UriTransformer cdn77UriTransformer = (Uri input) => Uri.parse(
       input.toString().replaceFirst(cdn77BaseUrl, cdn77VidtechBaseUrl));
 

@@ -21,12 +21,11 @@ void main() {
       final memoryFileSystem = MemoryFileSystem();
       final localFileSystem = LocalFileSystem();
 
-      final memoryTempDir =
-          memoryFileSystem.systemTempDirectory.createTempSync();
+      final memoryTempDir = createTempDirectory(memoryFileSystem);
       final memoryFile = memoryTempDir.childFile('test.txt');
       memoryFile.writeAsStringSync('hello world');
 
-      final localTempDir = localFileSystem.systemTempDirectory.createTempSync();
+      final localTempDir = createTempDirectory(localFileSystem);
 
       final localFile = await copyToFileSystem(memoryFile, localFileSystem,
           Uri.parse('${localTempDir.path}/test.txt'));

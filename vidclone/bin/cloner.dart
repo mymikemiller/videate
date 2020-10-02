@@ -65,7 +65,8 @@ class Cloner {
       final convertedMedia = await conversionResult.returnValue;
       final initialSize = (downloadedMedia as MediaFile).file.lengthSync();
       final convertedSize = (convertedMedia as MediaFile).file.lengthSync();
-      print('Reduced file size by ${convertedSize / initialSize}%');
+      final reduction = ((initialSize - convertedSize) / initialSize) * 100;
+      print('Reduced file size by ${reduction.round()}%)');
       print('=== ⏲${conversionResult.time} ⏲===');
 
       // Upload

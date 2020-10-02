@@ -49,7 +49,7 @@ abstract class RsyncFeedManager extends FeedManager with Rsync {
   Future<void> write() async {
     // Create a temporary file for rsync to upload
     final fs = LocalFileSystem();
-    final tempDir = fs.systemTempDirectory.createTempSync();
+    final tempDir = createTempDirectory(fs);
     final file = fs.file('${tempDir.path}/$feedPath');
     file.createSync(recursive: true);
 

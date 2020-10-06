@@ -110,7 +110,7 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
       '+faststart',
       '$outputPath',
     ];
-    // final command = a.join(' ');
+    // final command = args.join(' ');
 
     // ffmpeg -i input.mp4 -vf scale=-2:240 -vcodec libx265 -qscale 3 -crf 28 output.mp4
     await processStarter('ffmpeg', args).then((p) async {
@@ -141,6 +141,10 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
               currentTime.inMilliseconds / totalDuration.inMilliseconds;
           callback?.call(progress);
         }
+      });
+
+      p.stdout.transform(Utf8Decoder()).listen((String data) {
+        print(data);
       });
 
       final exitCode = await p.exitCode;

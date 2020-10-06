@@ -62,8 +62,9 @@ void updateProgressBar(ProgressBar progressBar, double progress) {
 
 f.Directory createTempDirectory(f.FileSystem filesystem) {
   final root = filesystem.systemTempDirectory.childDirectory('videate');
-  root.createSync(recursive: true);
-  return root; //.createTempSync();
+  root.createSync();
+  final newTempFolder = root.createTempSync();
+  return newTempFolder;
 }
 
 // Copies the contents of `file` into a new file at the given `uri` on the
@@ -80,8 +81,10 @@ Future<io.File> copyToFileSystem(
 
   // Copy to the new file line by line to avoid reading the whole file at once
   await for (List<int> line in inputStream) {
-    outputSink.write(line);
+    outputSink.add(line);
   }
+  await outputSink.flush();
+  await outputSink.close();
 
   return newFile;
 }

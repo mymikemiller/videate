@@ -48,8 +48,8 @@ class YoutubeDownloader extends Downloader {
     final videoId = getSourceUniqueId(media);
 
     // Set up a temporary file to hold the contents of the download
-    final path =
-        p.join(memoryFileSystem.systemTempDirectory.path, '$videoId.mp4');
+    final tempDirectory = createTempDirectory(memoryFileSystem);
+    final path = p.join(tempDirectory.path, '$videoId.mp4');
     final file = memoryFileSystem.file(path);
 
     await _download(videoId, file, callback);

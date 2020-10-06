@@ -34,6 +34,16 @@ Future<Duration> getDuration(File videoFile,
     throw ArgumentError(
         'Cannot get duration of non-video file ${videoFile.path}');
   }
+  final a = [
+    '-v',
+    'error',
+    '-show_entries',
+    'format=duration',
+    '-of',
+    'default=noprint_wrappers=1:nokey=1',
+    '-sexagesimal',
+    videoFile.path
+  ].join(' ');
   final output = await processRunner('ffprobe', [
     '-v',
     'error',
@@ -75,16 +85,15 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
     input = await ensureLocal(input);
 
     final inputPath = input.path;
-    final tempDir = LocalFileSystem().systemTempDirectory.createTempSync();
-    final outputPath = '${tempDir.path}/${basename(input.path)}';
+    final tempDir = createTempDirectory(LocalFileSystem());
+    // TODO: don't assume mp4 extension
+    final outputPath =
+        '${tempDir.path}/${basenameWithoutExtension(input.path)}.mp4';
 
-    var i = 0;
     var totalDuration;
-
-    // ffmpeg -i input.mp4 -vf scale=-2:240 -vcodec libx265 -qscale 3 -crf 28 output.mp4
-    await processStarter('ffmpeg', [
+    final args = [
       '-i',
-      inputPath,
+      '$inputPath',
       '-vf',
       // Specify the width/height of the resulting video. A negative value for
       // width tells ffmpeg to use an appropriate width that preserves the
@@ -93,14 +102,18 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
       'scale=-2:$height',
       '-vcodec',
       '$vcodec', // mpeg4, libx264, libx265
-      '-qscale',
+      '-q:v',
       '3',
       '-crf',
       '$crf',
       '-movflags',
       '+faststart',
-      outputPath,
-    ]).then((p) async {
+      '$outputPath',
+    ];
+    // final command = args.join(' ');
+
+    // ffmpeg -i input.mp4 -vf scale=-2:240 -vcodec libx265 -qscale 3 -crf 28 output.mp4
+    await processStarter('ffmpeg', args).then((p) async {
       p.stderr.transform(Utf8Decoder()).listen((String data) {
         final timeFormat = r'\d{2}:\d{2}:\d{2}\.\d{2}';
         if (totalDuration == null) {
@@ -132,7 +145,7 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
 
       final exitCode = await p.exitCode;
       if (exitCode != 0) {
-        throw 'ffmpeg convert error';
+        throw 'ffmpeg convert error (exitCode ${exitCode})';
       }
     });
 

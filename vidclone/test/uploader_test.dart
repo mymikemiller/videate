@@ -31,7 +31,7 @@ final successMockClient = (MediaFile mediaFile) => MockClient((request) async {
 
 void main() {
   final uploaderTests = [
-    UploaderTest(SaveToDiskUploader(MemoryFileSystem().systemTempDirectory)
+    UploaderTest(SaveToDiskUploader(createTempDirectory(MemoryFileSystem()))
       ..configure(ClonerTaskArgs((a) => a
         ..id = 'save_to_disk'
         ..args = ['feedName', 'test_feed', 'platformId', 'test_platform']

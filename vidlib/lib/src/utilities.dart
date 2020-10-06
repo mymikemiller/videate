@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io' as io;
 import 'package:file/file.dart' as f;
 import 'package:file/local.dart';
@@ -59,6 +60,13 @@ void updateProgressBar(ProgressBar progressBar, double progress) {
   }
 }
 
+f.Directory createTempDirectory(f.FileSystem filesystem) {
+  final root = filesystem.systemTempDirectory.childDirectory('videate');
+  root.createSync();
+  final newTempFolder = root.createTempSync();
+  return newTempFolder;
+}
+
 // Copies the contents of `file` into a new file at the given `uri` on the
 // given `fileSystem`. This function can be used to copy files from a file
 // system other than the LocalFileSystem, such as the File library's
@@ -68,17 +76,23 @@ Future<io.File> copyToFileSystem(
   final newFile = destinationFileSystem.file(uri);
   newFile.createSync(recursive: true);
 
-  // TODO: Don't read the whole file all at once. See:
-  // https://stackoverflow.com/questions/20815913/how-to-read-a-file-line-by-line-in-dart
-  // https://github.com/google/file.dart/issues/134
-  List bytes = file.readAsBytesSync();
+  Stream<List<int>> inputStream = file.openRead();
+  final outputSink = newFile.openWrite();
 
-  return newFile.writeAsBytes(bytes);
+  // Copy to the new file line by line to avoid reading the whole file at once
+  await for (List<int> line in inputStream) {
+    outputSink.add(line);
+  }
+  await outputSink.flush();
+  await outputSink.close();
+
+  return newFile;
 }
 
+// TODO: return a flag specifying whether a
 Future<io.File> ensureLocal(f.File file) async {
-  if (file.fileSystem != LocalFileSystem()) {
-    final tempDir = LocalFileSystem().systemTempDirectory.createTempSync();
+  if (file.fileSystem.runtimeType != LocalFileSystem().runtimeType) {
+    final tempDir = createTempDirectory(LocalFileSystem());
     final outputPath = '${tempDir.path}/${basename(file.path)}';
     final uri = Uri.parse(outputPath);
     file = await copyToFileSystem(file, LocalFileSystem(), uri);

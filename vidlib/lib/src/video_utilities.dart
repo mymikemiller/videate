@@ -143,10 +143,6 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
         }
       });
 
-      p.stdout.transform(Utf8Decoder()).listen((String data) {
-        print(data);
-      });
-
       final exitCode = await p.exitCode;
       if (exitCode != 0) {
         throw 'ffmpeg convert error (exitCode ${exitCode})';

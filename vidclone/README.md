@@ -4,9 +4,44 @@ With permission from a user, automatically clones their media content into a
 format VidCast can host as a podcast
 
 ## Usage
+
 ```
 cd vidclone
-dart bin/main.dart
+```
+
+### Run VidClone
+```
+cd vidclone
+dart bin/main.dart [path_to_cloner_configs_json]
+```
+
+### Run VidClone daily cloner configs via automator
+
+Double click vidclone.app in the root vidclone directory on a mac. This app can
+be started with the following launchd script (saved to
+~Library/LaunchAgents/org.videate.vidclone.plist) to run hourly:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.videate.vidclone</string>
+    <key>OnDemand</key>
+    <true/>
+    <key>ProgramArguments</key>
+    <array>
+        <string>open</string>
+        <string>/Users/mikem/projects/videate/vidclone/vidclone.app</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>1</integer>
+    </dict>
+</dict>
+</plist>
 ```
 
 ### Prerequisites

@@ -14,6 +14,13 @@ cd vidcast
 dart bin/server.dart
 ```
 
+-or-
+
+### Run VidCast server via automator
+
+Double click vidcast.app in the root vidcast directory on a mac. This app can
+be placed in the user's Login Items to launched automatically on startup
+
 ### Prerequisites
 
 Get Dart: (https://dart.dev/get-dart)

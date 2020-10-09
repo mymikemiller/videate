@@ -26,16 +26,23 @@ void main(List<String> arguments) async {
 
   print('');
 
+  final home = Platform.environment['HOME'];
+  final localFileSystem = LocalFileSystem();
+
+  // The first argument specifies the cloner configuration file to override the
+  // default with
+  final clonerConfigurationsFilePath = arguments.asMap().containsKey(0)
+      ? arguments[0]
+      : '$home/videate/cloner_configs.json';
+  final clonerConfigurationsFile =
+      localFileSystem.file(clonerConfigurationsFilePath);
+
   final internetArchiveAccessKey =
       getEnvVar('INTERNET_ARCHIVE_ACCESS_KEY', env);
   final internetArchiveSecretKey =
       getEnvVar('INTERNET_ARCHIVE_SECRET_KEY', env);
-  final home = Platform.environment['HOME'];
-  final localFileSystem = LocalFileSystem();
   final mediaBaseDirectory = localFileSystem.directory('$home/web/media');
   final feedsBaseDirectory = localFileSystem.directory('$home/web/feeds');
-  final clonerConfigurationsFile =
-      localFileSystem.file('$home/videate/cloner_configs.json');
 
   final downloaders = [
     YoutubeDownloader(),

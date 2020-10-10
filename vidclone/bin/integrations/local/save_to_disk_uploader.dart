@@ -21,7 +21,8 @@ class SaveToDiskUploader extends Uploader {
   }
 
   @override
-  Future<ServedMedia> upload(MediaFile mediaFile) async {
+  Future<ServedMedia> uploadMedia(MediaFile mediaFile,
+      [Function(double progress) callback]) async {
     final uri = getDestinationUri(mediaFile.media);
 
     await copyToFileSystem(mediaFile.file, baseDirectory.fileSystem, uri);

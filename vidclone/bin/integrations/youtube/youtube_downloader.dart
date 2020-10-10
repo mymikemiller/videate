@@ -43,25 +43,17 @@ class YoutubeDownloader extends Downloader {
         super();
 
   @override
-  Future<MediaFile> download(Media media,
-      {Function(double progress) callback}) async {
+  Future<MediaFile> downloadMedia(Media media,
+      [Function(double progress) callback]) async {
     final videoId = getSourceUniqueId(media);
 
     // Set up a temporary file to hold the contents of the download
     final tempDirectory = createTempDirectory(memoryFileSystem);
     final path = p.join(tempDirectory.path, '$videoId.mp4');
     final file = memoryFileSystem.file(path);
-
-    await _download(videoId, file, callback);
-    return MediaFile(media, file);
-  }
-
-  // Download the video with the specified id to the specified file, which will
-  // be opened for write and when finished, closed and returned.
-  Future<File> _download(
-      String id, File file, Function(double progress) callback) async {
     // Get the video media stream.
-    var manifest = await _youtubeExplode.videos.streamsClient.getManifest(id);
+    var manifest =
+        await _youtubeExplode.videos.streamsClient.getManifest(videoId);
 
     // Get the first muxed video (the one with the lowest bitrate to save space
     // and make downloads faster for now). note that mediaStreams.muxed will
@@ -114,7 +106,7 @@ class YoutubeDownloader extends Downloader {
       }
     }
     await output.close();
-    return file;
+    return MediaFile(media, file);
   }
 
   @override

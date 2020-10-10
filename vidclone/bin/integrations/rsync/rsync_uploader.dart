@@ -20,7 +20,8 @@ abstract class RsyncUploader extends Uploader with Rsync {
   }
 
   @override
-  Future<ServedMedia> upload(MediaFile mediaFile) async {
+  Future<ServedMedia> uploadMedia(MediaFile mediaFile,
+      [Function(double progress) callback]) async {
     final key = getKey(mediaFile.media);
     await push(mediaFile.file, key);
 

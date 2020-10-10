@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 import 'package:vidlib/vidlib.dart';
 import '../bin/integrations/media_converters/ffmpeg_media_converter.dart';
 import '../bin/media_converter.dart';
-
+import 'package:built_collection/built_collection.dart';
 import 'test_utilities.dart';
 
 class MediaConverterTest {
@@ -19,8 +19,17 @@ void main() async {
   List<MediaConverterTest> generateMediaConverterTests() => [
         MediaConverterTest(
             mediaConverter: FfmpegMediaConverter()
-              ..conversionArgs = FfmpegMediaConverter.createArgs(
-                  vcodec: 'libx256', height: 240, crf: 30))
+              ..conversionArgs = ClonerTaskArgs((a) => a
+                ..id = 'ffmpeg'
+                ..args = [
+                  'ffmpeg',
+                  'vcodec',
+                  'libx264',
+                  'height',
+                  '240',
+                  'crf',
+                  '30'
+                ].toBuiltList().toBuilder()))
       ];
 
   var mediaConverterTests = generateMediaConverterTests();

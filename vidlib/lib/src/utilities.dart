@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io' as io;
 import 'package:file/file.dart' as f;
 import 'package:file/local.dart';
@@ -26,12 +25,12 @@ Future<TimeResult> time(
   Map<Symbol, dynamic> namedArguments,
   String progressCallbackName,
 ]) async {
-  final progressCallbackSymbol = Symbol(progressCallbackName);
   // If the user specified that the function to time accepts a progress
   // callback (by specifying progressCallbackName), this function handles
   // creating and displaying the progress bar while the function is timed. If
   // the callback is already specified in namedArguments, no progress bar will
   // be created.
+  final progressCallbackSymbol = Symbol(progressCallbackName);
   if (progressCallbackName != null &&
       !namedArguments.containsKey(progressCallbackSymbol)) {
     final progressBar = ProgressBar();

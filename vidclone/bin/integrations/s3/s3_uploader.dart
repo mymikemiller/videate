@@ -40,7 +40,8 @@ abstract class S3Uploader extends Uploader {
   }
 
   @override
-  Future<ServedMedia> upload(MediaFile mediaFile) async {
+  Future<ServedMedia> uploadMedia(MediaFile mediaFile,
+      [Function(double progress) callback]) async {
     // _uploadStream currently fails due to authentication issues.
     // return _uploadStream(mediaFile);
 

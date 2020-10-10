@@ -17,30 +17,35 @@ dart bin/main.dart [path_to_cloner_configs_json]
 
 ### Run VidClone daily cloner configs via automator
 
-Double click vidclone.app in the root vidclone directory on a mac. This app can
-be started with the following launchd script (saved to
-~Library/LaunchAgents/org.videate.vidclone.plist) to run hourly:
+Double click vidclone.app in the root vidclone directory on a mac. This app
+launches a new terminal and performs the clone only if it does not detect a
+currently-running process previously started by the app. This allows the app to
+be run as often as necessary without starting multiple clone instances. It can
+be started with the following launchd script, which will run the script every
+hour on the hour (every 0'th minute, as specified in StartCalendarInterval).
+Save this script as ~/Library/LaunchAgents/org.videate.vidclone.plist and run
+`launchctl load ~/Library/LaunchAgents/org.videate.vidclone.plist`
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
+  <dict>
     <key>Label</key>
     <string>org.videate.vidclone</string>
     <key>OnDemand</key>
     <true/>
     <key>ProgramArguments</key>
     <array>
-        <string>open</string>
-        <string>/Users/mikem/projects/videate/vidclone/vidclone.app</string>
+      <string>open</string>
+      <string>/Users/mikem/projects/videate/vidclone/vidclone.app</string>
     </array>
     <key>StartCalendarInterval</key>
     <dict>
-        <key>Hour</key>
-        <integer>1</integer>
+      <key>Minute</key>
+      <integer>0</integer>
     </dict>
-</dict>
+  </dict>
 </plist>
 ```
 

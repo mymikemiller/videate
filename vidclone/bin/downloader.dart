@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:vidlib/vidlib.dart';
 import 'cloner_task.dart';
+import 'package:meta/meta.dart';
 
 /// Base class for downloaders, which turn [Media] on a platform into
 /// [MediaFile]s that can be passed to any [Uploader]
@@ -18,7 +19,19 @@ abstract class Downloader extends ClonerTask {
   Downloader();
 
   // Downloads the specified media.
-  Future<MediaFile> download(Media media, {Function(double progress) callback});
+  @nonVirtual
+  Future<MediaFile> download(Media media,
+      {Function(double progress) callback}) async {
+    callback?.call(0);
+    final mediaFile = await downloadMedia(media, callback);
+    callback?.call(1);
+    return mediaFile;
+  }
+
+  // Actual download logic. To be implemented by subclasses.
+  @protected
+  Future<MediaFile> downloadMedia(Media media,
+      [Function(double progress) callback]);
 
   // Returns a stream containing all media in the collection. The order of
   // [Media] is not guaranteed, but because reverseChronologicalMedia uses this

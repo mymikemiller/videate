@@ -99,8 +99,8 @@ class LocalDownloader extends Downloader {
   /// "Downloads" the specified [Media] by simply creating a [MediaFile] from
   /// the [File] at the [Media]'s uri
   @override
-  Future<MediaFile> download(Media media,
-      {Function(double progress) callback}) {
+  Future<MediaFile> downloadMedia(Media media,
+      [Function(double progress) callback]) {
     callback?.call(0);
     final path = Uri.decodeFull(media.source.uri.path.toString());
     final sourceFile = LocalFileSystem().file(path);

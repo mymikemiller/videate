@@ -116,11 +116,6 @@ class MockYoutubeDownloader implements YoutubeDownloader {
   Future<Media> mostRecentMedia() => _delegate.mostRecentMedia();
 
   @override
-  Future<MediaFile> download(Media media,
-          {Function(double progress) callback}) =>
-      _delegate.download(media);
-
-  @override
   void configure(ClonerTaskArgs args) => _delegate.configure(args);
 
   @override
@@ -152,6 +147,16 @@ class MockYoutubeDownloader implements YoutubeDownloader {
 
   @override
   yt_explode.ChannelId channelId;
+
+  @override
+  Future<MediaFile> download(Media media,
+          {Function(double progress) callback}) =>
+      _delegate.download(media, callback: callback);
+
+  @override
+  Future<MediaFile> downloadMedia(Media media,
+          [Function(double progress) callback]) =>
+      _delegate.downloadMedia(media, callback);
 }
 
 class MockYoutubeExplode extends Mock implements yt_explode.YoutubeExplode {}

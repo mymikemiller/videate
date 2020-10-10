@@ -1,5 +1,6 @@
 import 'package:vidlib/vidlib.dart';
 import 'cloner_task.dart';
+import 'package:meta/meta.dart';
 
 abstract class Uploader extends ClonerTask {
   /// An id unique to this uploader, e.g. "internet_archive".
@@ -9,7 +10,19 @@ abstract class Uploader extends ClonerTask {
 
   /// Uploads the file so it is available at the destination returned by
   /// [getDestinationUri].
-  Future<ServedMedia> upload(MediaFile file);
+  @nonVirtual
+  Future<ServedMedia> upload(MediaFile mediaFile,
+      {Function(double progress) callback}) async {
+    callback?.call(0);
+    final servedMedia = await uploadMedia(mediaFile, callback);
+    callback?.call(1);
+    return servedMedia;
+  }
+
+  // Actual upload logic. To be implemented by subclasses.
+  @protected
+  Future<ServedMedia> uploadMedia(MediaFile file,
+      [Function(double progress) callback]);
 
   /// Get a Uri that is guaranteed to be unique to this media among all media,
   /// even across different sources.

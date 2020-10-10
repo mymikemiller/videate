@@ -57,7 +57,8 @@ class InternetArchiveCliUploader extends Uploader {
   }
 
   @override
-  Future<ServedMedia> upload(MediaFile mediaFile) async {
+  Future<ServedMedia> uploadMedia(MediaFile mediaFile,
+      [Function(double progress) callback]) async {
     final identifier = getIdentifier(mediaFile.media);
     final file = await ensureLocal(mediaFile.file);
 
@@ -75,18 +76,21 @@ class InternetArchiveCliUploader extends Uploader {
     ];
     await processStarter('./bin/integrations/internet_archive/ia', args)
         .then((p) async {
-      p.stdout.transform(Utf8Decoder()).listen((String data) {
-        print(data);
-      });
       p.stderr.transform(Utf8Decoder()).listen((String data) {
         if (data.contains('This item has been taken offline')) {
           // Probably shouldn't throw here, but for now it's ok as this only
           // happens when the user deletes a video off ia, then tries to
-          // reupload with the same name.
-          // TODO: add retry logic that automatically changes the name
+          // reupload with the same name. TODO: add retry logic that
+          // automatically changes the name
           throw ('Upload failed. A video with the same name was probably previously deleted from this internet archive account. Consider changing the name and retrying.');
         }
-        print(data);
+
+        final progressRegex = RegExp(r'(\d+)%');
+        final progressMatch = progressRegex.firstMatch(data);
+        if (progressMatch != null) {
+          final progress = double.parse(progressMatch.group(1));
+          callback?.call(progress);
+        }
       });
 
       final exitCode = await p.exitCode;

@@ -10,9 +10,8 @@ class NullMediaConverter extends MediaConverter {
   String get id => _id;
 
   @override
-  Future<MediaFile> convert(MediaFile mediaFile,
-      {Function(double progress) callback}) async {
-    callback(1.0);
+  Future<MediaFile> convertMedia(MediaFile mediaFile,
+      [Function(double progress) callback]) async {
     return mediaFile;
   }
 }

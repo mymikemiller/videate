@@ -30,13 +30,12 @@ class Cloner {
   // Media that already exist at the uploader's destination will not be cloned.
   // Instead, a [ServedMedia] will be immediately returned.
   Future<ServedMedia> clone(Media media) async {
-    final mediaDebugName =
-        '${media.source.platform.id} Media ${media.source.id}';
     Console.init();
 
+    print('=== Clone: ${media.source.id} (${media.title})');
+
     // Existence Check
-    print(
-        '=== Clone: Checking if already cloned: $mediaDebugName (${media.source.releaseDate})===');
+    print('=== FeedManager(${feedManager.id}) Checking if already cloned ===');
     final existenceCheckResult =
         await time(uploader.getExistingServedMedia, [media]);
 
@@ -44,22 +43,22 @@ class Cloner {
 
     // Short-circuit downloading and uploading if the destination exists
     if (existenceCheckResult.returnValue != null) {
-      print(
-          'Destination exists. Skipping Download and Upload for ${media.title}.');
+      print('Destination exists. Skipping Download, Convert and Upload steps.');
       print('=== ⏲  ${existenceCheckResult.time} ⏲  ===');
       servedMedia = existenceCheckResult.returnValue;
     } else {
+      print('Destination does not exist. Performing full clone.');
       print('=== ⏲  ${existenceCheckResult.time} ⏲  ===');
 
       // Download
-      print('=== Clone: Download $mediaDebugName ===');
+      print('=== Download(${downloader.platform.id}) ===');
       final downloadResult =
           await time(downloader.download, [media], {}, 'callback');
       final downloadedMedia = await downloadResult.returnValue;
       print('=== ⏲  ${downloadResult.time} ⏲ ===');
 
       // Convert
-      print('=== Clone: Convert $mediaDebugName ===');
+      print('=== Convert(${mediaConverter.id}) ===');
       final conversionResult =
           await time(mediaConverter.convert, [downloadedMedia], {}, 'callback');
       final convertedMedia = await conversionResult.returnValue;
@@ -67,18 +66,19 @@ class Cloner {
       final convertedSize = (convertedMedia as MediaFile).file.lengthSync();
       final reduction = ((initialSize - convertedSize) / initialSize) * 100;
       print('Reduced file size by ${reduction.round()}%)');
-      print('=== ⏲${conversionResult.time} ⏲===');
+      print('=== ⏲${conversionResult.time} ⏲ ===');
 
       // Upload
-      print('=== Clone: Upload $mediaDebugName ===');
-      final uploadResult = await time(uploader.upload, [convertedMedia]);
+      print('=== Upload(${uploader.id}) ===');
+      final uploadResult =
+          await time(uploader.upload, [convertedMedia], {}, 'callback');
       servedMedia = await uploadResult.returnValue;
       print('=== ⏲${uploadResult.time} ⏲ ===');
       print('served media:${servedMedia.uri}');
     }
 
     // Update the feed to include the new media
-    print('=== Clone: Add $mediaDebugName to Feed ===');
+    print('=== FeedManager(${feedManager.id}) Add to Feed ===');
     final feedAddResult = await time(feedManager.add, [servedMedia]);
     print('=== ⏲${feedAddResult.time} ⏲ ===');
 

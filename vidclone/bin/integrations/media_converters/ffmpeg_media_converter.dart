@@ -9,15 +9,9 @@ class FfmpegMediaConverter extends MediaConverter {
   @override
   String get id => _id;
 
-  // Expected conversionArgs format: ['vcodec', 'X', 'height', 'Y', 'crf', 'Z']
-  static ClonerTaskArgs createArgs(
-          {@required String vcodec, @required int height, @required int crf}) =>
-      MediaConverter.createArgs(
-          _id, ['vcodec', '$vcodec', 'height', '$height', 'crf', '$crf']);
-
   @override
-  Future<MediaFile> convert(MediaFile mediaFile,
-      {Function(double progress) callback}) async {
+  Future<MediaFile> convertMedia(MediaFile mediaFile,
+      [Function(double progress) callback]) async {
     final vcodec = conversionArgs.get('vcodec');
     final height = int.parse(conversionArgs.get('height'));
     final crf = int.parse(conversionArgs.get('crf'));

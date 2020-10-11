@@ -34,7 +34,7 @@ Future<Duration> getDuration(File videoFile,
     throw ArgumentError(
         'Cannot get duration of non-video file ${videoFile.path}');
   }
-  final a = [
+  final args = [
     '-v',
     'error',
     '-show_entries',
@@ -43,17 +43,9 @@ Future<Duration> getDuration(File videoFile,
     'default=noprint_wrappers=1:nokey=1',
     '-sexagesimal',
     videoFile.path
-  ].join(' ');
-  final output = await processRunner('ffprobe', [
-    '-v',
-    'error',
-    '-show_entries',
-    'format=duration',
-    '-of',
-    'default=noprint_wrappers=1:nokey=1',
-    '-sexagesimal',
-    videoFile.path
-  ]);
+  ];
+  // final command = 'ffprobe ${args.join(' ')}';
+  final output = await processRunner('ffprobe', args);
 
   if (output.stderr.isNotEmpty) {
     throw 'ffprobe error: ${output.stderr}';

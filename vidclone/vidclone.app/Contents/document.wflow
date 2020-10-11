@@ -177,12 +177,10 @@ ps</string>
 						<string>4</string>
 					</dict>
 				</dict>
-				<key>conversionLabel</key>
-				<integer>0</integer>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>461.500000:433.000000</string>
+				<string>467.500000:253.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -360,12 +358,10 @@ echo "no"</string>
 						<string>4</string>
 					</dict>
 				</dict>
-				<key>conversionLabel</key>
-				<integer>0</integer>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>461.500000:796.000000</string>
+				<string>467.500000:436.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/English.lproj/main.nib</string>
 			</dict>
@@ -413,7 +409,12 @@ echo "no"</string>
 				<key>ActionParameters</key>
 				<dict>
 					<key>source</key>
-					<string>on run {input, parameters}	set launchCommand to item 1 of input	set alreadyRunning to item 2 of input	if (alreadyRunning = "yes") then		return "Not cloning because the specified VidClone process is already running."	end if			tell application "Terminal"		activate		try			set myTerm to do script "cd ~/projects/videate/vidclone"			do script launchCommand in myTerm		on error errmsg number errnbr			display alert "[ " &amp; errnbr &amp; " ] " &amp; errmsg as critical giving up after 10		end try	end tellend run</string>
+					<string>on run {input, parameters}	set launchCommand to item 1 of input	set alreadyRunning to item 2 of input	if (alreadyRunning = "yes") then		return "Not cloning because the specified VidClone process is already running."	end if		set myTerminal to null		tell application "Terminal"		# Try to find a terminal to reuse by checking if the last line this script prints is visible		windows where name contains "vidclone"		if result is not {} then			repeat with testWindow in result				repeat with j from 1 to number of tabs of testWindow					if contents of tab j of testWindow contains "Daily VidClone Finished" then						set myTerminal to tab j of testWindow						exit repeat					end if				end repeat				if myTerminal is not null then					exit repeat				end if			end repeat		end if				# No terminal was found for reuse, so start up a new one		if myTerminal is null then			activate			set myTerminal to do script "cd ~/projects/videate/vidclone"		end if				try			set startTime to (current date)			do script launchCommand in myTerminal			set endTime to (current date)						set elapsedTime to my TimeToText(endTime - startTime)			set finalPrintout to "Daily VidClone finished in " &amp; elapsedTime &amp; " on " &amp; (current date)			do script "echo '" &amp; finalPrintout &amp; "'" in myTerminal		on error errmsg number errnbr			display alert "[ " &amp; errnbr &amp; " ] " &amp; errmsg as critical giving up after 10		end try	end tellend runon TimeToText(TheTime)	(*
+ copied from https://discussions.apple.com/thread/1452549
+ converts a number to a time string
+ parameters - TheTime [integer]: the time in seconds
+ returns [text]: the time in the format hh:mm:ss
+*)	if (class of TheTime) as text is "integer" then		set TimeString to 1000000 + 10000 * (TheTime mod days div hours) -- hours		set TimeString to TimeString + 100 * (TheTime mod hours div minutes) -- minutes		set TimeString to (TimeString + (TheTime mod minutes)) as text -- seconds		tell TimeString to set TheTime to (text -6 thru -5) &amp; ":" &amp; (text -4 thru -3) &amp; ":" &amp; (text -2 thru -1)	end if	return TheTimeend TimeToText</string>
 				</dict>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.RunScript</string>
@@ -469,7 +470,7 @@ end run</string>
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>461.500000:1222.000000</string>
+				<string>467.500000:862.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run AppleScript.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -479,14 +480,14 @@ end run</string>
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>8171B26D-E676-400B-824A-A3BFB38CF008</key>
+		<key>1D8524EA-AE5D-483D-9DD2-DD5FE820C135</key>
 		<dict>
 			<key>from</key>
 			<string>6133A42A-860E-4D8C-9140-CD23BBE87B7F - 6133A42A-860E-4D8C-9140-CD23BBE87B7F</string>
 			<key>to</key>
 			<string>13E0643C-2A51-4F5D-9948-DFC6AD483396 - 13E0643C-2A51-4F5D-9948-DFC6AD483396</string>
 		</dict>
-		<key>8FC9D7A4-3280-49EE-AF8B-2C0101DE75A6</key>
+		<key>9F536273-A4A5-4DC9-B8C8-1136F5C3D149</key>
 		<dict>
 			<key>from</key>
 			<string>47B325A6-C387-428B-884C-3495AC141209 - 47B325A6-C387-428B-884C-3495AC141209</string>

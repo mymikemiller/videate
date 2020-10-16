@@ -15,6 +15,8 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
   String get author;
   String get email;
   String get imageUrl;
+
+  // Newer episodes are at the end of the list
   BuiltList<ServedMedia> get mediaList;
 
   // The builder pattern is required by built_value, which we use for serialization

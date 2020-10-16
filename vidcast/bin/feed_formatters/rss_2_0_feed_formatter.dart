@@ -39,8 +39,8 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
           builder.attribute('text', 'Arts');
         });
 
-        // Repeat for each episode
-        for (final media in feed.mediaList) {
+        // Repeat for each episode, starting with the most recent
+        for (final media in feed.mediaList.reversed) {
           final uri = transformUri(media.uri);
 
           // TODO: Bring back 'creators' // <a href=$baseUrl/tip?creator="${media.media.creators[0]}">Tip \$1</a><br><br>

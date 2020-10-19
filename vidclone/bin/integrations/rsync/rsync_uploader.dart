@@ -5,6 +5,10 @@ import 'rsync.dart';
 
 // Base class for uploaders that use the rsync command to upload.
 abstract class RsyncUploader extends Uploader with Rsync {
+  // The subfolder to store the media in inside the platform's folder. Putting
+  // media in a subfolder helps when looking for media that can be deleted.
+  String subfolder;
+
   // Use the Uploader's client for rsync requests
   @override
   Client get rsyncClient => client;
@@ -15,8 +19,13 @@ abstract class RsyncUploader extends Uploader with Rsync {
 
   RsyncUploader();
 
+  @override
+  void configure(ClonerTaskArgs args) {
+    subfolder = args.get('subfolder');
+  }
+
   String getKey(Media media, [String extension = 'mp4']) {
-    return 'media/${media.source.platform.id}/${media.source.id}.$extension';
+    return 'media/${media.source.platform.id}/${subfolder}/${media.source.id}.$extension';
   }
 
   @override

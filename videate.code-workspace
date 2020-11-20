@@ -1,15 +1,23 @@
 {
 	"folders": [
 		{
+			"name": "vidlib",
 			"path": "vidlib"
 		},
 		{
+			"name": "vidclone",
 			"path": "vidclone"
 		},
 		{
+			"name": "vidcast",
 			"path": "vidcast"
 		},
 		{
+			"name": "credits",
+			"path": "credits"
+		},
+		{
+			"name": "root_symlinks",
 			"path": "root_symlinks"
 		}
 	],

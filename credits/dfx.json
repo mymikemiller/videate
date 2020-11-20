@@ -1,0 +1,40 @@
+{
+  "canisters": {
+    "credits": {
+      "main": "src/credits/main.mo",
+      "type": "motoko"
+    },
+    "credits_assets": {
+      "dependencies": [
+        "credits"
+      ],
+      "frontend": {
+        "entrypoint": "src/credits_assets/public/index.js"
+      },
+      "source": [
+        "src/credits_assets/assets",
+        "dist/credits_assets/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": ""
+    }
+  },
+  "dfx": "0.6.12",
+  "networks": {
+    "ic": {
+      "providers": [
+        "https://gw.dfinity.network"
+      ],
+      "type": "persistent"
+    },
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}

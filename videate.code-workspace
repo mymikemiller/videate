@@ -17,6 +17,10 @@
 			"path": "credits"
 		},
 		{
+			"name": "manage",
+			"path": "manage"
+		},
+		{
 			"name": "root_symlinks",
 			"path": "root_symlinks"
 		}

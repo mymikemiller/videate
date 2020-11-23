@@ -9,7 +9,7 @@
         "credits"
       ],
       "frontend": {
-        "entrypoint": "src/credits_assets/public/index.js"
+        "entrypoint": "src/credits_assets/public/manage/main.dart.js"
       },
       "source": [
         "src/credits_assets/assets",

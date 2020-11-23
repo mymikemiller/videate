@@ -1,20 +1,50 @@
-# credits
+# The Credits
 
-Welcome to your new credits project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+A set of Internet Computer canisters (see https://dfinity.org/) that act as a
+sort of database to handle and track user's media requests.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+## Running Locally
 
-To learn more before you start working with credits, see the following documentation available online:
-
-- [Quick Start](https://sdk.dfinity.org/docs/quickstart/quickstart.html)
-- [SDK Developer Tools](https://sdk.dfinity.org/docs/developers-guide/sdk-guide.html)
-- [Motoko Programming Language Guide](https://sdk.dfinity.org/docs/language-guide/motoko.html)
-- [Motoko Language Quick Reference](https://sdk.dfinity.org/docs/language-guide/language-manual.html)
-
-If you want to start working on your project right away, you might want to try the following commands:
-
-```bash
-cd credits/
-dfx help
-dfx config --help
 ```
+cd credits
+dfx start --background
+dfx canister create --all
+dfx build
+dfx canister install --all
+```
+
+Note the canister IDs printed out for `credits` and `credits_assets`
+
+### Launch the automatically-generated, interactive Candid frontend for the appropriate canister
+
+`http://127.0.0.1:8000/candid?canisterId=`
+
+### Launch the Flutter frontend, hosted in the credits_assets canister
+
+`http://127.0.0.1:8000/?canisterId=`
+
+### Rebuild canisters
+
+After making changes to canisters, perform the following. This will preserve the state of any variables marked `stable`.
+
+```
+dfx build
+dfx canister install --all --mode=reinstall
+```
+
+### Rebuild frontend
+
+Before rebuilding canisters as above, make sure all necessary assets are in place. For example, `videate/credits/src/credits_assets/public/manage` is a symlink into the `manage` flutter project's web build output, so you'll need to build the `manage` frontend for web first:
+
+```
+cd videate/manage
+flutter web build
+```
+
+### Prerequisites
+
+[nstall the DFINITY Canister SDK](https://sdk.dfinity.org/docs/quickstart/quickstart.html#download-and-install)
+
+## Authors
+
+* **Mike Miller** - *Initial work* - [mymikemiller](https://github.com/mymikemiller)

@@ -1,5 +1,7 @@
 // Generates an xml podcast feed given metadata about the media in the feed.
 // Also includes functions to analyze file contents to fill that feed.
+import 'dart:html';
+
 import 'package:xml/xml.dart';
 import 'package:mime/mime.dart';
 import 'package:vidlib/vidlib.dart';
@@ -73,6 +75,6 @@ class RSS_2_0_FeedFormatter extends FeedFormatter<XmlDocument> {
         ;
       });
     });
-    return builder.build();
+    return builder.build() as XmlDocument;
   }
 }

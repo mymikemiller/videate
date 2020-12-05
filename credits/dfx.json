@@ -4,16 +4,16 @@
       "main": "src/credits/main.mo",
       "type": "motoko"
     },
-    "credits_assets": {
+    "serve": {
       "dependencies": [
         "credits"
       ],
       "frontend": {
-        "entrypoint": "src/credits_assets/public/index.js"
+        "entrypoint": "src/serve/public/index.js"
       },
       "source": [
-        "src/credits_assets/assets",
-        "dist/credits_assets/"
+        "src/serve/assets",
+        "dist/serve/"
       ],
       "type": "assets"
     }

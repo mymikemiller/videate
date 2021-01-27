@@ -19,7 +19,7 @@ Note the canister IDs printed out for `credits` and `credits_assets`
 
 `http://127.0.0.1:8000/candid?canisterId=`
 
-### Launch the Flutter frontend, hosted in the credits_assets canister
+### Launch the frontend, hosted in the credits_assets canister
 
 `http://127.0.0.1:8000/?canisterId=`
 
@@ -32,18 +32,32 @@ dfx build
 dfx canister install --all --mode=reinstall
 ```
 
-### Rebuild frontend
+## Generating XML feeds from The Credits data
 
-Before rebuilding canisters as above, make sure all necessary assets are in place. For example, `videate/credits/src/credits_assets/public/manage` is a symlink into the `manage` flutter project's web build output, so you'll need to build the `manage` frontend for web first:
+Run dfx and deploy the `credits` and `serve` canister
 
 ```
-cd videate/manage
-flutter web build
+cd videate/credits
+dfx start --background
+dfx deploy credits
+dfx deploy serve
 ```
+
+The [ic-http-lambda](https://github.com/nomeata/ic-http-lambda/) server must be
+running so http requests can be received, translated into canister requests,
+performed and returned as xml. Start the server by launching nomeata's server
+locally on the same machine running the dfx server, using the following args:
+--force-canister-id {credits canister id} --replica-url {local dfx replica url}
+
+Note that, to run non-locally, the ic-http-lambda server will need to be
+deployed somewhere, as nomeata did at https://<canister_id>.ic.nomeata.de/
+
+When the ic-http-lambda server is running and the canisters are deployed,
+navigate to http://127.0.0.1:7878/
 
 ### Prerequisites
 
-[nstall the DFINITY Canister SDK](https://sdk.dfinity.org/docs/quickstart/quickstart.html#download-and-install)
+[Install the DFINITY Canister SDK](https://sdk.dfinity.org/docs/quickstart/quickstart.html#download-and-install)
 
 ## Authors
 

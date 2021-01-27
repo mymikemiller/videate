@@ -17,7 +17,7 @@ import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 
-final forcedCloneStartDate = null;
+final forcedCloneStartDate = DateTime.parse('2021-01-01T00:00:00.000Z');
 // null; // DateTime.parse('2020-07-22T00:00:00.000Z');
 
 void main(List<String> arguments) async {

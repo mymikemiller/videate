@@ -34,15 +34,15 @@ actor Credits {
             imageUrl = "https://www.learningcontainer.com/wp-content/uploads/2019/10/Learning-container.png";
             mediaList = [
                 {
-                    title = "Sample media title";
-                    description = "Sample media description";
+                    title = "Test video";
+                    description = "Test";
                     source = {
                         platform = {
-                            uri = "https://www.learningcontainer.com/";
-                            id = "learningcontainer";
+                            uri = "http://videate.org/";
+                            id = "videate";
                         };
                         uri = "https://www.learningcontainer.com/mp4-sample-video-files-download/#Sample_MP4_File";
-                        id = "Sample_MP4_File";
+                        id = "test";
                     };
                     // contributors =;
                     // duration =;

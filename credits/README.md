@@ -52,8 +52,30 @@ locally on the same machine running the dfx server, using the following args:
 Note that, to run non-locally, the ic-http-lambda server will need to be
 deployed somewhere, as nomeata did at https://<canister_id>.ic.nomeata.de/
 
+A command like the following might work. Make sure to build the ic-http-lambda
+project, and use credits's canister id and the correct port for replica-url
+(printed shortly after running `dfx start`)
+
+```
+~/OneDrive/Projects/Web/ic-http-lambda/target/debug/ic-http-lambda --force-canister-id ryjl3-tyaaa-aaaaa-aaaba-cai --replica-url http://localhost:56605/
+```
+
 When the ic-http-lambda server is running and the canisters are deployed,
-navigate to http://127.0.0.1:7878/
+navigate to a feed!
+
+Hard-coded sample feed:
+``` 
+http://127.0.0.1:7878/
+```
+
+Use localhost.run to expose the feed to outside networks, e.g. for testing on a
+phone
+
+```
+ssh -R 80:localhost:7878 localhost.run
+```
+
+Then subscribe in a podcatcher to the address printed out
 
 ### Prerequisites
 

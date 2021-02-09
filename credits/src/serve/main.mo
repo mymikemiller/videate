@@ -16,6 +16,7 @@ import Nat16 "mo:base/Nat16";
 import Word32 "mo:base/Word32";
 import Char "mo:base/Char";
 import Debug "mo:base/Debug";
+import Option "mo:base/Option";
 import Credits "canister:credits";
 import Xml "xml";
 import Types "types";
@@ -96,8 +97,11 @@ actor Serve {
             Debug.print("using hard-coded \"slow\" feed");
             xml := sampleFeed;
         } else {
-            Debug.print("generating feed");
-            xml := await getFeedXml();
+            let uriIter = Text.split(request.uri, #char '/');
+            let requestParts = Iter.toArray(uriIter);
+            let feedName = requestParts[1];
+            Debug.print("generating \"" # feedName # "\" feed");
+            xml := await getFeedXml(feedName);
         };
         
         var response = await Utils.generateFeedResponse(xml);
@@ -105,10 +109,15 @@ actor Serve {
         return response;
     };
 
-    public func getFeedXml() : async Text {
-        let feed: Feed = await Credits.getSampleFeed();
-        let doc: Document = await Rss.format(feed);
-        let xml: Text = Xml.stringifyDocument(doc);
-        return xml;
+    public func getFeedXml(key: Text) : async Text {
+        let feed: ?Feed = await Credits.getFeed(key);
+
+        switch(feed) {
+            case null "Unrecognized feed: " # key;
+            case (?feed) {
+                let doc: Document = await Rss.format(feed);
+                Xml.stringifyDocument(doc);
+            };
+        };
     };
 };

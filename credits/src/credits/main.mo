@@ -1,5 +1,8 @@
 import Buffer "mo:base/Buffer";
 import List "mo:base/List";
+import Iter "mo:base/Iter";
+import Text "mo:base/Text";
+import HashMap "mo:base/HashMap";
 import Types "types";
 
 actor Credits {
@@ -8,19 +11,53 @@ actor Credits {
     type Media = Types.Media;
     type Feed = Types.Feed;
 
-    var allMedia = Buffer.Buffer<Media>(10);
+    // This pattern uses `preupgrade` and `postupgrade` to allow `feeds` to be
+    // stable even though HashMap is not. See
+    // https://sdk.dfinity.org/docs/language-guide/upgrades.html#_preupgrade_and_postupgrade_system_methods
+    stable var feedEntries : [(Text, Feed)] = [];
+    let feeds = HashMap.fromIter(feedEntries.vals(), 10, Text.equal, Text.hash);
 
-    public func addMedia(media : Media) : async Nat {
-        allMedia.add(media);
-        allMedia.size() - 1;
+    // var allMedia = Buffer.Buffer<Media>(10);
+
+    // Media
+    // public func addMedia(media : Media) : async Nat {
+    //     allMedia.add(media);
+    //     allMedia.size() - 1;
+    // };
+
+    // public func removeLastMedia() : async ?Media {
+    //     allMedia.removeLast();
+    // };
+
+    // public query func getAllMedia() : async [Media] {
+    //     allMedia.toArray();
+    // };
+
+    // Feeds
+    public func addFeed(key: Text, feed : Feed) : async Nat {
+        feeds.put(key, feed);
+        feeds.size() - 1;
     };
 
-    public func removeLastMedia() : async ?Media {
-        allMedia.removeLast();
+    public func deleteFeed(key: Text){
+        feeds.delete(key);
     };
 
-    public query func getAllMedia() : async [Media] {
-        allMedia.toArray();
+    public query func getAllFeeds() : async [(Text, Feed)] {
+        Iter.toArray(feeds.entries());
+    };
+
+    public query func getFeed(key: Text) : async ?Feed {
+        feeds.get(key);
+    };
+
+
+    system func preupgrade() {
+        feedEntries := Iter.toArray(feeds.entries());
+    };
+
+    system func postupgrade() {
+        feedEntries := [];
     };
 
     public query func getSampleFeed() : async Feed {

@@ -20,10 +20,17 @@ Future<ExposerProcess> expose() async {
   final output = await process.stdout.transform(utf8.decoder).first;
 
   // expected format for 'output':
-  // "Connect to http://mikem-abcd.localhost.run or https://mikem-abcd.localhost.run"
-  RegExp exp = new RegExp(
-      r"Connect to (http://.*.localhost.run)"); // or (https://.*.localhost.run)");
-  final hostname = exp.firstMatch(output)![1];
+  // old:  "Connect to http://mikem-abcd.localhost.run or https://mikem-abcd.localhost.run"
+  // new: "mikem-2e47e711.localhost.run tunneled with tls termination"
+  // old: RegExp exp = new RegExp(
+  //    r"Connect to (http://.*.localhost.run)"); // or (https://.*.localhost.run)");
+  RegExp exp =
+      new RegExp(r"(.*\.localhost\.run)"); // or (https://.*.localhost.run)");
+  final match = exp.firstMatch(output);
+  var hostname;
+  if (match != null) {
+    hostname = match[1];
+  }
   if (hostname == null) {
     throw ('Error getting hostname from localhost.run. Output: $output');
   }

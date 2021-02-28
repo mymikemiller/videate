@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:aws_s3_client/aws_s3.dart';
 import 'package:file/local.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
@@ -7,6 +6,7 @@ import 'package:dotenv/dotenv.dart' show load, env;
 import 'integrations/cdn77/cdn77_feed_manager.dart';
 import 'integrations/cdn77/cdn77_uploader.dart';
 import 'integrations/internet_archive/internet_archive_cli_uploader.dart';
+import 'integrations/internet_computer/internet_computer_feed_manager.dart';
 import 'integrations/local/json_file_feed_manager.dart';
 import 'integrations/local/local_downloader.dart';
 import 'integrations/local/save_to_disk_uploader.dart';
@@ -61,6 +61,7 @@ void main(List<String> arguments) async {
   final feedManagers = [
     JsonFileFeedManager(),
     Cdn77FeedManager(),
+    InternetComputerFeedManager(),
   ];
 
   // Generate a map to the downloaders keyed on the downloader's id.

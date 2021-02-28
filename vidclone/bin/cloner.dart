@@ -35,7 +35,7 @@ class Cloner {
     print('=== Clone: ${media.source.id} (${media.title})');
 
     // Existence Check
-    print('=== FeedManager(${feedManager.id}) Checking if already cloned ===');
+    print('=== FeedManager (${feedManager.id}) Checking if already cloned ===');
     final existenceCheckResult =
         await time(uploader.getExistingServedMedia, [media]);
 
@@ -51,14 +51,14 @@ class Cloner {
       print('=== ⏲  ${existenceCheckResult.time} ⏲  ===');
 
       // Download
-      print('=== Download(${downloader.platform.id}) ===');
+      print('=== Download (${downloader.platform.id}) ===');
       final downloadResult =
           await time(downloader.download, [media], {}, 'callback');
       final downloadedMedia = await downloadResult.returnValue;
       print('=== ⏲  ${downloadResult.time} ⏲ ===');
 
       // Convert
-      print('=== Convert(${mediaConverter.id}) ===');
+      print('=== Convert (${mediaConverter.id}) ===');
       final conversionResult =
           await time(mediaConverter.convert, [downloadedMedia], {}, 'callback');
       final convertedMedia = await conversionResult.returnValue;
@@ -69,7 +69,7 @@ class Cloner {
       print('=== ⏲${conversionResult.time} ⏲===');
 
       // Upload
-      print('=== Upload(${uploader.id}) ===');
+      print('=== Upload (${uploader.id}) ===');
       final uploadResult =
           await time(uploader.upload, [convertedMedia], {}, 'callback');
       servedMedia = await uploadResult.returnValue;
@@ -78,7 +78,7 @@ class Cloner {
     }
 
     // Update the feed to include the new media
-    print('=== FeedManager(${feedManager.id}) Add to Feed ===');
+    print('=== FeedManager (${feedManager.id}) Add to Feed ===');
     final feedAddResult = await time(feedManager.add, [servedMedia]);
     print('=== ⏲${feedAddResult.time} ⏲ ===');
 

@@ -47,17 +47,18 @@ The [ic-http-lambda](https://github.com/nomeata/ic-http-lambda/) server must be
 running so http requests can be received, translated into canister requests,
 performed and returned as xml. Start the server by launching nomeata's server
 locally on the same machine running the dfx server, using the following args:
---force-canister-id {credits canister id} --replica-url {local dfx replica url}
+--force-canister-id {serve canister id} --replica-url {local dfx replica url}
 
 Note that, to run non-locally, the ic-http-lambda server will need to be
 deployed somewhere, as nomeata did at https://<canister_id>.ic.nomeata.de/
 
 A command like the following might work. Make sure to build the ic-http-lambda
-project, and use credits's canister id and the correct port for replica-url
-(printed shortly after running `dfx start`)
+project, and use serve's canister id and the correct port for replica-url
+(printed shortly after running `dfx start`, or look under
+.dfx/replica-configuration)
 
 ```
-~/OneDrive/Projects/Web/ic-http-lambda/target/debug/ic-http-lambda --force-canister-id ryjl3-tyaaa-aaaaa-aaaba-cai --replica-url http://localhost:56605/
+~/OneDrive/Projects/Web/ic-http-lambda/target/debug/ic-http-lambda --force-canister-id rrkah-fqaaa-aaaaa-aaaaq-cai --replica-url http://localhost:56605/
 ```
 
 When the ic-http-lambda server is running and the canisters are deployed,

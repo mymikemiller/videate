@@ -3,7 +3,7 @@ import 'package:vidlib/vidlib.dart';
 typedef Uri UriTransformer(Uri input);
 
 abstract class FeedFormatter<T> {
-  final List<UriTransformer>? uriTransformers;
+  final List<UriTransformer> uriTransformers;
 
   T format(Feed feed);
 
@@ -12,7 +12,7 @@ abstract class FeedFormatter<T> {
   Uri transformUri(Uri input) {
     if (uriTransformers != null) {
       // Run all the transformers in order
-      return uriTransformers!.fold(
+      return uriTransformers.fold(
           input, (previousValue, transformer) => transformer(previousValue));
     }
     return input;

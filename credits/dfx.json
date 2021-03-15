@@ -1,15 +1,8 @@
 {
   "canisters": {
-    "credits": {
-      "main": "src/credits/main.mo",
-      "type": "motoko"
-    },
     "serve": {
       "main": "src/serve/main.mo",
-      "type": "motoko",
-      "dependencies": [
-        "credits"
-      ]
+      "type": "motoko"
     }
   },
   "defaults": {

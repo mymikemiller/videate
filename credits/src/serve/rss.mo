@@ -1,5 +1,5 @@
 import Xml "xml";
-import Credits "canister:credits";
+import Credits "credits";
 import Types "types";
 import Array "mo:base/Array";
 
@@ -17,7 +17,7 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed) : async Document {
+	public func format(feed: Feed) : Document {
 		{
 			prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 			root = {

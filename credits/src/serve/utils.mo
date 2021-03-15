@@ -7,7 +7,6 @@ import Word32 "mo:base/Word32";
 import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Xml "xml";
-import Credits "canister:credits";
 import Types "types";
 
 module {
@@ -21,7 +20,7 @@ module {
         generateResponse(200, [("content-type", "text/plain")], "Upgrading to non-query call", true);
     };
 
-    public func generateFeedResponse(xml: Text) : async Response {
+    public func generateFeedResponse(xml: Text) : Response {
         return generateResponse(200, [("content-type", "text/xml")], xml, false);
     };
 

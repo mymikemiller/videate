@@ -17,7 +17,8 @@ import Word32 "mo:base/Word32";
 import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Option "mo:base/Option";
-import Credits "canister:credits";
+import HashMap "mo:base/HashMap";
+import Credits "credits";
 import Xml "xml";
 import Types "types";
 import Utils "utils";
@@ -26,10 +27,27 @@ import Rss "rss";
 actor Serve {
     type Request = Types.Request;
     type Response = Types.Response;
+    type StableCredits = Types.StableCredits;
     type Feed = Credits.Feed;
     type Document = Xml.Document;
 
     let sampleFeed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" version=\"2.0\"> <channel> <atom:link href=\"http://mikem-18bd0e1e.localhost.run/\" rel=\"self\" type=\"application/rss+xml\"></atom:link> <title>Sample Feed</title> <link>http://example.com</link> <language>en-us</language> <itunes:subtitle>Just a sample</itunes:subtitle> <itunes:author>Mike Miller</itunes:author> <itunes:summary>A sample feed hosted on the Internet Computer</itunes:summary> <description>A sample feed hosted on the Internet Computer</description> <itunes:owner> <itunes:name>Mike Miller</itunes:name> <itunes:email>mike@videate.org</itunes:email> </itunes:owner> <itunes:explicit>no</itunes:explicit> <itunes:image href=\"https://brianchristner.io/content/images/2016/01/Success-loading.jpg\"></itunes:image> <itunes:category text=\"Arts\"></itunes:category> <item> <title>test</title> <itunes:summary>test</itunes:summary> <description>test</description> <link>http://example.com/podcast-1</link> <enclosure url=\"https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4\" type=\"video/mpeg\" length=\"1024\"></enclosure> <pubDate>21 Dec 2016 16:01:07 +0000</pubDate> <itunes:author>Mike Miller</itunes:author> <itunes:duration>00:32:16</itunes:duration> <itunes:explicit>no</itunes:explicit> <guid></guid> </item> </channel> </rss>";
+    
+    // This pattern uses `preupgrade` and `postupgrade` to allow `feeds` to be
+    // stable even though HashMap is not. See
+    // https://sdk.dfinity.org/docs/language-guide/upgrades.html#_preupgrade_and_postupgrade_system_methods
+    stable var stableCredits: StableCredits = { feedEntries = []; };
+    var credits : Credits.Credits = Credits.Credits(stableCredits);
+
+    system func preupgrade() {
+        stableCredits := credits.asStable();
+    };
+
+    system func postupgrade() {
+        stableCredits := { feedEntries=[]; };
+    };
+
+    /* Serve */
 
     // We must always upgrade to a non-query call because we're currently not
     // able to call into the Credit actor's functions from inside a query
@@ -73,6 +91,16 @@ actor Serve {
                 body = Utils.toNat8Array(sampleFeed);
                 upgrade = false;
             };
+        } else if (request.uri == "/query") {
+            let uriIter = Text.split(request.uri, #char '/');
+            let requestParts = Iter.toArray(uriIter);
+            let feedName = requestParts[1]; // should be 'query'
+            Debug.print("generating \"" # feedName # "\" feed");
+            var xml = getFeedXml(feedName);
+        
+            var response = Utils.generateFeedResponse(xml);
+            Debug.print("Returning feed response");
+            return response;
         };
         
         // Translate the inputs to the expected types
@@ -101,21 +129,44 @@ actor Serve {
             let requestParts = Iter.toArray(uriIter);
             let feedName = requestParts[1];
             Debug.print("generating \"" # feedName # "\" feed");
-            xml := await getFeedXml(feedName);
+            xml := getFeedXml(feedName);
         };
         
-        var response = await Utils.generateFeedResponse(xml);
+        var response = Utils.generateFeedResponse(xml);
         Debug.print("Returning feed response");
         return response;
     };
 
-    public func getFeedXml(key: Text) : async Text {
-        let feed: ?Feed = await Credits.getFeed(key);
+    /* Credits interface */
+
+    // Feeds
+    public func addFeed(key: Text, feed : Feed) : async Nat {
+        credits.addFeed(key, feed);
+    };
+
+    public func deleteFeed(key: Text){
+        credits.deleteFeed(key);
+    };
+
+    public query func getAllFeeds() : async [(Text, Feed)] {
+        credits.getAllFeeds();
+    };
+
+    public query func getFeed(key: Text) : async ?Feed {
+        credits.getFeed(key);
+    };
+
+    public query func getSampleFeed() : async Feed {
+        credits.getSampleFeed();
+    };
+
+    func getFeedXml(key: Text) : Text {
+        let feed: ?Feed = credits.getFeed(key);
 
         switch(feed) {
             case null "Unrecognized feed: " # key;
             case (?feed) {
-                let doc: Document = await Rss.format(feed);
+                let doc: Document = Rss.format(feed);
                 Xml.stringifyDocument(doc);
             };
         };

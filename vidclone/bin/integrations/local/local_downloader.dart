@@ -124,7 +124,8 @@ class LocalDownloader extends Downloader {
       final feedName = basename(sourceDirectory.path);
       return b
         ..title = feedName
-        ..subtitle = '$feedName feed';
+        ..subtitle = '$feedName feed'
+        ..description = '$feedName feed';
     }));
   }
 }

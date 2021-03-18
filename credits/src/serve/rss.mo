@@ -2,12 +2,14 @@ import Xml "xml";
 import Credits "credits";
 import Types "types";
 import Array "mo:base/Array";
+import Debug "mo:base/Debug";
 
 module {
   type Document = Xml.Document;
   type Element = Xml.Element;
   type Feed = Credits.Feed;
   type Media = Credits.Media;
+  type UriTransformer = Types.UriTransformer;
 
   // todo: this can be significantly cleaned up using default values. See
   // https://forum.dfinity.org/t/initializing-an-object-with-optional-nullable-fields/1790
@@ -17,7 +19,7 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed) : Document {
+	public func format(feed: Feed, uriTransformers: [UriTransformer]) : Document {
 		{
 			prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 			root = {
@@ -116,6 +118,7 @@ module {
               
               // episode list
               Array.map(feed.mediaList, func(media: Media) : Element { 
+                let uri = transformUri(media.uri, uriTransformers);
                 {
                   name = "item";
                   attributes = [];
@@ -139,12 +142,12 @@ module {
                     }, {
                       name = "link";
                       attributes = [];
-                      text = media.uri; // todo: this should link to a page describing the media, not the media itself
+                      text = uri; // todo: this should link to a page describing the media, not the media itself
                       children = [];
                     }, {
                       name = "enclosure";
                       attributes = [
-                        ("url", media.uri), 
+                        ("url", uri), 
                         ("type", "video/mpeg"), // todo: use correct media type
                         ("length", "1024") // todo: use lengthInBytes
                       ];
@@ -185,4 +188,9 @@ module {
 			};
 		};
 	};
+
+  func transformUri(input: Text, uriTransformers: [UriTransformer]) : Text {
+    // Run all the transformers in order
+    return Array.foldLeft(uriTransformers, input, func (previousValue: Text, transformer: UriTransformer) : Text = transformer(previousValue) );
+  }
 };

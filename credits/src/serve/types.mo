@@ -14,6 +14,8 @@ module {
         upgrade: Bool;
     };
 
+    public type UriTransformer = Text -> Text;
+
     /* Credits */
 
     // Used to store the contents of the Credits canister in stable types

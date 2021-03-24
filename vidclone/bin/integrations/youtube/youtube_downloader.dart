@@ -11,7 +11,12 @@ final memoryFileSystem = MemoryFileSystem();
 
 class YoutubeDownloader extends Downloader {
   // The channelId of the user whose videos to download, e.g.
-  // UC9CuvdOVfMPvKCiwdGKL3cQ
+  // UC9CuvdOVfMPvKCiwdGKL3cQ. To find the channelId for youtube channels where
+  // the user's username instead of the channelId is listed in the url, view
+  // source on the channel page and search for externalId or
+  // data-channel-external-id. Alternatively, use the YouTube API if you know
+  // the user's username:
+  // https://www.googleapis.com/youtube/v3/channels?key={YOUR_API_KEY}&forUsername={USERNAME}&part=id
   yt_explode.ChannelId channelId;
 
   @override
@@ -116,12 +121,16 @@ class YoutubeDownloader extends Downloader {
     }
     final stream = _youtubeExplode.channels.getUploads(channelId);
 
-    DateTime previousUploadPublishDate;
+    DateTime previousVideoPublishDate;
     Media previousMedia;
 
-    return stream.map((upload) {
-      var publishDate = upload.publishDate.toUtc();
-      if (publishDate == previousUploadPublishDate) {
+    return stream.asyncMap((upload) async {
+      // The publish date and the video description don't come through when
+      // using channels.getUploads, so we have to fetch each video individually
+      final video = await _youtubeExplode.videos.get(upload.id);
+      var publishDate = video.publishDate.toUtc();
+
+      if (publishDate == previousVideoPublishDate) {
         // youtube_explode returns the same time (midnight UTC) for all
         // publishDates, but we need the publishDate to match the order of
         // videos returned by youtube_expolode. So, if we get multiple videos
@@ -136,7 +145,7 @@ class YoutubeDownloader extends Downloader {
 
       final media = Media((v) => v
         ..title = upload.title
-        ..description = upload.description
+        ..description = video.description // upload.description is  ""
         ..duration = upload.duration
         ..source = Source((s) => s
           ..id = upload.id.toString()
@@ -144,7 +153,7 @@ class YoutubeDownloader extends Downloader {
           ..platform = getPlatform().toBuilder()
           ..releaseDate = publishDate).toBuilder());
 
-      previousUploadPublishDate = upload.publishDate.toUtc();
+      previousVideoPublishDate = publishDate.toUtc();
       previousMedia = media;
       return media;
     });
@@ -163,9 +172,13 @@ class YoutubeDownloader extends Downloader {
   @override
   Future<Feed> createEmptyFeed() async {
     final metadata = await _youtubeExplode.channels.get(channelId);
+
+    // The about page is necessary to get the channel description
+    final aboutPage = await _youtubeExplode.channels.getAboutPage(channelId);
+
     return Examples.emptyFeed.rebuild((b) => b
       ..title = metadata.title
-      ..description = metadata.description
+      ..description = aboutPage.description
       ..imageUrl = metadata.logoUrl
       ..subtitle = ''
       ..link = metadata.url

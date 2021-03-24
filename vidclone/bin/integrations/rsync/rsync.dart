@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:file/file.dart';
-import 'package:file/local.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart';
 import 'package:vidlib/vidlib.dart';
@@ -39,6 +38,6 @@ mixin Rsync {
   }
 
   Future<String> pull(String path) async {
-    return rsyncClient.read('$endpointUrl/$path');
+    return rsyncClient.read(Uri.parse('$endpointUrl/$path'));
   }
 }

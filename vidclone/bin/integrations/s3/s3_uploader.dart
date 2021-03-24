@@ -1,3 +1,5 @@
+/* Deprecated until we need an S3 uploader
+
 import 'dart:io';
 
 import 'package:aws_s3_client/aws_s3.dart';
@@ -126,3 +128,4 @@ abstract class S3Uploader extends Uploader {
       ..lengthInBytes = match.size);
   }
 }
+*/

@@ -1,3 +1,5 @@
+/* Deprecated until we need an S3 uploader
+
 import 'dart:io';
 import 'package:mockito/mockito.dart';
 import 'package:vidlib/vidlib.dart';
@@ -46,3 +48,4 @@ class FakeS3Bucket extends Fake implements Bucket {
         size: upload.value.length)));
   }
 }
+*/

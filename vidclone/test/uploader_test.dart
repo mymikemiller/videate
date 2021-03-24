@@ -12,7 +12,6 @@ import '../bin/integrations/cdn77/cdn77_uploader.dart';
 import '../bin/uploader.dart';
 import '../bin/integrations/rsync/rsync_uploader.dart';
 import 'mock_uploaders/mock_rsync_uploader.dart';
-import 'mock_uploaders/mock_s3_uploader.dart';
 import 'test_utilities.dart';
 
 final memoryFileSystem = MemoryFileSystem();
@@ -37,7 +36,6 @@ void main() {
         ..args = ['feedName', 'test_feed', 'platformId', 'test_platform']
             .toBuiltList()
             .toBuilder()))),
-    UploaderTest(MockS3Uploader()),
     UploaderTest(MockRsyncUploader()),
   ];
 

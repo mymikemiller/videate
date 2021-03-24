@@ -88,7 +88,7 @@ class InternetArchiveCliUploader extends Uploader {
         final progressRegex = RegExp(r'(\d+)%');
         final progressMatch = progressRegex.firstMatch(data);
         if (progressMatch != null) {
-          final progress = double.parse(progressMatch.group(1));
+          final progress = double.parse(progressMatch.group(1)) / 100.0;
           callback?.call(progress);
         }
       });

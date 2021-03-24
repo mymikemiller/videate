@@ -1,3 +1,5 @@
+/* Deprecated in favor of internet_archive_cli_uploader
+
 // Uploads media to archive.org
 import '../s3/s3_uploader.dart';
 
@@ -18,3 +20,4 @@ class InternetArchiveS3Uploader extends S3Uploader {
   @override
   String get endpointUrl => 's3.us.archive.org';
 }
+*/

@@ -1,3 +1,4 @@
+/* TODO: Add this back in with new youtube_exolode changes
 import 'dart:convert';
 import 'dart:io';
 import 'package:googleapis/youtube/v3.dart' hide Media;
@@ -121,13 +122,13 @@ class MockYoutubeApiDownloader implements YoutubeDownloader {
 }
 
 Future<PlaylistItemListResponse> responseWithJson(String filePath) async {
-  final testResonseJsonFile = await File(filePath);
+  final testResonseJsonFile = File(filePath);
   final testResponseJson =
       json.decode(await testResonseJsonFile.readAsString());
   return PlaylistItemListResponse.fromJson(testResponseJson);
 }
 
-class MockYoutubeApi extends Mock implements YoutubeApi {
+class MockYoutubeApi extends Mock implements YouTubeApi {
   ChannelsResourceApi mChannels = MockChannelsResourceApi();
   PlaylistItemsResourceApi mPlaylistItems = MockPlaylistItemsResourceApi();
 
@@ -191,3 +192,4 @@ class FakePlaylistItemsListResponse extends Fake
   @override
   String get nextPageToken => null;
 }
+*/

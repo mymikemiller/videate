@@ -58,7 +58,8 @@ class MockYoutubeDownloader implements YoutubeDownloader {
               Duration(minutes: 3, seconds: 33),
               yt_explode.ThumbnailSet('33333333333'),
               [],
-              yt_explode.Engagement(95128, 12708, 25)),
+              yt_explode.Engagement(95128, 12708, 25),
+              true),
           yt_explode.Video(
               yt_explode.VideoId('22222222222'),
               'Title 2',
@@ -70,7 +71,8 @@ class MockYoutubeDownloader implements YoutubeDownloader {
               Duration(minutes: 2, seconds: 22),
               yt_explode.ThumbnailSet('22222222222'),
               [],
-              yt_explode.Engagement(95128, 12708, 25)),
+              yt_explode.Engagement(95128, 12708, 25),
+              true),
           yt_explode.Video(
               yt_explode.VideoId('11111111111'),
               'Title 1',
@@ -82,7 +84,8 @@ class MockYoutubeDownloader implements YoutubeDownloader {
               Duration(minutes: 1, seconds: 11),
               yt_explode.ThumbnailSet('11111111111'),
               [],
-              yt_explode.Engagement(95128, 12708, 25)),
+              yt_explode.Engagement(95128, 12708, 25),
+              true),
         ]);
 
     when(mockStreamManifest.muxed).thenReturn([mockStreamInfo]);

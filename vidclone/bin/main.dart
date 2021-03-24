@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' as io;
 import 'package:file/local.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
@@ -26,7 +26,7 @@ void main(List<String> arguments) async {
 
   print('');
 
-  final home = Platform.environment['HOME'];
+  final home = io.Platform.environment['HOME'];
   final localFileSystem = LocalFileSystem();
 
   // The first argument specifies the cloner configuration file to override the
@@ -42,7 +42,7 @@ void main(List<String> arguments) async {
   final internetArchiveSecretKey =
       getEnvVar('INTERNET_ARCHIVE_SECRET_KEY', env);
   final mediaBaseDirectory = localFileSystem.directory('$home/web/media');
-  final feedsBaseDirectory = localFileSystem.directory('$home/web/feeds');
+  // final feedsBaseDirectory = localFileSystem.directory('$home/web/feeds');
 
   final downloaders = [
     YoutubeDownloader(),

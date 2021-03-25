@@ -10,7 +10,7 @@
       "packtool": ""
     }
   },
-  "dfx": "0.6.21",
+  "dfx": "0.6.26",
   "networks": {
     "ic": {
       "providers": [

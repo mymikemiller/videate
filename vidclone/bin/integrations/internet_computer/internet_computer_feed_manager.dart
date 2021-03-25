@@ -82,10 +82,12 @@ class InternetComputerFeedManager extends FeedManager {
   }
 
   String toCandidString(Feed feed) {
+    String escape(String str) => str.replaceAll('\"', '\\\"');
+
     final mediaListCandid = feed.mediaList.map((servedMedia) => '''
     record { 
       uri="${servedMedia.uri}"; 
-      title="${servedMedia.media.title}"; 
+      title="${escape(servedMedia.media.title)}"; 
       source=record { 
         id="${servedMedia.media.source.id}"; 
         uri="${servedMedia.media.source.uri}"; 
@@ -94,16 +96,16 @@ class InternetComputerFeedManager extends FeedManager {
           uri="${servedMedia.media.source.platform.uri}"
         } 
       }; 
-      description="${servedMedia.media.description}"
+      description="${escape(servedMedia.media.description)}"
     }''').join('; ');
 
     final candid = '''
 record { 
-  title="${feed.title}"; 
+  title="${escape(feed.title)}"; 
   link="http://example.com"; 
-  description="${feed.description}"; 
+  description="${escape(feed.description)}"; 
   email="${feed.email}"; 
-  author="${feed.author}"; 
+  author="${escape(feed.author)}"; 
   imageUrl="${feed.imageUrl}"; 
   mediaList=vec { 
 $mediaListCandid

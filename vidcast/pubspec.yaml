@@ -3,6 +3,9 @@ description: Hosts an rss (xml) feed of media files
 # version: 1.0.0
 # homepage: https://www.videate.org
 
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
 dependencies:
   http_server: ^0.9.8+3
   xml: ^3.7.0

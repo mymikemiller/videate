@@ -7,14 +7,10 @@ abstract class FeedFormatter<T> {
 
   T format(Feed feed);
 
-  FeedFormatter([this.uriTransformers]);
+  FeedFormatter(this.uriTransformers);
 
   Uri transformUri(Uri input) {
-    if (uriTransformers != null) {
-      // Run all the transformers in order
-      return uriTransformers.fold(
-          input, (previousValue, transformer) => transformer(previousValue));
-    }
-    return input;
+    return uriTransformers.fold(
+        input, (previousValue, transformer) => transformer(previousValue));
   }
 }

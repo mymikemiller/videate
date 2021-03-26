@@ -58,7 +58,7 @@ project, and use serve's canister id and the correct port for replica-url
 .dfx/replica-configuration)
 
 ```
-~/OneDrive/Projects/Web/ic-http-lambda/target/debug/ic-http-lambda --force-canister-id rrkah-fqaaa-aaaaa-aaaaq-cai --replica-url http://localhost:56605/
+~/OneDrive/Projects/Web/ic-http-lambda/target/debug/ic-http-lambda --force-canister-id ryjl3-tyaaa-aaaaa-aaaba-cai --replica-url http://localhost:56605/
 ```
 
 When the ic-http-lambda server is running and the canisters are deployed,

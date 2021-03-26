@@ -2,6 +2,7 @@ import Xml "xml";
 import Credits "credits";
 import Types "types";
 import Array "mo:base/Array";
+import List "mo:base/List";
 import Debug "mo:base/Debug";
 
 module {
@@ -20,7 +21,14 @@ module {
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
 	public func format(feed: Feed, uriTransformers: [UriTransformer]) : Document {
-		{
+    // Limit the media list to the most recent 3 episodes. Todo: Allow the
+    // limit to be greater if there is a registered user making the request
+    let mediaList = List.fromArray(feed.mediaList);
+    let splitMediaList = List.split(List.size(mediaList) - 3, mediaList);
+    let (_, shownMediaList) = splitMediaList;
+    let shownMediaArray = List.toArray(shownMediaList);
+    
+		return {
 			prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 			root = {
 				name = "rss";
@@ -117,7 +125,7 @@ module {
               }],
               
               // episode list
-              Array.map([feed.mediaList[0]], func(media: Media) : Element { 
+              Array.map(shownMediaArray, func(media: Media) : Element { 
                 let uri = transformUri(media.uri, uriTransformers);
                 {
                   name = "item";

@@ -20,9 +20,12 @@ module {
     };
 
     public func stringifyElement(element: Element, indentationLevel: Nat): Text {
+        // Remove characters not supported in xml
+        let sanitizedText = Text.replace(element.text, #text("&"), "&amp;");
+
         // todo: remove Option.make when the member is changed back to optional
         let attributes = Option.get(Option.make(element.attributes), []);
-        let text = Option.get(Option.make(element.text), "");
+        let text = Option.get(Option.make(sanitizedText), "");
         let children = Option.get(Option.make(element.children), []);
         
         let arr = Array.tabulate<Text>(indentationLevel, func _ { "  " });

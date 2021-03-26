@@ -117,7 +117,7 @@ module {
               }],
               
               // episode list
-              Array.map(feed.mediaList, func(media: Media) : Element { 
+              Array.map([feed.mediaList[0]], func(media: Media) : Element { 
                 let uri = transformUri(media.uri, uriTransformers);
                 {
                   name = "item";

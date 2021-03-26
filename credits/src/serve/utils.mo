@@ -6,6 +6,7 @@ import Nat16 "mo:base/Nat16";
 import Word32 "mo:base/Word32";
 import Char "mo:base/Char";
 import Debug "mo:base/Debug";
+import Array "mo:base/Array";
 import Xml "xml";
 import Types "types";
 
@@ -40,10 +41,13 @@ module {
     };
 
     public func toNat8Array(text: Text): [Nat8] {
-        var wordIter = Iter.map(text.chars(), func(c : Char) : Word32 { Char.toWord32(c) });
+        var wordIter = Iter.map(text.chars(), func(c : Char) : Word32 { Word32.fromChar(c) });
         var natIter = Iter.map(wordIter, func(w : Word32) : Nat { Word32.toNat(w) });
-        var nat8Iter = Iter.map(natIter, func(n : Nat) : Nat8 { Nat8.fromNat(n) });
-        return Iter.toArray(nat8Iter);
+        // Avoid overflow by replacing all ascii characters above 126 with "~" (126)
+        var sanitizedNatIter = Iter.map(natIter, func(n : Nat) : Nat { Nat.min(n, 126) });
+        var nat8Iter = Iter.map(sanitizedNatIter, func(sn : Nat) : Nat8 { Nat8.fromNat(sn) });
+        var nat8Array: [Nat8] = Iter.toArray(nat8Iter);
+        return nat8Array;
     };
 
     // Translate an array of Text tuples into an array of tuples of Nat8 arrays

@@ -24,8 +24,9 @@ module {
     // Limit the media list to the most recent 3 episodes. Todo: Allow the
     // limit to be greater if there is a registered user making the request
     let mediaList = List.fromArray(feed.mediaList);
-    let splitMediaList = List.split(List.size(mediaList) - 3, mediaList);
-    let (_, shownMediaList) = splitMediaList;
+    let mediaListNewestToOldest = List.reverse(mediaList);
+    let splitMediaList = List.split(3, mediaListNewestToOldest);
+    let (shownMediaList, _) = splitMediaList;
     let shownMediaArray = List.toArray(shownMediaList);
     
 		return {

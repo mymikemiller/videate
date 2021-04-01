@@ -21,7 +21,7 @@ dependencies:
       url: https://github.com/mymikemiller/youtube_explode_dart
       ref: publishdate
   dotenv: ^2.0.0
-  file: ^5.1.0
+  file: ^6.1.0
   # aws_s3_client:
   #   git:
   #     url: https://github.com/mymikemiller/aws_s3_client.git

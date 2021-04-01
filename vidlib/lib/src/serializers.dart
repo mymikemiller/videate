@@ -38,10 +38,12 @@ final Serializers jsonSerializers = (standardSerializers.toBuilder()
           () => ListBuilder<ClonerConfiguration>()))
     .build();
 
-T standardDeserialize<T>(dynamic value) => standardSerializers
-    .deserializeWith<T>(standardSerializers.serializerForType(T), value);
+T standardDeserialize<T>(dynamic value) =>
+    standardSerializers.deserializeWith<T>(
+        standardSerializers.serializerForType(T) as Serializer<T>, value)!;
+
 T jsonDeserialize<T>(dynamic value) => jsonSerializers.deserializeWith<T>(
-    jsonSerializers.serializerForType(T), value);
+    jsonSerializers.serializerForType(T) as Serializer<T>, value)!;
 
 class SerializationHelper {
   static final SerializationHelper _singleton = SerializationHelper._internal();

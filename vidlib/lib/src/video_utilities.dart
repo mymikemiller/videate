@@ -65,27 +65,27 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
   // result in lower quality and lower file sizes
   @override
   Future<File> convert(File input,
-      {String vcodec,
-      int height,
+      {String? vcodec,
+      int? height,
       int crf = 28,
-      Function(double progress) callback}) async {
+      Function(double progress)? callback}) async {
     if (!isVideo(input)) {
       throw 'input must be a File object representing a video file';
     }
 
     // ffmpeg can only work on local files
-    input = await ensureLocal(input);
+    final localFile = await ensureLocal(input);
 
-    final inputPath = input.path;
+    final localFilePath = localFile.path;
     final tempDir = createTempDirectory(LocalFileSystem());
     // TODO: don't assume mp4 extension
     final outputPath =
-        '${tempDir.path}/${basenameWithoutExtension(input.path)}.mp4';
+        '${tempDir.path}/${basenameWithoutExtension(localFilePath)}.mp4';
 
     var totalDuration;
     final args = [
       '-i',
-      '$inputPath',
+      '$localFilePath',
       '-vf',
       // Specify the width/height of the resulting video. A negative value for
       // width tells ffmpeg to use an appropriate width that preserves the
@@ -114,7 +114,7 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
           final durationRegex = RegExp('Duration: ($timeFormat)');
           final durationMatches = durationRegex.allMatches(data);
           if (durationMatches.isNotEmpty) {
-            totalDuration = parseDuration(durationMatches.last.group(1));
+            totalDuration = parseDuration(durationMatches.last.group(1)!);
           }
         }
 
@@ -128,7 +128,7 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
         final currentTimeRegex = RegExp('time=($timeFormat)');
         final currentTimeMatches = currentTimeRegex.allMatches(data);
         if (currentTimeMatches.isNotEmpty) {
-          final currentTime = parseDuration(currentTimeMatches.last.group(1));
+          final currentTime = parseDuration(currentTimeMatches.last.group(1)!);
           final progress =
               currentTime.inMilliseconds / totalDuration.inMilliseconds;
           callback?.call(progress);

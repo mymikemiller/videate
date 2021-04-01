@@ -24,7 +24,7 @@ abstract class ClonerTaskArgs
   // The builder pattern is required by built_value, which we use for
   // serialization
   ClonerTaskArgs._();
-  factory ClonerTaskArgs([Function(ClonerTaskArgsBuilder a) updates]) =>
+  factory ClonerTaskArgs(Function(ClonerTaskArgsBuilder a) updates) =>
       _$ClonerTaskArgs(updates);
 
   static Serializer<ClonerTaskArgs> get serializer =>

@@ -49,5 +49,5 @@ abstract class Feed implements Built<Feed, FeedBuilder> {
     return rebuild((b) => b.mediaList.addAll(nonDuplicatedMediaToAdd));
   }
 
-  ServedMedia get mostRecentMedia => mediaList.isEmpty ? null : mediaList.last;
+  ServedMedia? get mostRecentMedia => mediaList.isEmpty ? null : mediaList.last;
 }

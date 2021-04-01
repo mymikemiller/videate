@@ -12,8 +12,7 @@ abstract class Platform implements Built<Platform, PlatformBuilder> {
 
   // The builder pattern is required by built_value, which we use for serialization
   Platform._();
-  factory Platform([Function(PlatformBuilder b) updates]) =>
-      _$Platform(updates);
+  factory Platform(Function(PlatformBuilder b) updates) => _$Platform(updates);
 
   static Serializer<Platform> get serializer => _$platformSerializer;
 

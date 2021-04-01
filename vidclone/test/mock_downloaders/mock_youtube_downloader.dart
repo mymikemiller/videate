@@ -46,52 +46,50 @@ class MockYoutubeDownloader implements YoutubeDownloader {
         yt_explode.VideoResolution(640, 360),
         yt_explode.Framerate(30));
 
-    Stream<yt_explode.Video> generateMockVideoStream() => Stream.fromIterable([
-          yt_explode.Video(
-              yt_explode.VideoId('33333333333'),
-              'Title 3',
-              'Author 3`',
-              yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
-              DateTime.parse('2020-01-03 03:33:00.000Z'),
-              DateTime.parse('2020-01-03 03:33:00.000Z'),
-              'Description 3',
-              Duration(minutes: 3, seconds: 33),
-              yt_explode.ThumbnailSet('33333333333'),
-              [],
-              yt_explode.Engagement(95128, 12708, 25),
-              true),
-          yt_explode.Video(
-              yt_explode.VideoId('22222222222'),
-              'Title 2',
-              'Author 2`',
-              yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
-              DateTime.parse('2020-01-02 02:22:00.000Z'),
-              DateTime.parse('2020-01-02 02:22:00.000Z'),
-              'Description 2',
-              Duration(minutes: 2, seconds: 22),
-              yt_explode.ThumbnailSet('22222222222'),
-              [],
-              yt_explode.Engagement(95128, 12708, 25),
-              true),
-          yt_explode.Video(
-              yt_explode.VideoId('11111111111'),
-              'Title 1',
-              'Author 1`',
-              yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
-              DateTime.parse('2020-01-01 01:11:00.000Z'),
-              DateTime.parse('2020-01-01 01:11:00.000Z'),
-              'Description 1',
-              Duration(minutes: 1, seconds: 11),
-              yt_explode.ThumbnailSet('11111111111'),
-              [],
-              yt_explode.Engagement(95128, 12708, 25),
-              true),
-        ]);
+    final fullVideos = [1, 2, 3].map((i) {
+      var videoId = i.toString().padLeft(11, '0');
+      return yt_explode.Video(
+          yt_explode.VideoId(videoId),
+          'Title $i',
+          'Author $i',
+          yt_explode.ChannelId('UC9CuvdOVfMPvKCiwdGKL3cQ'),
+          DateTime.parse('2020-01-0$i 00:00:00.000Z'),
+          DateTime.parse('2020-01-0$i 00:00:00.000Z'),
+          'Description $i',
+          Duration(minutes: 3, seconds: 33),
+          yt_explode.ThumbnailSet(videoId),
+          [],
+          yt_explode.Engagement(95128, 12708, 25),
+          false);
+    });
+
+    final channelVideos = fullVideos.map((v) => yt_explode.Video(
+            v.id,
+            v.title,
+            v.author,
+            v.channelId,
+            null, // Channel videos don't have uploadDate
+            null, // Channel videos don't have publishDate
+            '', // Channel videos don't have descriptions
+            v.duration,
+            v.thumbnails,
+            v.keywords,
+            v.engagement,
+            null) // Channel videos don't have isLive
+        );
+
+    Stream<yt_explode.Video> generateMockVideoStream() =>
+        Stream.fromIterable(channelVideos);
 
     when(mockStreamManifest.muxed).thenReturn([mockStreamInfo]);
 
     final yt_explode.VideoClient mockVideoClient = MockVideoClient();
     when(_mockYoutubeExplode.videos).thenReturn(mockVideoClient);
+
+    for (var video in fullVideos) {
+      when(mockVideoClient.get(video.id))
+          .thenAnswer((realInvocation) => Future.value(video));
+    }
 
     when(mockVideoClient.streamsClient).thenReturn(mockStreamsClient);
 

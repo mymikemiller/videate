@@ -2,7 +2,6 @@ import 'dart:io' as io;
 import 'package:file/file.dart' as f;
 import 'package:file/local.dart';
 import 'package:path/path.dart';
-import 'package:console/console.dart';
 
 class TimeResult {
   final dynamic returnValue;
@@ -21,23 +20,25 @@ class TimeResult {
 // expected to have the following signature: void Function(double progress)
 Future<TimeResult> time(
   Function function, [
-  List positionalArguments,
-  Map<Symbol, dynamic> namedArguments,
-  String progressCallbackName,
+  List? positionalArguments,
+  Map<Symbol, dynamic>? namedArguments,
+  String? progressCallbackName,
 ]) async {
   // If the user specified that the function to time accepts a progress
   // callback (by specifying progressCallbackName), this function handles
   // creating and displaying the progress bar while the function is timed. If
   // the callback is already specified in namedArguments, no progress bar will
   // be created.
-  final progressCallbackSymbol = Symbol(progressCallbackName);
-  if (progressCallbackName != null &&
-      !namedArguments.containsKey(progressCallbackSymbol)) {
-    final progressBar = ProgressBar();
-    final progressCallback = (double progress) {
-      updateProgressBar(progressBar, progress);
-    };
-    namedArguments[progressCallbackSymbol] = progressCallback;
+  if (progressCallbackName != null) {
+    final progressCallbackSymbol = Symbol(progressCallbackName);
+    if (namedArguments != null &&
+        !namedArguments.containsKey(progressCallbackSymbol)) {
+      // final progressBar = ProgressBar();
+      final progressCallback = (double progress) {
+        updateProgressBar(/*progressBar, */ progress);
+      };
+      namedArguments[progressCallbackSymbol] = progressCallback;
+    }
   }
   final stopwatch = Stopwatch()..start();
   final result =
@@ -45,18 +46,22 @@ Future<TimeResult> time(
   return TimeResult(result, stopwatch.elapsed);
 }
 
-void updateProgressBar(ProgressBar progressBar, double progress) {
-  final progressInt = (progress * 100).round();
-  try {
-    progressBar.update(progressInt);
-  } on io.StdoutException catch (e) {
-    if (e.message == 'Could not get terminal size') {
-      print('If using VSCode, make sure you\'re using the Integrated Terminal,'
-          ' as the Debug Console does not support cursor positioning '
-          'necessary to display the progress bar. Set `"console": '
-          '"terminal"` in launch.json.');
-    }
-  }
+void updateProgressBar(/*ProgressBar progressBar, */ double progress) {
+  // The 'console' package is not null-safe, so we just print the progress
+  // instead. See https://github.com/DirectMyFile/console.dart/issues/31
+  print('${(progress * 100).round()}%');
+
+  // final progressInt = (progress * 100).round();
+  // try {
+  //   progressBar.update(progressInt);
+  // } on io.StdoutException catch (e) {
+  //   if (e.message == 'Could not get terminal size') {
+  //     print('If using VSCode, make sure you\'re using the Integrated Terminal,'
+  //         ' as the Debug Console does not support cursor positioning '
+  //         'necessary to display the progress bar. Set `"console": '
+  //         '"terminal"` in launch.json.');
+  //   }
+  // }
 }
 
 f.Directory createTempDirectory(f.FileSystem filesystem) {
@@ -88,15 +93,15 @@ Future<io.File> copyToFileSystem(
   return newFile;
 }
 
-// TODO: return a flag specifying whether a
 Future<io.File> ensureLocal(f.File file) async {
-  if (file.fileSystem.runtimeType != LocalFileSystem().runtimeType) {
+  if (file.fileSystem.runtimeType == LocalFileSystem().runtimeType) {
+    return file;
+  } else {
     final tempDir = createTempDirectory(LocalFileSystem());
     final outputPath = '${tempDir.path}/${basename(file.path)}';
     final uri = Uri.parse(outputPath);
-    file = await copyToFileSystem(file, LocalFileSystem(), uri);
+    return await copyToFileSystem(file, LocalFileSystem(), uri);
   }
-  return file;
 }
 
 // Return a map where the keys are results of calling valueAccessor on an item,

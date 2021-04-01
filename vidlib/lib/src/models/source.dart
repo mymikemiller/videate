@@ -23,7 +23,7 @@ abstract class Source implements Built<Source, SourceBuilder> {
   // The builder pattern is required by built_value, which we use for
   // serialization
   Source._();
-  factory Source([Function(SourceBuilder b) updates]) {
+  factory Source(Function(SourceBuilder b) updates) {
     var source = _$Source(updates);
 
     // Validate fields

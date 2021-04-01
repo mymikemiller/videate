@@ -18,7 +18,7 @@ abstract class Media implements Built<Media, MediaBuilder> {
 
   // The builder pattern is required by built_value, which we use for serialization
   Media._();
-  factory Media([Function(MediaBuilder b) updates]) => _$Media(updates);
+  factory Media(Function(MediaBuilder b) updates) => _$Media(updates);
 
   static Serializer<Media> get serializer => _$mediaSerializer;
 

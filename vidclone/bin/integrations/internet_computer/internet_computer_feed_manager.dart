@@ -5,9 +5,9 @@ import '../../feed_manager.dart';
 class InternetComputerFeedManager extends FeedManager {
   String feedKey;
 
-  // True to access a locally running IC instance, False to use canisters on
-  // the IC network
-  bool localIC;
+  // "local" to access a locally running IC instance
+  // "ic" to use canisters on the IC network
+  String network;
 
   // The working directory from which to run the dfx commands (i.e. the
   // directory containing a dfx.json file)
@@ -22,18 +22,18 @@ class InternetComputerFeedManager extends FeedManager {
   @override
   void configure(ClonerTaskArgs feedManagerArgs) {
     feedKey = feedManagerArgs.get('feedName');
-    localIC = feedManagerArgs.get('localIC').toLowerCase() == 'true';
+    network = feedManagerArgs.get('network').toLowerCase();
     dfxWorkingDirectory = feedManagerArgs.get('dfxWorkingDirectory');
   }
 
   @override
   Future<bool> populate() async {
-    final List<String> network = localIC ? [] : ['--network', 'ic'];
     final args = [
       'canister',
-      ...network,
+      '--network',
+      '$network',
       'call',
-      'credits',
+      'serve',
       'getFeed',
       '("$feedName")'
     ];
@@ -41,6 +41,11 @@ class InternetComputerFeedManager extends FeedManager {
         await processRunner('dfx', args, workingDirectory: dfxWorkingDirectory);
 
     final stdout = output.stdout;
+
+    final stderr = output.stderr;
+    if (stderr.isNotEmpty) {
+      throw stderr;
+    }
 
     if (stdout == '(null)\n)') {
       // No feed found with the given name
@@ -54,10 +59,10 @@ class InternetComputerFeedManager extends FeedManager {
   Future<void> write() async {
     final feedCandidString = toCandidString(feed);
 
-    final List<String> network = localIC ? [] : ['--network', 'ic'];
     final args = [
       'canister',
-      ...network,
+      '--network',
+      '$network',
       'call',
       'serve',
       'addFeed',

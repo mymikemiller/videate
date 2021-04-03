@@ -6,7 +6,6 @@ import 'downloader.dart';
 import 'feed_manager.dart';
 import 'media_converter.dart';
 import 'uploader.dart';
-import 'package:console/console.dart';
 
 // A fake file system that allows us to interact with downloaded data as though
 // it were a file on an actual file system, but it's only ever stored in
@@ -30,8 +29,6 @@ class Cloner {
   // Media that already exist at the uploader's destination will not be cloned.
   // Instead, a [ServedMedia] will be immediately returned.
   Future<ServedMedia> clone(Media media) async {
-    Console.init();
-
     print('=== Clone: ${media.source.id} (${media.title})');
 
     // Existence Check

@@ -71,8 +71,12 @@ module {
                 imageUrl = "https://www.learningcontainer.com/wp-content/uploads/2019/10/Learning-container.png";
                 mediaList = [
                     {
+                        uri = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4";
+                        etag = "a1b2c3";
+                        lengthInBytes = 12345;
                         title = "Test video";
                         description = "Test";
+                        durationInMicroseconds = 987654321;
                         source = {
                             platform = {
                                 uri = "http://videate.org/";
@@ -80,18 +84,11 @@ module {
                             };
                             uri = "https://www.learningcontainer.com/mp4-sample-video-files-download/#Sample_MP4_File";
                             id = "test";
+                            releaseDate = "1970-01-01T00:00:00.000Z";
                         };
-                        // contributors =;
-                        // duration =;
-                        uri = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4";
-                        // etag =;
-                        // lengthInBytea =;
                     }
                 ];
             };
         };
     }
-
-
-    
 }

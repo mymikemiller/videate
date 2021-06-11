@@ -52,7 +52,7 @@ class Cloner {
       final downloadResult =
           await time(downloader.download, [media], {}, 'callback');
       final downloadedMedia = await downloadResult.returnValue;
-      print('=== ⏲  ${downloadResult.time} ⏲ ===');
+      print('=== ⏲  ${downloadResult.time} ⏲  ===');
 
       // Convert
       print('=== Convert (${mediaConverter.id}) ===');
@@ -63,21 +63,21 @@ class Cloner {
       final convertedSize = (convertedMedia as MediaFile).file.lengthSync();
       final reduction = ((initialSize - convertedSize) / initialSize) * 100;
       print('Reduced file size by ${reduction.round()}%');
-      print('=== ⏲${conversionResult.time} ⏲===');
+      print('=== ⏲  ${conversionResult.time} ⏲  ===');
 
       // Upload
       print('=== Upload (${uploader.id}) ===');
       final uploadResult =
           await time(uploader.upload, [convertedMedia], {}, 'callback');
       servedMedia = await uploadResult.returnValue;
-      print('=== ⏲${uploadResult.time} ⏲ ===');
+      print('=== ⏲  ${uploadResult.time} ⏲  ===');
       print('served media:${servedMedia.uri}');
     }
 
     // Update the feed to include the new media
     print('=== FeedManager (${feedManager.id}) Add to Feed ===');
     final feedAddResult = await time(feedManager.add, [servedMedia]);
-    print('=== ⏲${feedAddResult.time} ⏲ ===');
+    print('=== ⏲  ${feedAddResult.time} ⏲  ===');
 
     return servedMedia;
   }

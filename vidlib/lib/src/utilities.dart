@@ -46,10 +46,17 @@ Future<TimeResult> time(
   return TimeResult(result, stopwatch.elapsed);
 }
 
+var previouslyReportedProgress = -1;
+
+// todo: bring back progress bar (bug was fixed apr 14)
 void updateProgressBar(/*ProgressBar progressBar, */ double progress) {
   // The 'console' package is not null-safe, so we just print the progress
   // instead. See https://github.com/DirectMyFile/console.dart/issues/31
-  print('${(progress * 100).round()}%');
+  final progressToReport = (progress * 100).round();
+  if (progressToReport != previouslyReportedProgress) {
+    print('$progressToReport%');
+    previouslyReportedProgress = progressToReport;
+  }
 
   // final progressInt = (progress * 100).round();
   // try {

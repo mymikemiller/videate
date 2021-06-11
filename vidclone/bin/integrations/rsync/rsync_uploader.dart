@@ -25,7 +25,7 @@ abstract class RsyncUploader extends Uploader with Rsync {
   }
 
   String getKey(Media media, [String extension = 'mp4']) {
-    return 'media/${media.source.platform.id}/${subfolder}/${media.source.id}.$extension';
+    return 'media/${media.source.platform.id}/$subfolder/${media.source.id}.$extension';
   }
 
   @override

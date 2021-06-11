@@ -38,6 +38,6 @@ mixin Rsync {
   }
 
   Future<String> pull(String path) async {
-    return rsyncClient.read(Uri.parse('$endpointUrl/$path'));
+    return rsyncClient.read(Uri.parse('$endpointUrl$path'));
   }
 }

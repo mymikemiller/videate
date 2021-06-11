@@ -45,8 +45,9 @@ module {
         // the uri
         id: Text;
 
-        // The date the media was released on the source platform
-        // releaseDate: DateTime;
+        // The date the media was released on the source platform. Example:
+        // 1970-01-01T00:00:00.000Z
+        releaseDate: Text;
     };
 
     public type Feed = {
@@ -71,13 +72,14 @@ module {
         // Everyone who participated in the media's creation or consumption
         // contributors: [Contributor];
 
-        // The length of the media in nanoseconds
-        //duration: Nat;
+        // The duration of the media in microseconds
+        durationInMicroseconds: Nat;
 
-        // From ServedMedia
+        // From ServedMedia when cloning, but all media on the InternetComputer
+        // is served, so these values are just stored on Media directly
         uri: Text;
-        // etag: Text;
-        // lengthInBytes: Nat;
+        etag: Text;
+        lengthInBytes: Nat;
     };
 
     // Contributor: a causal factor in the existence or occurrence of something

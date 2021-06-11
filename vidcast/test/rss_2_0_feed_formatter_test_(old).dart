@@ -1,3 +1,6 @@
+/* Removed in favor of generating feeds on the Internet Computer (see credits
+ folder)
+
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:vidlib/vidlib.dart';
@@ -21,3 +24,5 @@ void main() async {
     });
   });
 }
+
+*/

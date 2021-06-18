@@ -44,25 +44,25 @@ jobs:
       working-directory: vidclone
       run: pub run test
 
-  test_VidCast:
-    name: VidCast Tests
-    runs-on: ubuntu-latest
-    container:
-      image:  google/dart:latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install pub dependencies for vidlib
-      working-directory: vidlib
-      run: pub get
-    - name: Generate source for vidlib
-      working-directory: vidlib
-      run: pub run build_runner build
-    - name: Install pub dependencies
-      working-directory: vidcast
-      run: pub get
-    - name: Generate source
-      working-directory: vidlib
-      run: pub run build_runner build
-    - name: Run tests
-      working-directory: vidcast
-      run: pub run test
+#   test_VidCast:
+#     name: VidCast Tests
+#     runs-on: ubuntu-latest
+#     container:
+#       image:  google/dart:latest
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Install pub dependencies for vidlib
+#       working-directory: vidlib
+#       run: pub get
+#     - name: Generate source for vidlib
+#       working-directory: vidlib
+#       run: pub run build_runner build
+#     - name: Install pub dependencies
+#       working-directory: vidcast
+#       run: pub get
+#     - name: Generate source
+#       working-directory: vidlib
+#       run: pub run build_runner build
+#     - name: Run tests
+#       working-directory: vidcast
+#       run: pub run test

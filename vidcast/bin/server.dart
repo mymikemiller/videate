@@ -1,5 +1,7 @@
-// Serves generated rss feeds for the content under /web
-// Use the URL localhost:8080 in your browser.
+// Run locally, this will serve all videos under $home/web/media Use the URL
+// localhost:8080 in your browser. Code here used to generate and serve rss
+// feeds, but that functaionality has moved to the Internet Computer under the
+// "credits" project
 import 'dart:async';
 import 'dart:convert';
 import 'package:vidlib/vidlib.dart' hide Platform;
@@ -51,8 +53,8 @@ Future main(List<String> args) async {
   final UriTransformer cdn77UriTransformer = (Uri input) => Uri.parse(
       input.toString().replaceFirst(cdn77BaseUrl, cdn77VidtechBaseUrl));
 
-  final feedFormatter =
-      RSS_2_0_FeedFormatter([localFileUriTransformer, cdn77UriTransformer]);
+  // final feedFormatter =
+  //     RSS_2_0_FeedFormatter([localFileUriTransformer, cdn77UriTransformer]);
 
   // Print out the url to each valid feed
   final feedsBaseDirectory = Directory(feedsBaseDirectoryPath);
@@ -92,20 +94,21 @@ Future main(List<String> args) async {
       request.response.write('Your \$1 tip has been sent to $creator');
       request.response.close();
     } else if (path.extension(request.uri.path) == '') {
-      // feed request (i.e. a request without a file extension)
-      final name = path.basenameWithoutExtension(request.uri.path);
+      throw 'Received non-file request from server. Rss feed generation has moved to the IC';
+      // // feed request (i.e. a request without a file extension)
+      // final name = path.basenameWithoutExtension(request.uri.path);
 
-      // We expect to find a json feed file with the requested name
-      final file = File('$feedsBaseDirectoryPath/$name.json');
-      if (file.existsSync()) {
-        final json = await file.readAsString();
-        final feed = Feed.fromJson(json);
-        serve(feed, feedFormatter, request.response);
-      } else {
-        request.response.write('No feed with the name "$name" found.');
-      }
+      // // We expect to find a json feed file with the requested name
+      // final file = File('$feedsBaseDirectoryPath/$name.json');
+      // if (file.existsSync()) {
+      //   final json = await file.readAsString();
+      //   final feed = Feed.fromJson(json);
+      //   serve(feed, feedFormatter, request.response);
+      // } else {
+      //   request.response.write('No feed with the name "$name" found.');
+      // }
 
-      request.response.close();
+      // request.response.close();
     } else {
       // Video file request
       staticFiles.serveRequest(request);

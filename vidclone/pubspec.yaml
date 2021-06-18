@@ -10,22 +10,10 @@ dependencies:
   googleapis: ^2.0.0
   googleapis_auth: ^1.1.0
   http: ^0.13.1
-  youtube_explode_dart:
-    # We use my fork to get the change from two necessary PRs:
-    # https://github.com/Hexer10/youtube_explode_dart/pull/69#issuecomment-802735403)
-    # which adds access to the channel description, and
-    # https://github.com/Hexer10/youtube_explode_dart/pull/115 which adds video
-    # publishDate (as opposed to uploadDate). Once both PRs are released to
-    # pub, this can be switched back to just reference the newest pub version 
-    git: 
-      url: https://github.com/mymikemiller/youtube_explode_dart
-      ref: publishdate
+  youtube_explode_dart: ^1.9.4
   dotenv: ^2.0.0
   file: ^6.1.0
-  # aws_s3_client:
-  #   git:
-  #     url: https://github.com/mymikemiller/aws_s3_client.git
-  #     ref: patch-2
+  quiver: ^3.0.1
   vidlib:
     path: ../vidlib
 

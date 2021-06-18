@@ -53,8 +53,8 @@ abstract class Downloader extends ClonerTask {
       // Sort first on releaseDate...
       var cmp = a.source.releaseDate.compareTo(b.source.releaseDate);
       if (cmp == 0) {
-        // When dates match, secondarily sort by uri path
-        return a.source.uri.path.compareTo(b.source.uri.path);
+        // When dates match, secondarily sort by title
+        return a.title.compareTo(b.title);
       }
       return cmp;
     };
@@ -91,9 +91,9 @@ abstract class Downloader extends ClonerTask {
 
         // Assert that we're always yielding in reverse date order. If we ever
         // fail this assertion, slidingWindowSize may need to be increased for
-        // this [Downloader]
+        // this [Downloader].
         if (previouslyYielded != null) {
-          assert(dateComparator(previouslyYielded, toYield) > 0);
+          assert(dateComparator(previouslyYielded, toYield) >= 0);
         }
         previouslyYielded = toYield;
         yield toYield;

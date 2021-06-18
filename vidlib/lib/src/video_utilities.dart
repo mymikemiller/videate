@@ -137,7 +137,7 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
 
       final exitCode = await p.exitCode;
       if (exitCode != 0) {
-        throw 'ffmpeg convert error (exitCode ${exitCode})';
+        throw 'ffmpeg convert error (exitCode $exitCode)';
       }
     });
 

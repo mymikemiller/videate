@@ -8,6 +8,8 @@
 //
 // Specifically, this file is modeled after nomeata's Rust example here:
 // https://github.com/nomeata/ic-telegram-bot/blob/main/telegram/src/lib.rs
+import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
@@ -18,6 +20,7 @@ import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Option "mo:base/Option";
 import HashMap "mo:base/HashMap";
+import Error "mo:base/Error";
 import Credits "credits";
 import Xml "xml";
 import Types "types";
@@ -144,12 +147,32 @@ actor Serve {
         credits.deleteFeed(key);
     };
 
+    public query func getAllFeedKeys() : async [Text] {
+        credits.getAllFeedKeys();
+    };
+
     public query func getAllFeeds() : async [(Text, Feed)] {
         credits.getAllFeeds();
     };
 
     public query func getFeed(key: Text) : async ?Feed {
         credits.getFeed(key);
+    };
+
+    public func getFeedSummary(key: Text) : async (Text, Text) {
+        credits.getFeedSummary(key);
+    };
+
+    public func getAllFeedSummaries() : async [(Text, Text)] {
+        await credits.getAllFeedSummaries();
+    };
+
+    public func getFeedMediaDetails(key: Text) : async (Text, [(Text, Text)]) {
+        credits.getFeedMediaDetails(key);
+    };
+
+    public func getAllFeedMediaDetails() : async [(Text, [(Text, Text)])] {
+        await credits.getAllFeedMediaDetails();
     };
 
     public query func getSampleFeed() : async Feed {

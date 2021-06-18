@@ -2,6 +2,7 @@ import 'dart:io' as io;
 import 'package:file/file.dart' as f;
 import 'package:file/local.dart';
 import 'package:path/path.dart';
+import 'package:console/console.dart';
 
 class TimeResult {
   final dynamic returnValue;
@@ -33,9 +34,9 @@ Future<TimeResult> time(
     final progressCallbackSymbol = Symbol(progressCallbackName);
     if (namedArguments != null &&
         !namedArguments.containsKey(progressCallbackSymbol)) {
-      // final progressBar = ProgressBar();
+      final progressBar = ProgressBar();
       final progressCallback = (double progress) {
-        updateProgressBar(/*progressBar, */ progress);
+        updateProgressBar(progressBar, progress);
       };
       namedArguments[progressCallbackSymbol] = progressCallback;
     }
@@ -46,22 +47,18 @@ Future<TimeResult> time(
   return TimeResult(result, stopwatch.elapsed);
 }
 
-void updateProgressBar(/*ProgressBar progressBar, */ double progress) {
-  // The 'console' package is not null-safe, so we just print the progress
-  // instead. See https://github.com/DirectMyFile/console.dart/issues/31
-  print('${(progress * 100).round()}%');
-
-  // final progressInt = (progress * 100).round();
-  // try {
-  //   progressBar.update(progressInt);
-  // } on io.StdoutException catch (e) {
-  //   if (e.message == 'Could not get terminal size') {
-  //     print('If using VSCode, make sure you\'re using the Integrated Terminal,'
-  //         ' as the Debug Console does not support cursor positioning '
-  //         'necessary to display the progress bar. Set `"console": '
-  //         '"terminal"` in launch.json.');
-  //   }
-  // }
+void updateProgressBar(ProgressBar progressBar, double progress) {
+  final progressInt = (progress * 100).round();
+  try {
+    progressBar.update(progressInt);
+  } on io.StdoutException catch (e) {
+    if (e.message == 'Could not get terminal size') {
+      print('If using VSCode, make sure you\'re using the Integrated Terminal,'
+          ' as the Debug Console does not support cursor positioning '
+          'necessary to display the progress bar. Set `"console": '
+          '"terminal"` in launch.json.');
+    }
+  }
 }
 
 f.Directory createTempDirectory(f.FileSystem filesystem) {

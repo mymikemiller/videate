@@ -350,12 +350,12 @@ $mediaListCandid
   static const vectorSignifier = 'vec {';
 
   static String removeUnnecessaryLeadingCandid(String candid) {
-    final c = candid.trimLeft();
+    var c = candid.trimLeft();
     if (c.startsWith('(')) {
-      candid = candid.substring(candid.indexOf('(') + 1);
+      c = c.substring(c.indexOf('(') + 1).trimLeft();
     }
     if (c.startsWith('opt ')) {
-      candid = candid.substring(candid.indexOf('opt ') + 4);
+      c = c.substring(c.indexOf('opt ') + 4).trimLeft();
     }
     return c;
   }

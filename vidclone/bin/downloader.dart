@@ -91,7 +91,7 @@ abstract class Downloader extends ClonerTask {
 
         // Assert that we're always yielding in reverse date order. If we ever
         // fail this assertion, slidingWindowSize may need to be increased for
-        // this [Downloader]. Allow equal
+        // this [Downloader].
         if (previouslyYielded != null) {
           assert(dateComparator(previouslyYielded, toYield) >= 0);
         }

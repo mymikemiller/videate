@@ -34,12 +34,11 @@ dfx canister install --all --mode=reinstall
 
 ## Generating XML feeds from The Credits data
 
-Run dfx and deploy the `credits` and `serve` canister
+Run dfx and deploy the `serve` canister
 
 ```
 cd videate/credits
 dfx start --background
-dfx deploy credits
 dfx deploy serve
 ```
 
@@ -66,7 +65,7 @@ navigate to a feed!
 
 Hard-coded sample feed:
 ``` 
-http://127.0.0.1:7878/
+http://127.0.0.1:7878/fast
 ```
 
 Use localhost.run to expose the feed to outside networks, e.g. for testing on a

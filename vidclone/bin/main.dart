@@ -17,8 +17,8 @@ import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 
-final forcedCloneStartDate = DateTime.parse('2021-04-22T00:00:00.000Z');
-// null; // DateTime.parse('2020-07-22T00:00:00.000Z');
+final forcedCloneStartDate =
+    null; // DateTime.parse('2020-07-22T00:00:00.000Z');
 
 void main(List<String> arguments) async {
   // Load environment variables from local .env file
@@ -133,7 +133,7 @@ void main(List<String> arguments) async {
         var cloneStartDate;
         if (forcedCloneStartDate != null) {
           print(
-              'Forcing clone to consider only videos released on or after $forcedCloneStartDate');
+              'Forcing clone of all videos released on or after $forcedCloneStartDate, even if they\'re already in the feed. Duplicates may occur.');
           cloneStartDate = forcedCloneStartDate;
         } else {
           print(

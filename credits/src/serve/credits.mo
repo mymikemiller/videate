@@ -2,13 +2,17 @@
 // issue with dfinity's current implementation, we can't communicate between
 // actors unless all the calls are update (non-query) calls, which would cause
 // a ~30-second delay when making any request. So instead, we shove all the
-// "database" functionality right inside the "serve" actor.
+// "database" functionality right inside the "serve" actor. See
+// https://forum.dfinity.org/t/cant-call-an-imported-actors-query-functions
 
+import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
-import List "mo:base/List";
-import Iter "mo:base/Iter";
-import Text "mo:base/Text";
+import Error "mo:base/Error";
 import Map "mo:base/HashMap";
+import Iter "mo:base/Iter";
+import List "mo:base/List";
+import Nat "mo:base/Nat";
+import Text "mo:base/Text";
 import Types "types";
 
 module {
@@ -56,8 +60,74 @@ module {
             Iter.toArray(feeds.entries());
         };
 
+        public func getAllFeedKeys() : [Text] {
+            Array.map(getAllFeeds(), func((key: Text, feed: Feed)) : Text { 
+                key
+            });
+        };
+
         public func getFeed(key: Text) : ?Feed {
             feeds.get(key);
+        };
+
+        public func getFeedSummary(key: Text) : (Text, Text) {
+            let feed: ?Feed = getFeed(key);
+
+            switch (feed) {
+                case (?feed) {
+                    (feed.title, "items: " # Nat.toText(feed.mediaList.size()));
+                };
+                case (null) ("Unrecognized feed: " # key, "");
+            };
+        };
+
+        public func getAllFeedSummaries() : async [(Text, Text)] {
+            let keys: [Text] = getAllFeedKeys();
+            var buffer = Buffer.Buffer<(Text, Text)>(keys.size()); 
+            for (key in keys.vals()) {
+                let summary = getFeedSummary(key); 
+                buffer.add(summary);
+            };
+            buffer.toArray();
+            // Not sure why this doesn't work instead of the above:
+            // Array.map(keys, func(key: Text) : (Text, Text)
+            //     {getFeedSummary(key);
+            // });
+        };
+
+        public func getFeedMediaDetails(key: Text) : (Text, [(Text, Text)]) {
+            let feed: ?Feed = getFeed(key);
+
+            switch (feed) {
+                case (?feed) {
+                    var buffer = Buffer.Buffer<(Text, Text)>(feed.mediaList.size()); 
+                    for (media in feed.mediaList.vals()) {
+                        let details = (media.source.releaseDate, media.title); 
+                        buffer.add(details);
+                    };
+                    let mediaDetails = buffer.toArray();
+                    // Not sure why this doesn't work instead of the above:
+                    // let mediaDetails = Array.map(feed.mediaList, func(media: Media) : (Text, Text) {
+                    //     (media.releaseDate, media.title);
+                    // });
+                    (feed.title, mediaDetails);
+                };
+                case (null) ("Unrecognized feed: " # key, []);
+            };
+        };
+
+        public func getAllFeedMediaDetails() : async [(Text, [(Text, Text)])] {
+            let keys: [Text] = getAllFeedKeys();
+            var buffer = Buffer.Buffer<(Text, [(Text, Text)])>(keys.size()); 
+            for (key in keys.vals()) {
+                let details = getFeedMediaDetails(key); 
+                buffer.add(details);
+            };
+            buffer.toArray();
+            // Not sure why this doesn't work instead of the above:
+            // Array.map(keys, func(key: Text) : (Text, Text)
+            //     {getFeedSummary(key);
+            // });
         };
 
         public func getSampleFeed() : Feed {

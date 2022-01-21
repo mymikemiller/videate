@@ -42,40 +42,31 @@ dfx start --background
 dfx deploy serve
 ```
 
-The [ic-http-lambda](https://github.com/nomeata/ic-http-lambda/) server must be
-running so http requests can be received, translated into canister requests,
-performed and returned as xml. Start the server by launching nomeata's server
-locally on the same machine running the dfx server, using the following args:
---force-canister-id {serve canister id} --replica-url {local dfx replica url}
+Navigate to a feed!
 
-Note that, to run non-locally, the ic-http-lambda server will need to be
-deployed somewhere, as nomeata did at https://<canister_id>.ic.nomeata.de/
+Use an existing feed key and the correct canisterId for the `serve` canister)
 
-A command like the following might work. Make sure to build the ic-http-lambda
-project, and use serve's canister id and the correct port for replica-url
-(printed shortly after running `dfx start`, or look under
-.dfx/replica-configuration)
-
-```
-~/OneDrive/Projects/Web/ic-http-lambda/target/debug/ic-http-lambda --force-canister-id ryjl3-tyaaa-aaaaa-aaaba-cai --replica-url http://localhost:56605/
-```
-
-When the ic-http-lambda server is running and the canisters are deployed,
-navigate to a feed!
-
-Hard-coded sample feed:
-``` 
-http://127.0.0.1:7878/fast
-```
+http://127.0.0.1:8002/example_feed_key?canisterId=rrkah-fqaaa-aaaaa-aaaaq-cai
 
 Use localhost.run to expose the feed to outside networks, e.g. for testing on a
 phone
 
 ```
-ssh -R 80:localhost:7878 localhost.run
+ssh -R 80:localhost:8002 localhost.run
 ```
 
-Then subscribe in a podcatcher to the address printed out
+Then subscribe in a podcatcher to the address printed out, e.g.:
+
+https://0d16ad07d6e56a.localhost.run/example_feed_key?canisterId=rrkah-fqaaa-aaaaa-aaaaq-cai
+
+Deploy to the Internet Computer:
+
+dfx deploy --network ic
+
+Navigate to a feed hosted on the Internet Computer. Note that ".raw.ic0.app"
+must be used, not just ".ic0.app" since we're not hosting static files.
+
+https://mvjun-2yaaa-aaaah-aac3q-cai.raw.ic0.app/example_feed_key
 
 ### Prerequisites
 

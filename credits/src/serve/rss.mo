@@ -21,13 +21,13 @@ module {
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
 	public func format(feed: Feed, uriTransformers: [UriTransformer]) : Document {
-    // Limit the media list to the most recent 3 episodes. Todo: Allow the
-    // limit to be greater if there is a registered user making the request
     let mediaList = List.fromArray(feed.mediaList);
     let mediaListNewestToOldest = List.reverse(mediaList);
-    let splitMediaList = List.split(3, mediaListNewestToOldest);
-    let (shownMediaList, _) = splitMediaList;
-    let shownMediaArray = List.toArray(shownMediaList);
+    // todo: Limit the media list to the most recent 3 episodes unless there is
+    // a registered user making the request 
+    // let splitMediaList = List.split(3, mediaListNewestToOldest); 
+    // let (shownMediaList, _) = splitMediaList;
+    let shownMediaArray = List.toArray(mediaListNewestToOldest);
     
 		return {
 			prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";

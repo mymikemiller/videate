@@ -1,17 +1,33 @@
 module {
     /* Serve */
-    public type Request = {
-        method: Text;
-        headers: [([Nat8], [Nat8])];
-        uri: Text;
-        body: [Nat8];
+    public type HeaderField = (Text, Text);
+    
+    public type Token = {};
+
+    public type StreamingCallbackHttpResponse = {
+        body : Blob;
+        token : Token;
     };
 
-    public type Response = {
-        status: Nat16;
-        headers: [([Nat8], [Nat8])];
-        body: [Nat8];
-        upgrade: Bool;
+    public type StreamingStrategy = {
+        #Callback : {
+            callback : shared Token -> async StreamingCallbackHttpResponse;
+            token : Token;
+        };
+    };
+
+    public type HttpRequest = {
+        method: Text;
+        headers: [HeaderField];
+        url: Text;
+        body: Blob;
+    };
+
+    public type HttpResponse = {
+        status_code: Nat16;
+        headers: [HeaderField];
+        body: Blob;
+        streaming_strategy : ?StreamingStrategy;
     };
 
     public type UriTransformer = Text -> Text;

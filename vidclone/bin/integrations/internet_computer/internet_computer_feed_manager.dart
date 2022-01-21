@@ -452,7 +452,7 @@ $mediaListCandid
     // Also select the rest (throwing out a semicolon and any whitespace at the
     // end if found) to pass along with the result
     final match = RegExp(
-      r'([\d_\.]+);?\s*(.*$)',
+      r'([\d_\.]+)( : nat)?;?\s*(.*$)',
       dotAll: true,
     ).firstMatch(candid);
     if (match == null) {
@@ -460,7 +460,7 @@ $mediaListCandid
     }
 
     final str = match.group(1).replaceAll('_', '');
-    final rest = match.group(2);
+    final rest = match.group(3);
 
     final num = double.parse(str);
 

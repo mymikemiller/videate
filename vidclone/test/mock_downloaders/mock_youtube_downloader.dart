@@ -3,7 +3,9 @@ import 'package:mockito/mockito.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
 import 'dart:io';
 import 'package:vidlib/vidlib.dart';
+import 'package:http_parser/http_parser.dart';
 import '../../bin/integrations/youtube/youtube_downloader.dart';
+import 'dart:collection';
 
 // MockYoutubeDownloader implements, not extends, YoutubeDownloader because
 // YoutubeDownloader's only constructors are factory constructors which can't
@@ -44,7 +46,8 @@ class MockYoutubeDownloader implements YoutubeDownloader {
         '360p',
         yt_explode.VideoQuality.medium360,
         yt_explode.VideoResolution(640, 360),
-        yt_explode.Framerate(30));
+        yt_explode.Framerate(30),
+        MediaType.parse('video/mp4'));
 
     final fullVideos = [1, 2, 3].map((i) {
       var videoId = i.toString().padLeft(11, '0');
@@ -81,7 +84,8 @@ class MockYoutubeDownloader implements YoutubeDownloader {
     Stream<yt_explode.Video> generateMockVideoStream() =>
         Stream.fromIterable(channelVideos);
 
-    when(mockStreamManifest.muxed).thenReturn([mockStreamInfo]);
+    when(mockStreamManifest.muxed).thenReturn(
+        UnmodifiableListView<yt_explode.MuxedStreamInfo>([mockStreamInfo]));
 
     final yt_explode.VideoClient mockVideoClient = MockVideoClient();
     when(_mockYoutubeExplode.videos).thenReturn(mockVideoClient);

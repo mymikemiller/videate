@@ -35,8 +35,8 @@ class MockRsyncFeedManager extends RsyncFeedManager {
   @override
   ProcessResult Function(String executable, List<String> arguments)
       get processRunner => (String executable, List<String> arguments) {
-            // The file path should be the third argument
-            final filePath = arguments[2];
+            // The file path should be the fourth argument
+            final filePath = arguments[3];
             final file = File(filePath);
             final json = file.readAsStringSync();
             final feed = Feed.fromJson(json);

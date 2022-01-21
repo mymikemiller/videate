@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:file/memory.dart';
-import 'package:vidlib/src/models/media.dart';
 import 'dart:async';
 import 'package:vidlib/vidlib.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
@@ -104,6 +103,7 @@ class YoutubeDownloader extends Downloader {
         // print(e);
 
         // Clear the file and start over
+        print('Encountered error downloading video. Starting over.');
         await file.writeAsBytes([]);
         output = file.openWrite(mode: FileMode.writeOnlyAppend);
         count = 0;

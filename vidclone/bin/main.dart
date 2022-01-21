@@ -17,14 +17,14 @@ import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 
-final forcedCloneStartDate =
-    null; // DateTime.parse('2020-07-22T00:00:00.000Z');
+final forcedCloneStartDate = null;
+// null; // DateTime.parse('2020-07-22T00:00:00.000Z');
 
 void main(List<String> arguments) async {
   // Load environment variables from local .env file
   load();
 
-  print('');
+  print('starting clone');
 
   final home = io.Platform.environment['HOME'];
   final localFileSystem = LocalFileSystem();

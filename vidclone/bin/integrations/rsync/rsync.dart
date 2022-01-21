@@ -15,9 +15,10 @@ mixin Rsync {
   Future<void> push(File file, String destinationPath) async {
     file = await ensureLocal(file);
 
-    // rsync -e "ssh -i ~/.ssh/cdn77_id_rsa" /path/to/source.txt
+    // rsync -e "ssh -i ~/.ssh/cdn77_id_rsa" "/path/to/source.txt"
     // user_amhl64ul@push-24.cdn77.com:/www/path/to/destination.txt
     final output = await rsyncProcessRunner('rsync', [
+      '--protect-args',
       '-e',
       'ssh -i ~/.ssh/cdn77_id_rsa',
       file.path,
@@ -33,6 +34,7 @@ mixin Rsync {
         print(
             'rsync error may imply a missing directory structure at the destination. Try creating the "www/$dir" directory.');
       }
+      // todo: fix this when there's not a folder for the feed: rsync error may imply a missing directory structure at the destination. Try creating the "www/media/youtube/gamegrumps" directory.
       throw 'rsync process error: ${output.stderr}';
     }
   }

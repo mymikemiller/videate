@@ -66,17 +66,6 @@ module {
         releaseDate: Text;
     };
 
-    public type Feed = {
-        title: Text;
-        subtitle: Text;
-        description: Text;
-        link: Text;
-        author: Text;
-        email: Text;
-        imageUrl: Text;
-        mediaList: [Media];
-    };
-    
     public type Media = {
         title: Text;
         description: Text;
@@ -98,6 +87,17 @@ module {
         lengthInBytes: Nat;
     };
 
+    public type Feed = {
+        title: Text;
+        subtitle: Text;
+        description: Text;
+        link: Text;
+        author: Text;
+        email: Text;
+        imageUrl: Text;
+        mediaList: [Media];
+    };
+    
     // Contributor: a causal factor in the existence or occurrence of something
     // All users (creators, consumers and supporters) are contributors
     // public type Contributor = {

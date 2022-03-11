@@ -25,5 +25,5 @@ service : {
   create: (ProfileUpdate) -> (Result);
   delete: () -> (Result);
   read: () -> (Result_1);
-  update: (Profile) -> (Result);
+  update: (ProfileUpdate) -> (Result);
 }

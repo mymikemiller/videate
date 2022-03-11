@@ -1,7 +1,7 @@
 # The Credits
 
 A set of Internet Computer canisters (see https://dfinity.org/) that act as a
-sort of database to handle and track user's media requests.
+sort of database to handle and track users` media requests.
 
 ## Running Locally
 
@@ -14,6 +14,32 @@ dfx canister install --all
 ```
 
 Note the canister IDs printed out for `credits` and `credits_assets`
+
+## Running Internet Identity Locally
+
+To use a locally running copy of Internet Identity when logging in to the web
+interface for NODE_ENV=development builds (production builds default to using
+the actual Internet Identity service), you need to build and start the
+[Internet Identity canister](https://github.com/dfinity/internet-identity).
+Clone that repository and build and start according to the instructions. The
+startup command is duplicated here for convenience but the Internet Identity
+readme's command should be used (and this should be updated) if they differ.
+
+Run this from the internet-identity folder:
+
+```bash
+II_FETCH_ROOT_KEY=1 dfx deploy --no-wallet --argument '(null)'
+```
+
+Ensure that the value printed out for "Installing code for canister
+internet_identity" (also found in
+internet-identity/.dfx/local/canister_ids.json under "internet_identity") is
+written in webpack.config.js for the development II_URL.
+
+Once that is running locally (and so are this package's canisters), navigating
+to http://localhost:8000?canisterId=[local contributor_assets cid] will load
+the login UI and authenticating with Internet Identity will redirect to
+http://localhost:8000/authorize?canisterId=[cid found above]
 
 ### Launch the automatically-generated, interactive Candid frontend for the appropriate canister
 

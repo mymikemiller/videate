@@ -13,7 +13,7 @@ export const idlFactory = ({ IDL }) => {
     'create' : IDL.Func([ProfileUpdate], [Result], []),
     'delete' : IDL.Func([], [Result], []),
     'read' : IDL.Func([], [Result_1], []),
-    'update' : IDL.Func([Profile], [Result], []),
+    'update' : IDL.Func([ProfileUpdate], [Result], []),
   });
 };
 export const init = ({ IDL }) => { return []; };

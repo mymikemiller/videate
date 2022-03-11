@@ -7,6 +7,19 @@
     "contributor": {
       "main": "src/contributor/contributor.mo",
       "type": "motoko"
+    },
+    "contributor_assets": {
+      "dependencies": [
+        "contributor"
+      ],
+      "frontend": {
+        "entrypoint": "src/contributor_assets/src/index.html"
+      },
+      "source": [
+        "src/contributor_assets/assets",
+        "dist/contributor_assets/"
+      ],
+      "type": "assets"
     }
   },
   "defaults": {
@@ -23,7 +36,7 @@
       "type": "persistent"
     },
     "local": {
-      "bind": "0.0.0.0:8002",
+      "bind": "0.0.0.0:8000",
       "type": "ephemeral"
     }
   },

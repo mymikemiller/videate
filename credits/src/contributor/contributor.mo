@@ -87,13 +87,19 @@ actor Contributor {
   };
 
   // Update profile
-  public shared(msg) func update(profile : Profile) : async Result.Result<(), Error> {
+  public shared(msg) func update(profile : ProfileUpdate) : async Result.Result<(), Error> {
     // Get caller principal
     let callerId = msg.caller;
 
     // Reject the AnonymousIdentity
     if(Principal.toText(callerId) == "2vxsx-fae") {
       return #err(#NotAuthorized);
+    };
+
+    // Associate user profile with their principal
+    let userProfile: Profile = {
+        bio = profile.bio;
+        id = callerId;
     };
     
     let result = Trie.find(
@@ -112,7 +118,7 @@ actor Contributor {
           profiles,
           key(callerId),
           Principal.equal,
-          ?profile
+          ?userProfile
         ).0;
         #ok(());
       };

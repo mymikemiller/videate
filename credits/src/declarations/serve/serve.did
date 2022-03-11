@@ -1,0 +1,95 @@
+type Token = record {};
+type StreamingStrategy = variant {
+                           Callback:
+                            record {
+                              callback:
+                               func (Token) ->
+                                (StreamingCallbackHttpResponse);
+                              token: Token;
+                            };};
+type StreamingCallbackHttpResponse = 
+ record {
+   body: blob;
+   token: Token;
+ };
+type Source = 
+ record {
+   id: text;
+   platform: Platform;
+   releaseDate: text;
+   uri: text;
+ };
+type Platform = 
+ record {
+   id: text;
+   uri: text;
+ };
+type Media = 
+ record {
+   description: text;
+   durationInMicroseconds: nat;
+   etag: text;
+   lengthInBytes: nat;
+   source: Source;
+   title: text;
+   uri: text;
+ };
+type HttpResponse = 
+ record {
+   body: blob;
+   headers: vec HeaderField;
+   status_code: nat16;
+   streaming_strategy: opt StreamingStrategy;
+ };
+type HttpRequest = 
+ record {
+   body: blob;
+   headers: vec HeaderField;
+   method: text;
+   url: text;
+ };
+type HeaderField = 
+ record {
+   text;
+   text;
+ };
+type Feed = 
+ record {
+   author: text;
+   description: text;
+   email: text;
+   imageUrl: text;
+   link: text;
+   mediaList: vec Media;
+   subtitle: text;
+   title: text;
+ };
+service : {
+  addFeed: (text, Feed) -> (nat);
+  deleteFeed: (text) -> () oneway;
+  getAllFeedKeys: () -> (vec text) query;
+  getAllFeedMediaDetails: () -> (vec record {
+                                       text;
+                                       vec record {
+                                             text;
+                                             text;
+                                           };
+                                     });
+  getAllFeedSummaries: () -> (vec record {
+                                    text;
+                                    text;
+                                  });
+  getAllFeeds: () -> (vec record {
+                            text;
+                            Feed;
+                          }) query;
+  getFeed: (text) -> (opt Feed) query;
+  getFeedMediaDetails: (text) -> (text, vec record {
+                                              text;
+                                              text;
+                                            });
+  getFeedSummary: (text) -> (text, text);
+  getSampleFeed: () -> (Feed) query;
+  http_request: (HttpRequest) -> (HttpResponse) query;
+  http_request_update: (HttpRequest) -> (HttpResponse);
+}

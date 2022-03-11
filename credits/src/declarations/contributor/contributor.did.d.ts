@@ -13,5 +13,5 @@ export interface _SERVICE {
   'create' : (arg_0: ProfileUpdate) => Promise<Result>,
   'delete' : () => Promise<Result>,
   'read' : () => Promise<Result_1>,
-  'update' : (arg_0: Profile) => Promise<Result>,
+  'update' : (arg_0: ProfileUpdate) => Promise<Result>,
 }

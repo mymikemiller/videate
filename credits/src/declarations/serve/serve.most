@@ -1,0 +1,14 @@
+type Feed =
+  {
+    author : Text;
+    description : Text;
+    email : Text;
+    imageUrl : Text;
+    link : Text;
+    mediaList : [Media];
+    subtitle : Text;
+    title : Text
+  };
+actor {
+  stable var stableCredits : {feedEntries : [(Text, Feed)]}
+};

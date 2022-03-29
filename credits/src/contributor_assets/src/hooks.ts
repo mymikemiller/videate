@@ -1,22 +1,32 @@
-import { ActorSubclass, Identity } from "@dfinity/agent";
+import { ActorSubclass } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
-import { clear, get, remove, set } from "local-storage";
 import { useState, useEffect } from "react";
 import { canisterId, createActor } from "../../declarations/contributor";
 import { ProfileUpdate, _SERVICE } from "../../declarations/contributor/contributor.did";
+import { useNavigate } from "react-router-dom";
+import { compareProfiles } from "./utils";
 
 type UseAuthClientProps = {};
 export function useAuthClient(props?: UseAuthClientProps) {
   const [authClient, setAuthClient] = useState<AuthClient>();
   const [actor, setActor] = useState<ActorSubclass<_SERVICE>>();
+  const [profile, setProfile] = useState<ProfileUpdate>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const login = () => {
     authClient?.login({
       identityProvider: process.env.II_URL,
       onSuccess: () => {
-        initActor();
         setIsAuthenticated(true);
+
+        if (!profile || profile == undefined || compareProfiles(profile, emptyProfile)) {
+          // Authenticated but no profile
+          navigate('/create');
+        } else {
+          // Logged in with profile
+          navigate('/manage');
+        }
       },
     });
   };
@@ -31,16 +41,16 @@ export function useAuthClient(props?: UseAuthClientProps) {
   };
 
   const logout = () => {
-    clear();
     setIsAuthenticated(false);
     setActor(undefined);
+    navigate('/');
   };
 
   useEffect(() => {
     AuthClient.create().then(async (client) => {
-      const isAuthenticated = await client.isAuthenticated();
+      // Call client.isAuthenticated for side effect purposes
+      await client.isAuthenticated();
       setAuthClient(client);
-      setIsAuthenticated(true);
     });
   }, []);
 
@@ -56,33 +66,9 @@ export function useAuthClient(props?: UseAuthClientProps) {
     login,
     logout,
     actor,
+    profile,
+    setProfile,
   };
-}
-
-type UseProfileProps = {
-  identity?: Identity;
-};
-export function useProfile(props: UseProfileProps) {
-  const { identity } = props;
-  const [profile, setProfile] = useState<ProfileUpdate>();
-
-  const updateProfile = (profile: ProfileUpdate | undefined) => {
-    if (profile) {
-      set("profile", JSON.stringify(profile));
-    } else remove("profile");
-    setProfile(profile);
-  };
-
-  useEffect(() => {
-    const stored = JSON.parse(get("profile")) as ProfileUpdate | undefined;
-    if (stored) {
-      setProfile(stored);
-    }
-  }, []);
-
-  if (!identity) return { profile: emptyProfile, updateProfile };
-
-  return { profile, updateProfile };
 }
 
 export const emptyProfile: ProfileUpdate = {

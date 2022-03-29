@@ -43,7 +43,7 @@ http://localhost:8000/authorize?canisterId=[cid found above]
 
 ### Launch the automatically-generated, interactive Candid frontend for the appropriate canister
 
-`http://127.0.0.1:8000/candid?canisterId=`
+`http://127.0.0.1:8000/canisterId={__CANDID_UI cid from .dfx/local/canisters}`
 
 ### Launch the frontend, hosted in the credits_assets canister
 

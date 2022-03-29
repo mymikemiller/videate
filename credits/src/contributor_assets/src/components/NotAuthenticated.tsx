@@ -1,8 +1,6 @@
 import { Button, Icon } from "@adobe/react-spectrum";
 import * as React from "react";
-import { useEffect } from "react";
 import { useContext } from "react";
-import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import Loop from "../../assets/loop.svg";
 import { AppContext } from "../App";

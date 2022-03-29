@@ -1,4 +1,3 @@
-import { remove, set } from "local-storage";
 import React from "react";
 import {
   ProfileUpdate,
@@ -7,46 +6,35 @@ import {
 import ProfileForm from "./ProfileForm";
 import toast from "react-hot-toast";
 import { emptyProfile } from "../hooks";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AppContext } from "../App";
-import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateProfile = () => {
-  const { setIsAuthenticated, isAuthenticated, actor, profile, updateProfile } =
+  const navigate = useNavigate();
+  const { setIsAuthenticated, isAuthenticated, actor, profile, setProfile } =
     useContext(AppContext);
 
-  useEffect(() => {
-    console.log("profile", profile);
-  }, [profile, isAuthenticated]);
-
   function handleCreationError() {
-    remove("profile");
     setIsAuthenticated?.(false);
-    updateProfile?.(emptyProfile);
+    setProfile?.(emptyProfile);
     toast.error("There was a problem creating your profile");
   }
 
   const submitCallback = async (profile: ProfileUpdate) => {
-    // Save profile locally
-    set("profile", JSON.stringify(profile));
-
-    // Optimistic update
-    updateProfile?.(profile);
-    toast.success("Profile created");
-
     // Handle creation and verification async
     actor?.create(profile).then(async (createResponse) => {
       if ("ok" in createResponse) {
         const profileResponse = await actor.read();
         if ("ok" in profileResponse) {
-          // Do nothing, we already updated
+          navigate('/manage');
         } else {
           console.error(profileResponse.err);
           handleCreationError();
         }
       } else {
         handleCreationError();
-        remove("ic-delegation");
+        console.log("there was an error in profile creation:");
         console.error(createResponse.err);
       }
     });

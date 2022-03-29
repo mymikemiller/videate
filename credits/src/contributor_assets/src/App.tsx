@@ -12,24 +12,18 @@ import { _SERVICE, ProfileUpdate } from "../../declarations/contributor/contribu
 import toast, { Toaster } from "react-hot-toast";
 import ErrorBoundary from "./components/ErrorBoundary";
 import {
-  BrowserRouter as Router,
-  Redirect,
   Route,
-  Switch,
-  useHistory,
-  withRouter,
+  Routes,
+  useNavigate,
 } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import CreateProfile from "./components/CreateProfile";
 import ManageProfile from "./components/ManageProfile";
-import { emptyProfile, useAuthClient, useProfile } from "./hooks";
+import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
 import { useEffect } from "react";
-import { clear, remove } from "local-storage";
-import { useState } from "react";
-import RedirectManager from "./components/RedirectManager";
-import { compareProfiles } from "./utils";
+import { compareProfiles } from './utils';
 
 const Header = styled.header`
   position: relative;
@@ -61,7 +55,7 @@ export const AppContext = React.createContext<{
   logout: () => void;
   actor?: ActorSubclass<_SERVICE>;
   profile?: ProfileUpdate;
-  updateProfile?: React.Dispatch<ProfileUpdate>;
+  setProfile?: React.Dispatch<ProfileUpdate>;
 }>({
   login: () => { },
   logout: () => { },
@@ -78,38 +72,32 @@ const App = () => {
     login,
     logout,
     actor,
+    profile,
+    setProfile,
   } = useAuthClient();
-  const identity = authClient?.getIdentity();
-  const { profile, updateProfile } = useProfile({ identity });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (history.location.pathname === "/") return;
-
     if (actor) {
       if (!profile) {
         toast.loading("Checking for an existing contributor profile");
       }
       actor.read().then((result) => {
-        if (history.location.pathname === "/") return;
         if ("ok" in result) {
-          // Return if IC profile matches current
-          if (compareProfiles(profile, result.ok)) {
-            return;
-          }
-          toast.success("Updated contributor profile from IC");
-          updateProfile(result.ok);
+          toast.success("Found contributor profile in IC. Loading Home Page.");
+          setProfile(result.ok);
+          navigate('/manage');
         } else {
           if ("NotAuthorized" in result.err) {
             // clear local delegation and log in
-            toast.error("Your session expired. Please reauthenticate");
+            toast.error("Your session expired. Please reauthenticate.");
             logout();
           } else if ("NotFound" in result.err) {
             // User has deleted account
-            remove("profile");
             if (profile) {
               toast.error("Contributor profile not found in IC. Please try creating again.");
             }
-            updateProfile(undefined);
+            setProfile(undefined);
           } else {
             toast.error("Error: " + Object.keys(result.err)[0]);
           }
@@ -139,44 +127,52 @@ const App = () => {
             logout,
             actor,
             profile,
-            updateProfile,
+            setProfile
           }}
         >
           <Provider theme={defaultTheme}>
-            <Router>
-              <RedirectManager />
-              <Header>
-                <Route path="/manage">
+            <Header>
+              <Routes>
+                <Route path="/" element={
+                  <span />
+                }>
+                </Route>
+                <Route path="/manage" element={
                   <ActionButton id="logout" onPress={logout}>
                     Log out
                   </ActionButton>
+                }>
                 </Route>
-                <Route path="/create">
+                <Route path="/create" element={
                   <ActionButton id="logout" onPress={logout}>
                     Log out
                   </ActionButton>
+                }>
                 </Route>
-                <h2>Videate</h2>
-              </Header>
-              <Main>
-                <Flex maxWidth={700} margin="2rem auto" id="main-container">
-                  <Switch>
-                    <Route path="/" exact>
-                      <Flex direction="column">
-                        <Home />
-                        <NotAuthenticated />
-                      </Flex>
-                    </Route>
-                    <Route path="/manage" exact>
-                      <ManageProfile />
-                    </Route>
-                    <Route path="/create" exact>
-                      <CreateProfile />
-                    </Route>
-                  </Switch>
-                </Flex>
-              </Main>
-            </Router>
+              </Routes>
+              <h2>Videate</h2>
+            </Header>
+            <Main>
+              <Flex maxWidth={700} margin="2rem auto" id="main-container">
+                <Routes>
+                  <Route path="/" element={
+                    <Flex direction="column">
+                      <Home />
+                      <NotAuthenticated />
+                    </Flex>
+                  }>
+                  </Route>
+                  <Route path="/manage" element={
+                    <ManageProfile />
+                  } >
+                  </Route>
+                  <Route path="/create" element={
+                    <CreateProfile />
+                  }>
+                  </Route>
+                </Routes>
+              </Flex>
+            </Main>
           </Provider>
         </AppContext.Provider>
       </ErrorBoundary>

@@ -8,11 +8,10 @@ import {
 import Cancel from "@spectrum-icons/workflow/Cancel";
 import Delete from "@spectrum-icons/workflow/Delete";
 import Edit from "@spectrum-icons/workflow/Edit";
-import { remove, set } from "local-storage";
 import * as React from "react";
 import { useContext } from "react";
 import toast from "react-hot-toast";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
   ProfileUpdate,
@@ -31,9 +30,8 @@ const DetailsList = styled.dl`
 
 function ManageProfile() {
   const [isEditing, setIsEditing] = React.useState(false);
-  const { actor, profile, isAuthenticated, updateProfile } =
-    useContext(AppContext);
-  const history = useHistory();
+  const { actor, profile, setProfile, isAuthenticated } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const deleteProfile = async () => {
     if (
@@ -43,9 +41,8 @@ function ManageProfile() {
     ) {
       const result = await actor?.delete();
       toast.success("Contributor profile successfully deleted");
-      remove("profile");
       console.log(result);
-      history.push("/");
+      navigate("/");
     }
   };
 
@@ -54,9 +51,6 @@ function ManageProfile() {
   };
 
   const submitCallback = (profile: ProfileUpdate) => {
-    // Optimistically update
-    updateProfile?.(profile);
-    set("profile", JSON.stringify(profile));
     toast.success("Contributor profile updated!");
     setIsEditing(false);
 
@@ -68,7 +62,8 @@ function ManageProfile() {
           // Don't do anything if there is no difference.
           if (!compare(profileResponse.ok)) return;
 
-          updateProfile?.(profileResponse.ok);
+          setProfile?.(profileResponse.ok);
+          navigate('/manage');
         } else {
           console.error(profileResponse.err);
           toast.error("Failed to read profile from IC");
@@ -86,7 +81,10 @@ function ManageProfile() {
     profile: profile ?? emptyProfile,
   };
 
-  if (!profile) return null;
+  if (!profile) {
+    console.log('There is no profile, so returning null for ManageProfile component');
+    return null;
+  }
 
   const { name } = profile.bio;
 

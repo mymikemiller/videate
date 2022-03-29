@@ -49,11 +49,10 @@
     "@dfinity/identity": "^0.10.3",
     "@spectrum-icons/workflow": "^3.2.1",
     "@types/react-router-dom": "^5.1.8",
-    "local-storage": "^2.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hot-toast": "^2.1.0",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^6.2.2",
     "styled-components": "^5.3.0"
   }
 }

@@ -15,6 +15,7 @@ import {
   Route,
   Routes,
   useNavigate,
+  useSearchParams,
 } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import CreateProfile from "./components/CreateProfile";
@@ -23,7 +24,6 @@ import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
 import { useEffect } from "react";
-import { compareProfiles } from './utils';
 
 const Header = styled.header`
   position: relative;
@@ -63,7 +63,6 @@ export const AppContext = React.createContext<{
 });
 
 const App = () => {
-  const history = createBrowserHistory();
   const {
     authClient,
     setAuthClient,
@@ -76,6 +75,28 @@ const App = () => {
     setProfile,
   } = useAuthClient();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // At the page we first land on, record the URL from the search params so we
+  // know which rss feed the user was watching when they clicked the link to
+  // launch this site.
+  useEffect(() => {
+    const feedUrl = searchParams.get("feedUrl");
+    if (feedUrl) {
+      console.log(`Found incoming feed url in searchParams: ${feedUrl}`);
+      localStorage.setItem('incomingFeedUrl', feedUrl);
+    } else {
+      console.error('No incoming feed url was found in searchParams');
+      localStorage.removeItem('incomingFeedUrl');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (profile) {
+      const feedUrl = localStorage.getItem('incomingFeedUrl');
+      console.log(`Adding feedUrl to profile: ${feedUrl}`);
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (actor) {

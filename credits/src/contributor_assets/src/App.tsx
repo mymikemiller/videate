@@ -15,6 +15,7 @@ import {
   Route,
   Routes,
   useNavigate,
+  useSearchParams,
 } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import CreateProfile from "./components/CreateProfile";
@@ -23,7 +24,6 @@ import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
 import { useEffect } from "react";
-import { compareProfiles } from './utils';
 
 const Header = styled.header`
   position: relative;
@@ -55,15 +55,15 @@ export const AppContext = React.createContext<{
   logout: () => void;
   actor?: ActorSubclass<_SERVICE>;
   profile?: ProfileUpdate;
-  setProfile?: React.Dispatch<ProfileUpdate>;
+  setProfile: React.Dispatch<ProfileUpdate>;
 }>({
   login: () => { },
   logout: () => { },
   profile: emptyProfile,
+  setProfile: () => { },
 });
 
 const App = () => {
-  const history = createBrowserHistory();
   const {
     authClient,
     setAuthClient,
@@ -76,6 +76,37 @@ const App = () => {
     setProfile,
   } = useAuthClient();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // At the page we first land on, record the URL from the search params so we
+  // know which rss feed the user was watching when they clicked the link to
+  // launch this site.
+  useEffect(() => {
+    const feedUrl = searchParams.get("feedUrl");
+    if (feedUrl) {
+      localStorage.setItem('incomingFeedUrl', feedUrl);
+    } else {
+      localStorage.removeItem('incomingFeedUrl');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (profile && actor) {
+      const incomingFeedUrl = localStorage.getItem('incomingFeedUrl');
+      if (incomingFeedUrl) {
+        actor.addFeedUrl(incomingFeedUrl).then((result) => {
+          if ("ok" in result) {
+            toast.success(`Feed Url successfully added.`);
+            setProfile(result.ok);
+            navigate('/manage');
+          } else {
+            toast.error("Error: " + Object.keys(result.err)[0]);
+          };
+        });
+        localStorage.removeItem("incomingFeedUrl");
+      };
+    };
+  }, [profile]);
 
   useEffect(() => {
     if (actor) {

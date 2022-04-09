@@ -14,12 +14,13 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
+  Profile,
   ProfileUpdate,
   _SERVICE,
 } from "../../../declarations/contributor/contributor.did";
 import { AppContext } from "../App";
 import { emptyProfile } from "../hooks";
-import { compareProfiles } from "../utils";
+import { pushProfileUpdate } from "../utils";
 import ProfileForm from "./ProfileForm";
 
 const DetailsList = styled.dl`
@@ -46,31 +47,15 @@ function ManageProfile() {
     }
   };
 
-  const compare = (updatedProfile: ProfileUpdate) => {
-    return compareProfiles(profile, updatedProfile);
-  };
-
-  const submitCallback = (profile: ProfileUpdate) => {
-    toast.success("Contributor profile updated!");
+  const submitCallback = (profileUpdate: ProfileUpdate) => {
     setIsEditing(false);
 
     // Handle update async
-    actor?.update(profile).then(async (profileUpdate) => {
-      if ("ok" in profileUpdate) {
-        const profileResponse = await actor.read();
-        if ("ok" in profileResponse) {
-          // Don't do anything if there is no difference.
-          if (!compare(profileResponse.ok)) return;
-
-          setProfile?.(profileResponse.ok);
-          navigate('/manage');
-        } else {
-          console.error(profileResponse.err);
-          toast.error("Failed to read profile from IC");
-        }
-      } else {
-        console.error(profileUpdate.err);
-        toast.error("Failed to save update to IC");
+    pushProfileUpdate(actor!, profileUpdate).then(async (profile: Profile | undefined) => {
+      if (profile) {
+        toast.success("Contributor profile updated!");
+        setProfile(profile);
+        navigate('/manage');
       }
     });
   };
@@ -87,6 +72,7 @@ function ManageProfile() {
   }
 
   const { name } = profile.bio;
+  const { feedUrls } = profile;
 
   // Greet the user
   let fallbackDisplayName = name;
@@ -118,6 +104,14 @@ function ManageProfile() {
               <dt>{name}</dt>
             </Grid>
           </DetailsList>
+          {feedUrls.length == 0 && <Text>No feed URLs found. Please click the Videate link in the shownotes to populate.</Text>}
+          <ul>
+            {feedUrls.map((feedUrl, index) => (
+              <li key={index}>
+                <p>{feedUrl}</p>
+              </li>
+            ))}
+          </ul>
           <ButtonGroup>
             <ActionButton onPress={() => setIsEditing(true)}>
               <Edit />

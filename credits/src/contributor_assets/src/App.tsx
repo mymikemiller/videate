@@ -55,11 +55,12 @@ export const AppContext = React.createContext<{
   logout: () => void;
   actor?: ActorSubclass<_SERVICE>;
   profile?: ProfileUpdate;
-  setProfile?: React.Dispatch<ProfileUpdate>;
+  setProfile: React.Dispatch<ProfileUpdate>;
 }>({
   login: () => { },
   logout: () => { },
   profile: emptyProfile,
+  setProfile: () => { },
 });
 
 const App = () => {
@@ -83,19 +84,28 @@ const App = () => {
   useEffect(() => {
     const feedUrl = searchParams.get("feedUrl");
     if (feedUrl) {
-      console.log(`Found incoming feed url in searchParams: ${feedUrl}`);
       localStorage.setItem('incomingFeedUrl', feedUrl);
     } else {
-      console.error('No incoming feed url was found in searchParams');
       localStorage.removeItem('incomingFeedUrl');
     }
   }, []);
 
   useEffect(() => {
-    if (profile) {
-      const feedUrl = localStorage.getItem('incomingFeedUrl');
-      console.log(`Adding feedUrl to profile: ${feedUrl}`);
-    }
+    if (profile && actor) {
+      const incomingFeedUrl = localStorage.getItem('incomingFeedUrl');
+      if (incomingFeedUrl) {
+        actor.addFeedUrl(incomingFeedUrl).then((result) => {
+          if ("ok" in result) {
+            toast.success(`Feed Url successfully added.`);
+            setProfile(result.ok);
+            navigate('/manage');
+          } else {
+            toast.error("Error: " + Object.keys(result.err)[0]);
+          };
+        });
+        localStorage.removeItem("incomingFeedUrl");
+      };
+    };
   }, [profile]);
 
   useEffect(() => {

@@ -21,12 +21,13 @@ const CreateProfile = () => {
     toast.error("There was a problem creating your profile");
   }
 
-  const submitCallback = async (profile: ProfileUpdate) => {
+  const submitCallback = async (profileUpdate: ProfileUpdate) => {
     // Handle creation and verification async
-    actor?.create(profile).then(async (createResponse) => {
+    actor?.create(profileUpdate).then(async (createResponse) => {
       if ("ok" in createResponse) {
         const profileResponse = await actor.read();
         if ("ok" in profileResponse) {
+          setProfile(profileResponse.ok);
           navigate('/manage');
         } else {
           console.error(profileResponse.err);

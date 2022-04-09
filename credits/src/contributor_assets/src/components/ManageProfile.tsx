@@ -54,7 +54,7 @@ function ManageProfile() {
     pushProfileUpdate(actor!, profileUpdate).then(async (profile: Profile | undefined) => {
       if (profile) {
         toast.success("Contributor profile updated!");
-        setProfile!(profile);
+        setProfile(profile);
         navigate('/manage');
       }
     });
@@ -72,6 +72,7 @@ function ManageProfile() {
   }
 
   const { name } = profile.bio;
+  const { feedUrls } = profile;
 
   // Greet the user
   let fallbackDisplayName = name;
@@ -103,6 +104,14 @@ function ManageProfile() {
               <dt>{name}</dt>
             </Grid>
           </DetailsList>
+          {feedUrls.length == 0 && <Text>No feed URLs found. Please click the Videate link in the shownotes to populate.</Text>}
+          <ul>
+            {feedUrls.map((feedUrl, index) => (
+              <li key={index}>
+                <p>{feedUrl}</p>
+              </li>
+            ))}
+          </ul>
           <ButtonGroup>
             <ActionButton onPress={() => setIsEditing(true)}>
               <Edit />

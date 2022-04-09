@@ -1,3 +1,9 @@
+type Trie = 
+ variant {
+   branch: Branch;
+   "empty";
+   leaf: Leaf;
+ };
 type Result_1 = 
  variant {
    err: Error;
@@ -8,22 +14,62 @@ type Result =
    err: Error;
    ok;
  };
-type ProfileUpdate = record {bio: Bio;};
+type ProfileUpdate = 
+ record {
+   bio: Bio;
+   feedUrls: vec text;
+ };
 type Profile = 
  record {
    bio: Bio;
+   feedUrls: vec text;
    id: principal;
  };
+type List = 
+ opt record {
+       record {
+         Key;
+         Profile;
+       };
+       List;
+     };
+type Leaf = 
+ record {
+   keyvals: AssocList;
+   size: nat;
+ };
+type Key = 
+ record {
+   hash: Hash;
+   key: principal;
+ };
+type Hash = nat32;
 type Error = 
  variant {
    AlreadyExists;
    NotAuthorized;
    NotFound;
  };
+type Branch = 
+ record {
+   left: Trie;
+   right: Trie;
+   size: nat;
+ };
 type Bio = record {name: opt text;};
+type AssocList = 
+ opt record {
+       record {
+         Key;
+         Profile;
+       };
+       List;
+     };
 service : {
+  addFeedUrl: (text) -> (Result_1);
   create: (ProfileUpdate) -> (Result);
   delete: () -> (Result);
+  getAllProfiles: () -> (Trie);
   read: () -> (Result_1);
   update: (ProfileUpdate) -> (Result);
 }

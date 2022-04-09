@@ -25,10 +25,10 @@ Clone that repository and build and start according to the instructions. The
 startup command is duplicated here for convenience but the Internet Identity
 readme's command should be used (and this should be updated) if they differ.
 
-Run this from the internet-identity folder:
+Run this, updating the path to point to your local copy of internet-identity:
 
 ```bash
-II_FETCH_ROOT_KEY=1 dfx deploy --no-wallet --argument '(null)'
+cd ~/Library/CloudStorage/OneDrive-Personal/Projects/Web/internet-identity/; rm -rf .dfx; II_FETCH_ROOT_KEY=1 dfx deploy --no-wallet --argument '(null)'
 ```
 
 Ensure that the value printed out for "Installing code for canister
@@ -47,7 +47,11 @@ http://localhost:8000/authorize?canisterId=[cid found above]
 
 ### Launch the frontend, hosted in the credits_assets canister
 
-`http://127.0.0.1:8000/?canisterId=`
+`http://127.0.0.1:8000/?canisterId={contributor_assets cid from .dfx/local/canisters}`
+
+If you get a "Register Device. This user does not have access to this wallet."
+page when clicking the login link (likely after a `dfx start --clean`),
+re-deploy the Internet Identity canister by following the instructions above.
 
 ### Rebuild canisters
 

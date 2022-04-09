@@ -14,7 +14,6 @@ export function compareProfiles(p1: any | null, p2: any) {
   return true;
 }
 
-
 export async function pushProfileUpdate(actor: ActorSubclass<_SERVICE>, profileUpdate: ProfileUpdate): Promise<Profile | undefined> {
   const result = await actor!.update(profileUpdate);
   if ("ok" in result) {

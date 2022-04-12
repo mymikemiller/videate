@@ -40,10 +40,7 @@ function ManageProfile() {
   const navigate = useNavigate();
 
   const initServeActor = () => {
-    const sActor = createServeActor(serveCanisterId as string, {
-      agentOptions: {
-      },
-    });
+    const sActor = createServeActor(serveCanisterId as string);
     setServeActor(sActor);
   };
 

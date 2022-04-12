@@ -5,27 +5,33 @@ import {
 } from "../../../declarations/serve";
 import {
   Feed,
-  _SERVICE,
+  _SERVICE as _SERVE_SERVICE,
 } from "../../../declarations/serve/serve.did";
+import { useContext } from "react";
+import { AppContext } from "../App";
+import { Actor } from "@dfinity/agent";
+
+const urlTemplate = 'localhost:8000/{feedKey}?canisterId={serveCanisterId}&principal={principal}';
 
 interface CopyableLinkProps {
-  serveActor: ActorSubclass<_SERVICE>;
+  serveActor: ActorSubclass<_SERVE_SERVICE>;
   feedKey: string;
 };
 
-
 const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
 
-  function copy() {
-    alert('You clicked me!');
-  };
-
+  const { authClient } = useContext(AppContext);
   const [exists, setExists] = useState(true);
   const [feed, setFeed] = useState<Feed | undefined>(undefined);
+  const [customizedFeedUrl, setCustomizedFeedUrl] = useState<string>("");
 
   useEffect(() => {
     setFeedInfo(feedKey);
   }, []);
+
+  function copy() {
+    alert('You clicked me!');
+  };
 
   const setFeedInfo = async (feedKey: string) => {
     console.log("CopyableLink is looking for key: " + feedKey);
@@ -46,9 +52,27 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
       setExists(false);
       return;
     } else {
+
+      if (!authClient) {
+        console.error('authClient not set when trying to create CopyableLink');
+        return;
+      }
+      if (!serveActor) {
+        console.error('serveActor not set when trying to create CopyableLink');
+        return;
+      }
+
+      const serveCanisterId = Actor.canisterIdOf(serveActor).toText();
+      const principal = authClient.getIdentity().getPrincipal().toText();
+      const url = urlTemplate
+        .replace('{feedKey}', feedKey)
+        .replace('{serveCanisterId}', serveCanisterId)
+        .replace('{principal}', principal);
+
       console.log('setting exists to true, and feed to ' + feed.title);
       setExists(true);
       setFeed(feed);
+      setCustomizedFeedUrl(url);
     };
   };
 
@@ -70,7 +94,7 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
           {feed?.title}
         </h5>
         <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* url and copy button */}
-          <input type="text" readOnly value={feed?.link} style={{ height: '100%', padding: 0, border: 0, paddingLeft: '1em', flexGrow: 1 }}></input>
+          <input type="text" readOnly value={customizedFeedUrl} style={{ height: '100%', padding: 0, border: 0, paddingLeft: '1em', flexGrow: 1 }}></input>
           <button type="button" style={{ height: '100%' }} onClick={() => copy()}>Copy</button>
         </div>
       </div>

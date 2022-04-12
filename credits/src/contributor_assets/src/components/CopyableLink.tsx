@@ -42,42 +42,23 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
   };
 
   const setFeedInfo = async (feedKey: string) => {
-    console.log("CopyableLink is looking for key: " + feedKey);
+    if (!authClient) {
+      console.error('null authClient when trying to set CopyableLink feed info');
+      return;
+    }
 
-    if (serve == undefined) {
-      console.log('serve is undefined');
-    };
     const feeds: [Feed] | [] = await serveActor.getFeed(feedKey);
-    if (feeds.length == 0) {
-      console.log('feeds is []');
-    };
-    const feed: Feed | undefined = feeds!.at(0);
+    const feed: Feed | undefined = feeds?.at(0);
     if (feed == undefined) {
-      console.log('feed is undefined');
-    };
-    if (feed == undefined) {
-      console.log('setting exists to false');
+      console.error(`Feed ${feedKey} does not exist.`);
       setExists(false);
       return;
     } else {
-
-      if (!authClient) {
-        console.error('authClient not set when trying to create CopyableLink');
-        return;
-      }
-      if (!serveActor) {
-        console.error('serveActor not set when trying to create CopyableLink');
-        return;
-      }
-
-      const serveCanisterId = Actor.canisterIdOf(serveActor).toText();
-      const principal = authClient.getIdentity().getPrincipal().toText();
       const url = urlTemplate
         .replace('{feedKey}', feedKey)
-        .replace('{serveCanisterId}', serveCanisterId)
-        .replace('{principal}', principal);
+        .replace('{serveCanisterId}', Actor.canisterIdOf(serveActor).toText())
+        .replace('{principal}', authClient.getIdentity().getPrincipal().toText());
 
-      console.log('setting exists to true, and feed to ' + feed.title);
       setExists(true);
       setFeed(feed);
       setCustomizedFeedUrl(url);

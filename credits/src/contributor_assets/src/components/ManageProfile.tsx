@@ -36,7 +36,7 @@ const DetailsList = styled.dl`
 function ManageProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [serveActor, setServeActor] = useState<ActorSubclass<_SERVE_SERVICE>>();
-  const { actor, profile, setProfile, isAuthenticated } = useContext(AppContext);
+  const { actor, profile, setProfile } = useContext(AppContext);
   const navigate = useNavigate();
 
   const initServeActor = () => {

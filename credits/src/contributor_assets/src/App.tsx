@@ -97,7 +97,6 @@ const App = () => {
         console.log("adding feedKey: " + incomingFeedKey);
         actor.addFeedKey(incomingFeedKey).then((result) => {
           if ("ok" in result) {
-            toast.success(`Feed key successfully added to profile.`);
             setProfile(result.ok);
             navigate('/manage');
           } else {
@@ -111,23 +110,20 @@ const App = () => {
 
   useEffect(() => {
     if (actor) {
-      if (!profile) {
-        toast.loading("Checking for an existing contributor profile");
-      }
       actor.read().then((result) => {
         if ("ok" in result) {
-          toast.success("Found contributor profile in IC. Loading Home Page.");
+          // Found contributor profile in IC. Load Home Page.
           setProfile(result.ok);
           navigate('/manage');
         } else {
           if ("NotAuthorized" in result.err) {
-            // clear local delegation and log in
+            // Clear local delegation and log in
             toast.error("Your session expired. Please reauthenticate.");
             logout();
           } else if ("NotFound" in result.err) {
             // User has deleted account
             if (profile) {
-              toast.error("Contributor profile not found in IC. Please try creating again.");
+              toast.error("Contributor profile not found. Please try creating again.");
             }
             setProfile(undefined);
           } else {

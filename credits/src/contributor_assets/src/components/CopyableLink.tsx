@@ -10,6 +10,7 @@ import {
 import { useContext } from "react";
 import { AppContext } from "../App";
 import { Actor } from "@dfinity/agent";
+import toast from "react-hot-toast";
 
 const urlTemplate = 'localhost:8000/{feedKey}?canisterId={serveCanisterId}&principal={principal}';
 
@@ -30,7 +31,14 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
   }, []);
 
   function copy() {
-    alert('You clicked me!');
+    navigator.clipboard.writeText(customizedFeedUrl)
+      .then(() => {
+        toast.success('Copied!');
+      })
+      .catch(err => {
+        toast.error('Error copying URL. Try selecting the text and copying manually.');
+        console.error(err);
+      })
   };
 
   const setFeedInfo = async (feedKey: string) => {

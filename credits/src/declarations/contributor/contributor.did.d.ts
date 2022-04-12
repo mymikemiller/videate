@@ -12,9 +12,9 @@ export type List = [] | [[[Key, Profile], List]];
 export interface Profile {
   'id' : Principal,
   'bio' : Bio,
-  'feedUrls' : Array<string>,
+  'feedKeys' : Array<string>,
 }
-export interface ProfileUpdate { 'bio' : Bio, 'feedUrls' : Array<string> }
+export interface ProfileUpdate { 'bio' : Bio, 'feedKeys' : Array<string> }
 export type Result = { 'ok' : null } |
   { 'err' : Error };
 export type Result_1 = { 'ok' : Profile } |
@@ -23,7 +23,7 @@ export type Trie = { 'branch' : Branch } |
   { 'leaf' : Leaf } |
   { 'empty' : null };
 export interface _SERVICE {
-  'addFeedUrl' : (arg_0: string) => Promise<Result_1>,
+  'addFeedKey' : (arg_0: string) => Promise<Result_1>,
   'create' : (arg_0: ProfileUpdate) => Promise<Result>,
   'delete' : () => Promise<Result>,
   'getAllProfiles' : () => Promise<Trie>,

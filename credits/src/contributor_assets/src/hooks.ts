@@ -75,5 +75,5 @@ export const emptyProfile: ProfileUpdate = {
   bio: {
     name: [],
   },
-  feedUrls: [],
+  feedKeys: [],
 };

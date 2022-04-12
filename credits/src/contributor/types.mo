@@ -16,12 +16,12 @@ module {
     id: Principal;
 
     bio: Bio;
-    feedUrls: [Text];
+    feedKeys: [Text];
   };
 
   public type ProfileUpdate = {
     bio: Bio;
-    feedUrls: [Text];
+    feedKeys: [Text];
   };
 
   public type Error = {

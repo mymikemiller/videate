@@ -81,7 +81,7 @@ actor Contributor {
     let userProfile: Profile = {
       id = principal;
       bio = profileUpdate.bio;
-      feedUrls = profileUpdate.feedUrls;
+      feedKeys = profileUpdate.feedKeys;
     };
 
     switch (getProfile(principal)) {
@@ -103,9 +103,9 @@ actor Contributor {
 
   // Public Application Interface
 
-  // Add a feed url to the beginning of the list, or move it to the beginning
+  // Add a feed key to the beginning of the list, or move it to the beginning
   // if it is already in the array
-  public shared(msg) func addFeedUrl(feedUrl: Text) : async Result.Result<Profile, Error> {
+  public shared(msg) func addFeedKey(feedKey: Text) : async Result.Result<Profile, Error> {
     // Get caller principal
     let callerId = msg.caller;
 
@@ -119,20 +119,20 @@ actor Contributor {
         #err(#NotFound);
       };
       case (? existingProfile) {
-        // Update the profile with the new feedUrls since we can't make
-        // feedUrls mutable (it needs to be transfered via candid)
-        let feedUrlsBuffer = Buffer.Buffer<Text>(existingProfile.feedUrls.size());
-        feedUrlsBuffer.add(feedUrl); // Add the new url to the top of the list
-        Iter.iterate(existingProfile.feedUrls.vals(), func(f: Text, _index: Nat) {
-          if (f != feedUrl) { // Skip the new url so we don't store it twice
-            feedUrlsBuffer.add(f);
+        // Update the profile with the new feedKeys since we can't make
+        // feedKeys mutable (it needs to be transfered via candid)
+        let feedKeysBuffer = Buffer.Buffer<Text>(existingProfile.feedKeys.size());
+        feedKeysBuffer.add(feedKey); // Add the new url to the top of the list
+        Iter.iterate(existingProfile.feedKeys.vals(), func(f: Text, _index: Nat) {
+          if (f != feedKey) { // Skip the new url so we don't store it twice
+            feedKeysBuffer.add(f);
           }
         });
-        let newFeedUrls = feedUrlsBuffer.toArray();
+        let newFeedKeys = feedKeysBuffer.toArray();
 
         let profileUpdate: ProfileUpdate = {
           bio = existingProfile.bio;
-          feedUrls = newFeedUrls;
+          feedKeys = newFeedKeys;
         };
 
         let updatedProfile: ?Profile = await updateProfile(callerId, profileUpdate);
@@ -157,7 +157,7 @@ actor Contributor {
     let userProfile: Profile = {
       id = callerId;
       bio = profile.bio;
-      feedUrls = profile.feedUrls;
+      feedKeys = profile.feedKeys;
     };
 
     let (newProfiles, existing) = Trie.put(

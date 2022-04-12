@@ -53,6 +53,9 @@ If you get a "Register Device. This user does not have access to this wallet."
 page when clicking the login link (likely after a `dfx start --clean`),
 re-deploy the Internet Identity canister by following the instructions above.
 
+If you get a page asking you to enter in a canisterID, try changing "127.0.0.1"
+to "localhost" or "0.0.0.0"
+
 ### Rebuild canisters
 
 After making changes to canisters, perform the following. This will preserve the state of any variables marked `stable`.

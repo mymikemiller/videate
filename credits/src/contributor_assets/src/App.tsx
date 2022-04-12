@@ -78,32 +78,33 @@ const App = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // At the page we first land on, record the URL from the search params so we
+  // At the page we first land on, record the key from the search params so we
   // know which rss feed the user was watching when they clicked the link to
   // launch this site.
   useEffect(() => {
-    const feedUrl = searchParams.get("feedUrl");
-    if (feedUrl) {
-      localStorage.setItem('incomingFeedUrl', feedUrl);
+    const feedKey = searchParams.get("feedKey");
+    if (feedKey) {
+      localStorage.setItem('incomingFeedKey', feedKey);
     } else {
-      localStorage.removeItem('incomingFeedUrl');
+      localStorage.removeItem('incomingFeedKey');
     }
   }, []);
 
   useEffect(() => {
     if (profile && actor) {
-      const incomingFeedUrl = localStorage.getItem('incomingFeedUrl');
-      if (incomingFeedUrl) {
-        actor.addFeedUrl(incomingFeedUrl).then((result) => {
+      const incomingFeedKey = localStorage.getItem('incomingFeedKey');
+      if (incomingFeedKey) {
+        console.log("adding feedKey: " + incomingFeedKey);
+        actor.addFeedKey(incomingFeedKey).then((result) => {
           if ("ok" in result) {
-            toast.success(`Feed Url successfully added.`);
+            toast.success(`Feed key successfully added to profile.`);
             setProfile(result.ok);
             navigate('/manage');
           } else {
             toast.error("Error: " + Object.keys(result.err)[0]);
           };
         });
-        localStorage.removeItem("incomingFeedUrl");
+        localStorage.removeItem("incomingFeedKey");
       };
     };
   }, [profile]);

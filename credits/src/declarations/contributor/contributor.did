@@ -17,12 +17,12 @@ type Result =
 type ProfileUpdate = 
  record {
    bio: Bio;
-   feedUrls: vec text;
+   feedKeys: vec text;
  };
 type Profile = 
  record {
    bio: Bio;
-   feedUrls: vec text;
+   feedKeys: vec text;
    id: principal;
  };
 type List = 
@@ -66,7 +66,7 @@ type AssocList =
        List;
      };
 service : {
-  addFeedUrl: (text) -> (Result_1);
+  addFeedKey: (text) -> (Result_1);
   create: (ProfileUpdate) -> (Result);
   delete: () -> (Result);
   getAllProfiles: () -> (Trie);

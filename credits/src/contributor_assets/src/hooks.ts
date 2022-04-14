@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { canisterId, createActor } from "../../declarations/contributor";
 import { ProfileUpdate, _SERVICE } from "../../declarations/contributor/contributor.did";
 import { useNavigate } from "react-router-dom";
-import { compareProfiles } from "./utils";
 
 type UseAuthClientProps = {};
 export function useAuthClient(props?: UseAuthClientProps) {
@@ -19,14 +18,7 @@ export function useAuthClient(props?: UseAuthClientProps) {
       identityProvider: process.env.II_URL,
       onSuccess: () => {
         setIsAuthenticated(true);
-
-        if (!profile || profile == undefined || compareProfiles(profile, emptyProfile)) {
-          // Authenticated but no profile
-          navigate('/create');
-        } else {
-          // Logged in with profile
-          navigate('/manage');
-        }
+        navigate('/loading');
       },
     });
   };

@@ -28,4 +28,4 @@ function NotAuthenticated() {
   );
 }
 
-export default React.memo(NotAuthenticated);
+export default NotAuthenticated;

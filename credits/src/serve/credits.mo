@@ -30,22 +30,6 @@ module {
             feedEntries = Iter.toArray(feeds.entries());
         };
 
-        // var allMedia = Buffer.Buffer<Media>(10);
-
-        // Media
-        // public func addMedia(media : Media) : async Nat {
-        //     allMedia.add(media);
-        //     allMedia.size() - 1;
-        // };
-
-        // public func removeLastMedia() : async ?Media {
-        //     allMedia.removeLast();
-        // };
-
-        // public query func getAllMedia() : async [Media] {
-        //     allMedia.toArray();
-        // };
-
         // Feeds
         public func addFeed(key: Text, feed : Feed) : Nat {
             feeds.put(key, feed);

@@ -47,6 +47,8 @@ http://localhost:8000/authorize?canisterId=[cid found above]
 
 ### Launch the frontend, hosted in the credits_assets canister
 
+#### Locally:
+
 `http://127.0.0.1:8000/?canisterId={contributor_assets cid from .dfx/local/canisters}`
 
 If you get a "Register Device. This user does not have access to this wallet."
@@ -55,6 +57,10 @@ re-deploy the Internet Identity canister by following the instructions above.
 
 If you get a page asking you to enter in a canisterID, try changing "127.0.0.1"
 to "localhost" or "0.0.0.0"
+
+#### Hosted on the Internet Computer:
+
+https://44ejt-7yaaa-aaaao-aabqa-cai.raw.ic0.app/?feedKey=tdts
 
 ### Rebuild canisters
 

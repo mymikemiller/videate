@@ -117,19 +117,16 @@ function ManageProfile() {
             Welcome back
             {fallbackDisplayName[0] ? `, ${fallbackDisplayName[0]}` : ""}!
           </Heading>
-          <DetailsList>
-            <Grid columns="1fr 1fr" gap="1rem">
-              <dd>Name:</dd>
-              <dt>{name}</dt>
-            </Grid>
-          </DetailsList>
           {feedKeys.length == 0 && <Text>No feed keys found. Please click the Videate link in the shownotes to populate.</Text>}
           <ul style={{ padding: 0 }} >
-            {feedKeys.map((feedKey, index) => (
-              <li key={index} style={{ listStyleType: 'none' }} >
-                <CopyableLink serveActor={serveActor!} feedKey={feedKey} />
-              </li>
-            ))}
+            {feedKeys.map((feedKey, index) => {
+              console.log(`${index}: ${feedKey}`)
+              return (
+                <li key={feedKey} style={{ listStyleType: 'none', marginBottom: '1em' }} >
+                  <CopyableLink serveActor={serveActor!} feedKey={feedKey} />
+                </li>
+              )
+            })}
           </ul>
           <ButtonGroup>
             <ActionButton onPress={() => setIsEditing(true)}>
@@ -146,4 +143,4 @@ function ManageProfile() {
   );
 }
 
-export default React.memo(ManageProfile);
+export default ManageProfile;

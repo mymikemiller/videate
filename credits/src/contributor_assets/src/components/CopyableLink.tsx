@@ -12,6 +12,8 @@ import { AppContext } from "../App";
 import { Actor } from "@dfinity/agent";
 import toast from "react-hot-toast";
 
+// todo: change urlTemplate when running on IC to 
+// 'https://{serveCanisterId}.raw.ic0.app/{feedKey}?principal={principal}';
 const urlTemplate = 'localhost:8000/{feedKey}?canisterId={serveCanisterId}&principal={principal}';
 
 interface CopyableLinkProps {
@@ -47,9 +49,17 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
       return;
     }
 
+    if (!serveActor) {
+      return;
+    }
+
     const feeds: [Feed] | [] = await serveActor.getFeed(feedKey);
-    const feed: Feed | undefined = feeds?.at(0);
-    if (feed == undefined) {
+    var feed: Feed | undefined = undefined;
+    // Note that we cannot use null chaining here (feeds?.at(0)) as it is not
+    // supported in Apple Podcast's internal browser
+    if (feeds?.length == 1) feed = feeds[0];
+
+    if (!feed) {
       console.error(`Feed ${feedKey} does not exist.`);
       setExists(false);
       return;
@@ -72,7 +82,7 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', width: '100%', backgroundColor: '#1a1a1a' }}>
       <img style={{ width: 75, height: 75 }} src={feed?.imageUrl} />
-      <div style={{ display: 'flex', flexDirection: 'column' }}> {/* name and stuff below */}
+      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}> {/* name and stuff below */}
         <h5 style={{
           margin: '0.5em 1em',
           textOverflow: 'ellipsis',

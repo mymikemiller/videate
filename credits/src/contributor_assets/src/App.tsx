@@ -17,13 +17,14 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
-import { createBrowserHistory } from "history";
 import CreateProfile from "./components/CreateProfile";
 import ManageProfile from "./components/ManageProfile";
+import Loading from "./components/Loading";
 import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
 import { useEffect } from "react";
+import { compareProfiles } from "./utils";
 
 const Header = styled.header`
   position: relative;
@@ -114,7 +115,13 @@ const App = () => {
         if ("ok" in result) {
           // Found contributor profile in IC. Load Home Page.
           setProfile(result.ok);
-          navigate('/manage');
+          if (compareProfiles(result.ok, emptyProfile)) {
+            // Authenticated but no profile
+            navigate('/create');
+          } else {
+            // Logged in with profile
+            navigate('/manage');
+          }
         } else {
           if ("NotAuthorized" in result.err) {
             // Clear local delegation and log in
@@ -125,7 +132,9 @@ const App = () => {
             if (profile) {
               toast.error("Contributor profile not found. Please try creating again.");
             }
+            // Authenticated but no profile
             setProfile(undefined);
+            navigate('/create');
           } else {
             toast.error("Error: " + Object.keys(result.err)[0]);
           }
@@ -163,8 +172,10 @@ const App = () => {
               <Routes>
                 <Route path="/" element={
                   <span />
-                }>
-                </Route>
+                } />
+                <Route path="/loading" element={
+                  <span />
+                } />
                 <Route path="/manage" element={
                   <ActionButton id="logout" onPress={logout}>
                     Log out
@@ -183,21 +194,15 @@ const App = () => {
             <Main>
               <Flex maxWidth={700} margin="2rem auto" id="main-container">
                 <Routes>
+                  <Route path="/loading" element={<Loading />} />
                   <Route path="/" element={
                     <Flex direction="column">
                       <Home />
                       <NotAuthenticated />
                     </Flex>
-                  }>
-                  </Route>
-                  <Route path="/manage" element={
-                    <ManageProfile />
-                  } >
-                  </Route>
-                  <Route path="/create" element={
-                    <CreateProfile />
-                  }>
-                  </Route>
+                  } />
+                  <Route path="/manage" element={<ManageProfile />} />
+                  <Route path="/create" element={<CreateProfile />} />
                 </Routes>
               </Flex>
             </Main>

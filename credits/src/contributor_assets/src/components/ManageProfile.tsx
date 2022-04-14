@@ -1,3 +1,4 @@
+import { ActorSubclass } from "@dfinity/agent";
 import {
   ActionButton,
   ButtonGroup,
@@ -8,7 +9,7 @@ import {
 import Cancel from "@spectrum-icons/workflow/Cancel";
 import Delete from "@spectrum-icons/workflow/Delete";
 import Edit from "@spectrum-icons/workflow/Edit";
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +22,10 @@ import {
 import { AppContext } from "../App";
 import { emptyProfile } from "../hooks";
 import { pushProfileUpdate } from "../utils";
+import CopyableLink from "./CopyableLink";
 import ProfileForm from "./ProfileForm";
+import { canisterId as serveCanisterId, createActor as createServeActor } from "../../../declarations/serve";
+import { _SERVICE as _SERVE_SERVICE } from "../../../declarations/serve/serve.did";
 
 const DetailsList = styled.dl`
   dd {
@@ -30,9 +34,19 @@ const DetailsList = styled.dl`
 `;
 
 function ManageProfile() {
-  const [isEditing, setIsEditing] = React.useState(false);
-  const { actor, profile, setProfile, isAuthenticated } = useContext(AppContext);
+  const [isEditing, setIsEditing] = useState(false);
+  const [serveActor, setServeActor] = useState<ActorSubclass<_SERVE_SERVICE>>();
+  const { actor, profile, setProfile } = useContext(AppContext);
   const navigate = useNavigate();
+
+  const initServeActor = () => {
+    const sActor = createServeActor(serveCanisterId as string);
+    setServeActor(sActor);
+  };
+
+  useEffect(() => {
+    initServeActor();
+  }, []);
 
   const deleteProfile = async () => {
     if (
@@ -72,11 +86,16 @@ function ManageProfile() {
   }
 
   const { name } = profile.bio;
-  const { feedUrls } = profile;
+  const { feedKeys } = profile;
 
   // Greet the user
   let fallbackDisplayName = name;
   if (name[0]) fallbackDisplayName = name;
+
+  if (serveActor == undefined) {
+    console.log('serveActor is undefined when trying to render ManageProfile');
+    return null;
+  }
 
   return (
     <>
@@ -98,19 +117,16 @@ function ManageProfile() {
             Welcome back
             {fallbackDisplayName[0] ? `, ${fallbackDisplayName[0]}` : ""}!
           </Heading>
-          <DetailsList>
-            <Grid columns="1fr 1fr" gap="1rem">
-              <dd>Name:</dd>
-              <dt>{name}</dt>
-            </Grid>
-          </DetailsList>
-          {feedUrls.length == 0 && <Text>No feed URLs found. Please click the Videate link in the shownotes to populate.</Text>}
-          <ul>
-            {feedUrls.map((feedUrl, index) => (
-              <li key={index}>
-                <p>{feedUrl}</p>
-              </li>
-            ))}
+          {feedKeys.length == 0 && <Text>No feed keys found. Please click the Videate link in the shownotes to populate.</Text>}
+          <ul style={{ padding: 0 }} >
+            {feedKeys.map((feedKey, index) => {
+              console.log(`${index}: ${feedKey}`)
+              return (
+                <li key={feedKey} style={{ listStyleType: 'none', marginBottom: '1em' }} >
+                  <CopyableLink serveActor={serveActor!} feedKey={feedKey} />
+                </li>
+              )
+            })}
           </ul>
           <ButtonGroup>
             <ActionButton onPress={() => setIsEditing(true)}>
@@ -127,4 +143,4 @@ function ManageProfile() {
   );
 }
 
-export default React.memo(ManageProfile);
+export default ManageProfile;

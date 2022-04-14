@@ -24,19 +24,19 @@ const Figure = styled.figure`
   }
 `;
 
-function Loader(props: Props) {
-  const { message = "Checking if you have an existing profile" } = props;
+function Loading(props: Props) {
+  const { message = "Loading..." } = props;
 
   return (
     <>
       <Figure>
         <img src={glitch} alt="Page is loading" />
         <figcaption>
-          <h2>{message}</h2>
+          <h3>{message}</h3>
         </figcaption>
       </Figure>
     </>
   );
 }
 
-export default React.memo(Loader);
+export default Loading;

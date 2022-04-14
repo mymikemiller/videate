@@ -5,7 +5,7 @@ export const idlFactory = ({ IDL }) => {
   const Profile = IDL.Record({
     'id' : IDL.Principal,
     'bio' : Bio,
-    'feedUrls' : IDL.Vec(IDL.Text),
+    'feedKeys' : IDL.Vec(IDL.Text),
   });
   const Error = IDL.Variant({
     'NotFound' : IDL.Null,
@@ -15,7 +15,7 @@ export const idlFactory = ({ IDL }) => {
   const Result_1 = IDL.Variant({ 'ok' : Profile, 'err' : Error });
   const ProfileUpdate = IDL.Record({
     'bio' : Bio,
-    'feedUrls' : IDL.Vec(IDL.Text),
+    'feedKeys' : IDL.Vec(IDL.Text),
   });
   const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const Branch = IDL.Record({
@@ -32,7 +32,7 @@ export const idlFactory = ({ IDL }) => {
     IDL.Variant({ 'branch' : Branch, 'leaf' : Leaf, 'empty' : IDL.Null })
   );
   return IDL.Service({
-    'addFeedUrl' : IDL.Func([IDL.Text], [Result_1], []),
+    'addFeedKey' : IDL.Func([IDL.Text], [Result_1], []),
     'create' : IDL.Func([ProfileUpdate], [Result], []),
     'delete' : IDL.Func([], [Result], []),
     'getAllProfiles' : IDL.Func([], [Trie], []),

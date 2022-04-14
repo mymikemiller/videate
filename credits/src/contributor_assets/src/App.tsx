@@ -17,13 +17,14 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
-import { createBrowserHistory } from "history";
 import CreateProfile from "./components/CreateProfile";
 import ManageProfile from "./components/ManageProfile";
+import Loading from "./components/Loading";
 import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
 import { useEffect } from "react";
+import { compareProfiles } from "./utils";
 
 const Header = styled.header`
   position: relative;
@@ -78,57 +79,62 @@ const App = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // At the page we first land on, record the URL from the search params so we
+  // At the page we first land on, record the key from the search params so we
   // know which rss feed the user was watching when they clicked the link to
   // launch this site.
   useEffect(() => {
-    const feedUrl = searchParams.get("feedUrl");
-    if (feedUrl) {
-      localStorage.setItem('incomingFeedUrl', feedUrl);
+    const feedKey = searchParams.get("feedKey");
+    if (feedKey) {
+      localStorage.setItem('incomingFeedKey', feedKey);
     } else {
-      localStorage.removeItem('incomingFeedUrl');
+      localStorage.removeItem('incomingFeedKey');
     }
   }, []);
 
   useEffect(() => {
     if (profile && actor) {
-      const incomingFeedUrl = localStorage.getItem('incomingFeedUrl');
-      if (incomingFeedUrl) {
-        actor.addFeedUrl(incomingFeedUrl).then((result) => {
+      const incomingFeedKey = localStorage.getItem('incomingFeedKey');
+      if (incomingFeedKey) {
+        console.log("adding feedKey: " + incomingFeedKey);
+        actor.addFeedKey(incomingFeedKey).then((result) => {
           if ("ok" in result) {
-            toast.success(`Feed Url successfully added.`);
             setProfile(result.ok);
             navigate('/manage');
           } else {
             toast.error("Error: " + Object.keys(result.err)[0]);
           };
         });
-        localStorage.removeItem("incomingFeedUrl");
+        localStorage.removeItem("incomingFeedKey");
       };
     };
   }, [profile]);
 
   useEffect(() => {
     if (actor) {
-      if (!profile) {
-        toast.loading("Checking for an existing contributor profile");
-      }
       actor.read().then((result) => {
         if ("ok" in result) {
-          toast.success("Found contributor profile in IC. Loading Home Page.");
+          // Found contributor profile in IC. Load Home Page.
           setProfile(result.ok);
-          navigate('/manage');
+          if (compareProfiles(result.ok, emptyProfile)) {
+            // Authenticated but no profile
+            navigate('/create');
+          } else {
+            // Logged in with profile
+            navigate('/manage');
+          }
         } else {
           if ("NotAuthorized" in result.err) {
-            // clear local delegation and log in
+            // Clear local delegation and log in
             toast.error("Your session expired. Please reauthenticate.");
             logout();
           } else if ("NotFound" in result.err) {
             // User has deleted account
             if (profile) {
-              toast.error("Contributor profile not found in IC. Please try creating again.");
+              toast.error("Contributor profile not found. Please try creating again.");
             }
+            // Authenticated but no profile
             setProfile(undefined);
+            navigate('/create');
           } else {
             toast.error("Error: " + Object.keys(result.err)[0]);
           }
@@ -166,8 +172,10 @@ const App = () => {
               <Routes>
                 <Route path="/" element={
                   <span />
-                }>
-                </Route>
+                } />
+                <Route path="/loading" element={
+                  <span />
+                } />
                 <Route path="/manage" element={
                   <ActionButton id="logout" onPress={logout}>
                     Log out
@@ -186,21 +194,15 @@ const App = () => {
             <Main>
               <Flex maxWidth={700} margin="2rem auto" id="main-container">
                 <Routes>
+                  <Route path="/loading" element={<Loading />} />
                   <Route path="/" element={
                     <Flex direction="column">
                       <Home />
                       <NotAuthenticated />
                     </Flex>
-                  }>
-                  </Route>
-                  <Route path="/manage" element={
-                    <ManageProfile />
-                  } >
-                  </Route>
-                  <Route path="/create" element={
-                    <CreateProfile />
-                  }>
-                  </Route>
+                  } />
+                  <Route path="/manage" element={<ManageProfile />} />
+                  <Route path="/create" element={<CreateProfile />} />
                 </Routes>
               </Flex>
             </Main>

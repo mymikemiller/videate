@@ -55,8 +55,8 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
 
     const feeds: [Feed] | [] = await serveActor.getFeed(feedKey);
     var feed: Feed | undefined = undefined;
-    // Note that we cannot use null chaining here (feeds?.at(0)) as it is not
-    // supported in Apple Podcast's internal browser
+    // Note that we cannot use optional chaining here (feeds?.at(0)) as it is
+    // not supported in Apple Podcast's internal browser
     if (feeds?.length == 1) feed = feeds[0];
 
     if (!feed) {

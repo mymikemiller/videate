@@ -86,6 +86,9 @@ class CandidResult<V extends CandidValue> {
 class InternetComputerFeedManager extends FeedManager {
   String feedKey;
 
+  @override
+  String feedName;
+
   // "local" to access a locally running IC instance
   // "ic" to use canisters on the IC network
   String network;
@@ -98,11 +101,9 @@ class InternetComputerFeedManager extends FeedManager {
   String get id => 'internet_computer';
 
   @override
-  String get feedName => feedKey;
-
-  @override
   void configure(ClonerTaskArgs feedManagerArgs) {
-    feedKey = feedManagerArgs.get('feedName');
+    feedKey = feedManagerArgs.get('key');
+    feedName = feedManagerArgs.get('name');
     network = feedManagerArgs.get('network').toLowerCase();
     dfxWorkingDirectory = feedManagerArgs.get('dfxWorkingDirectory');
   }
@@ -149,7 +150,7 @@ class InternetComputerFeedManager extends FeedManager {
       'call',
       'serve',
       'addFeed',
-      '("$feedName", $feedCandidString)'
+      '("$feedKey", $feedCandidString)'
     ];
     final output =
         await processRunner('dfx', args, workingDirectory: dfxWorkingDirectory);

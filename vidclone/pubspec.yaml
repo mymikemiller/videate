@@ -10,7 +10,7 @@ dependencies:
   googleapis: ^7.0.0
   googleapis_auth: ^1.1.0
   http: ^0.13.1
-  youtube_explode_dart: ^1.10.0
+  youtube_explode_dart: ^1.10.10+2
   dotenv: ^3.0.0
   file: ^6.1.2
   quiver: ^3.0.1

@@ -70,8 +70,8 @@ module {
         title: Text;
         description: Text;
 
-        // The source of the media, which contains information about how to access
-        // the media on the platform on which it was originally released
+        // The source of the media, which contains information about how to
+        // access the media on the platform on which it was originally released
         source: Source;
 
         // Everyone who participated in the media's creation or consumption

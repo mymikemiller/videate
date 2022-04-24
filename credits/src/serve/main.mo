@@ -1,13 +1,3 @@
-
-// This is the Motoko version of
-// [nomeata](https://forum.dfinity.org/u/nomeata)'s Rust
-// [example](https://github.com/nomeata/ic-telegram-bot) utilizing his [proxy
-// solution](https://github.com/nomeata/ic-http-lambda/) for being able to
-// return xml and media from Internet Computer canisters. See the [forum
-// discussion](https://forum.dfinity.org/t/can-a-canister-return-generated-xml/1636/7)
-//
-// Specifically, this file is modeled after nomeata's Rust example here:
-// https://github.com/nomeata/ic-telegram-bot/blob/main/telegram/src/lib.rs
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Iter "mo:base/Iter";
@@ -20,13 +10,14 @@ import Debug "mo:base/Debug";
 import Option "mo:base/Option";
 import HashMap "mo:base/HashMap";
 import Error "mo:base/Error";
+import Principal "mo:base/Principal";
 import Credits "credits";
 import Xml "xml";
 import Types "types";
 import Utils "utils";
 import Rss "rss";
 
-actor Serve {
+actor class Serve() = this {
     type HttpRequest = Types.HttpRequest;
     type HttpResponse = Types.HttpResponse;
     type StableCredits = Types.StableCredits;
@@ -58,8 +49,9 @@ actor Serve {
     /* Serve */
 
     public query func http_request(request : HttpRequest) : async HttpResponse {
-        let beforeQueryParams: Text = Iter.toArray(Text.split(request.url, #text("?")))[0];
-        let feedName: Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[1];
+        let splitUrl = Iter.toArray(Text.split(request.url, #text("?")));
+        let beforeQueryParams: Text = splitUrl[0];
+        let feedKey: Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[1];
 
         // Short-circuit simple requests
         if (request.url == "/favicon.ico") {
@@ -80,8 +72,8 @@ actor Serve {
             };
         };
 
-
-        var xml = getFeedXml(feedName);
+        let settingsUri = getVideateSettingsUri(request, feedKey);
+        var xml = getFeedXml(feedKey, settingsUri);
         Utils.generateFeedResponse(xml);       
     };
 
@@ -92,6 +84,58 @@ actor Serve {
             body = Text.encodeUtf8("Response to " # request.method # " request (update)");
             streaming_strategy = null;
         };
+    };
+
+    private func getQueryParam(param: Text, url: Text): ?Text {
+        let splitUrl = Iter.toArray(Text.split(url, #text("?")));
+        let queryParamsText: Text = splitUrl[1];
+
+        let queryParamsArray = Iter.toArray(Text.split(queryParamsText, #text("&")));
+        let queryParamsPairs = Array.map<Text, (Text, Text)>(queryParamsArray, func keyAndValue { 
+            let pair = Iter.toArray(Text.split(keyAndValue, #text("=")));
+            return (pair[0], pair[1]);
+        });
+
+        let found = Array.find<(Text, Text)>(queryParamsPairs, func pair { pair.0 == param });
+        return switch(found) {
+            case null null;
+            case (? f) Option.make(f.1);
+        };     
+    };
+
+    private func getVideateSettingsUri(request: HttpRequest, feedKey: Text): Text {
+        // If this 'serve' canister is hosted on the IC, use the hard-coded IC
+        // contributor_assets canister as the host for the videate settings
+        // page. Otherwise, use the same host as in the request, since that
+        // host should also work for the contributor_assets canister (i.e. when
+        // dfx is running locally, even when accessed through localhost.run)
+        let settingsBaseUri = if(Principal.toText(Principal.fromActor(this)) == "mvjun-2yaaa-aaaah-aac3q-cai")
+        {
+            "https://44ejt-7yaaa-aaaao-aabqa-cai.raw.ic0.app/?"
+        } else { 
+            // Get the host from the request header so we can tell if we're
+            // using localhost or a localhost.run tunnel
+            let hostHeader = Array.find<(Text, Text)>(request.headers, func pair { pair.0 == "host"});
+            
+            // We should never get the below error. The host header should
+            // always be defined in requests.
+            let host = Option.get(hostHeader, ("host","ERROR_NO_HOST_HEADER")).1;
+
+            // Parse the contributor_assets canister cid from the query params,
+            // which we specify if we're locally hosting. This is necessary
+            // since there's no way, from motoko, to examine
+            // .dfx/local/canister_ids.json file or the generated files under
+            // ../declarations to find the cid, so we have to specify it
+            // manually in the url when subscribing to a feed. See
+            // https://forum.dfinity.org/t/programmatically-find-the-canister-id-of-a-frontend-canister
+            let contributorAssetsCid = Option.get(
+                getQueryParam("contributorAssetsCid", request.url),
+                "ERROR_NO_CONTRIBUTOR_ASSETS_CID_QUERY_PARAM"
+            );
+
+            "https://" # host # "/?canisterId=" # contributorAssetsCid # "&";
+        };
+        return settingsBaseUri # "feedKey=" # feedKey;
     };
 
     /* Credits interface */
@@ -137,13 +181,12 @@ actor Serve {
         credits.getSampleFeed();
     };
 
-    func getFeedXml(key: Text) : Text {
+    func getFeedXml(key: Text, videateSettingsUri: Text) : Text {
         let feed: ?Feed = credits.getFeed(key);
-
         switch(feed) {
             case null "Unrecognized feed: " # key;
             case (?feed) {
-                let doc: Document = Rss.format(feed, uriTransformers);
+                let doc: Document = Rss.format(feed, key, videateSettingsUri, uriTransformers);
                 Xml.stringifyDocument(doc);
             };
         };

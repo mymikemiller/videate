@@ -20,14 +20,13 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed, uriTransformers: [UriTransformer]) : Document {
+	public func format(feed: Feed, key: Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
     let mediaList = List.fromArray(feed.mediaList);
     let mediaListNewestToOldest = List.reverse(mediaList);
     // todo: Limit the media list to the most recent 3 episodes unless there is
     // a registered user making the request 
     // let splitMediaList = List.split(3, mediaListNewestToOldest); 
     // let (shownMediaList, _) = splitMediaList;
-    let shownMediaArray = List.toArray(mediaListNewestToOldest);
     
 		return {
 			prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -45,7 +44,7 @@ module {
 						name = "channel";
             attributes = [];
             text = "";
-						children = Array.append([
+						children = List.toArray(List.append(List.fromArray([
               {
                 name = "atom:link";
                 attributes = [
@@ -55,8 +54,7 @@ module {
                 ];
                 text = "";
                 children = [];
-              },
-							{
+              }, {
 								name = "title";
                 attributes = [];
                 text = feed.title;
@@ -123,11 +121,13 @@ module {
                 attributes = [("text", "Arts")]; // todo: use correct category
                 text = "";
                 children = [];
-              }],
+              }]),
               
               // episode list
-              Array.map(shownMediaArray, func(media: Media) : Element { 
-                let uri = transformUri(media.uri, uriTransformers);
+              List.map(mediaListNewestToOldest, func(media: Media) : Element {
+                let mediaDescription: Text = media.description # "\n\nManage your Videate settings:\n" # videateSettingsUri # "\n\n";
+
+                let uri = transformUri(media.uri, mediaUriTransformers);
                 {
                   name = "item";
                   attributes = [];
@@ -141,12 +141,12 @@ module {
                     }, {
                       name = "itunes:summary";
                       attributes = [];
-                      text = media.description;
+                      text = mediaDescription;
                       children = [];
                     }, {
                       name = "description";
                       attributes = [];
-                      text = media.description;
+                      text = mediaDescription;
                       children = [];
                     }, {
                       name = "link";
@@ -191,7 +191,7 @@ module {
                   ];
                 }
               })
-            );
+            ));
 					},
 				];
 			};

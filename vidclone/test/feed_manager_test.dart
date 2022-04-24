@@ -74,7 +74,9 @@ void main() async {
               ..configure(ClonerTaskArgs((a) => a
                 ..id = 'internet_computer'
                 ..args = [
-                  'feedName',
+                  'name',
+                  'test',
+                  'key',
                   'test',
                   'network',
                   'local',

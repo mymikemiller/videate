@@ -1,20 +1,18 @@
-import { ActorSubclass } from "@dfinity/agent";
+import { Actor, ActorSubclass } from "@dfinity/agent";
 import React, { useEffect, useState } from "react";
-import {
-  serve,
-} from "../../../declarations/serve";
 import {
   Feed,
   _SERVICE as _SERVE_SERVICE,
 } from "../../../declarations/serve/serve.did";
+import { canisterId as assetsCanisterId } from "../../../declarations/contributor_assets";
 import { useContext } from "react";
 import { AppContext } from "../App";
-import { Actor } from "@dfinity/agent";
 import toast from "react-hot-toast";
 
-// todo: change urlTemplate when running on IC to 
-// 'https://{serveCanisterId}.raw.ic0.app/{feedKey}?principal={principal}';
-const urlTemplate = 'localhost:8000/{feedKey}?canisterId={serveCanisterId}&principal={principal}';
+const isDevelopment = process.env.NODE_ENV !== "production";
+const urlTemplate = isDevelopment ?
+  '{origin}/{feedKey}?canisterId={serveCanisterId}&contributorAssetsCid={contributorAssetsCid}&principal={principal}'
+  : 'https://{serveCanisterId}.raw.ic0.app/{feedKey}?contributorAssetsCid={contributorAssetsCid}&principal={principal}';
 
 interface CopyableLinkProps {
   serveActor: ActorSubclass<_SERVE_SERVICE>;
@@ -22,7 +20,6 @@ interface CopyableLinkProps {
 };
 
 const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
-
   const { authClient } = useContext(AppContext);
   const [exists, setExists] = useState(true);
   const [feed, setFeed] = useState<Feed | undefined>(undefined);
@@ -65,8 +62,10 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
       return;
     } else {
       const url = urlTemplate
+        .replace('{origin}', window.location.origin)
         .replace('{feedKey}', feedKey)
         .replace('{serveCanisterId}', Actor.canisterIdOf(serveActor).toText())
+        .replace('{contributorAssetsCid}', assetsCanisterId!)
         .replace('{principal}', authClient.getIdentity().getPrincipal().toText());
 
       setExists(true);

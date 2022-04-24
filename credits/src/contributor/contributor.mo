@@ -65,8 +65,6 @@ actor Contributor {
   };
 
   private func getProfile(principal: Principal) : ?Profile {
-    Debug.print("Looking for principal " # Principal.toText(principal));
-
     return Trie.find(
       profiles,          // Target trie
       key(principal),    // Key

@@ -28,10 +28,6 @@ actor class Serve() = this {
 
     let sampleFeed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" version=\"2.0\"> <channel> <atom:link href=\"http://mikem-18bd0e1e.localhost.run/\" rel=\"self\" type=\"application/rss+xml\"></atom:link> <title>Sample Feed</title> <link>http://example.com</link> <language>en-us</language> <itunes:subtitle>Just a sample</itunes:subtitle> <itunes:author>Mike Miller</itunes:author> <itunes:summary>A sample feed hosted on the Internet Computer</itunes:summary> <description>A sample feed hosted on the Internet Computer</description> <itunes:owner> <itunes:name>Mike Miller</itunes:name> <itunes:email>mike@videate.org</itunes:email> </itunes:owner> <itunes:explicit>no</itunes:explicit> <itunes:image href=\"https://brianchristner.io/content/images/2016/01/Success-loading.jpg\"></itunes:image> <itunes:category text=\"Arts\"></itunes:category> <item> <title>test</title> <itunes:summary>test</itunes:summary> <description>test</description> <link>http://example.com/podcast-1</link> <enclosure url=\"https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4\" type=\"video/mpeg\" length=\"1024\"></enclosure> <pubDate>21 Dec 2016 16:01:07 +0000</pubDate> <itunes:author>Mike Miller</itunes:author> <itunes:duration>00:32:16</itunes:duration> <itunes:explicit>no</itunes:explicit> <guid></guid> </item> </channel> </rss>";
     
-    let uriTransformers: [UriTransformer] = [
-        func (input: Text): Text { Text.replace(input, #text("file:///Users/mikem/web/media/"), "http://videate.org/"); },
-    ];
-
     // This pattern uses `preupgrade` and `postupgrade` to allow `feeds` to be
     // stable even though HashMap is not. See
     // https://sdk.dfinity.org/docs/language-guide/upgrades.html#_preupgrade_and_postupgrade_system_methods
@@ -73,8 +69,20 @@ actor class Serve() = this {
         };
 
         let settingsUri = getVideateSettingsUri(request, feedKey);
-        var xml = getFeedXml(feedKey, settingsUri);
-        Utils.generateFeedResponse(xml);       
+        let mediaHost = "videate.org"
+
+        // Todo: Translate all media links that point to web/media to point to
+        // whatever host was used in the rss request, which might be localhost
+        // or a localhost.run tunnel. This can be done by setting the host to
+        // the following instead: 
+        //
+        // let mediaHost = getRequestHost(request);
+        let uriTransformers: [UriTransformer] = [
+            func (input: Text): Text { Text.replace(input, #text("file:///Users/mikem/web/media/"), "https://" # mediaHost # "/"); },
+        ];
+
+        var xml = getFeedXml(feedKey, settingsUri, uriTransformers);
+        Utils.generateFeedResponse(xml);
     };
 
     public shared func http_request_update(request : HttpRequest) : async HttpResponse {
@@ -103,6 +111,16 @@ actor class Serve() = this {
         };     
     };
 
+    private func getRequestHost(request: HttpRequest): Text {
+        // Get the host from the request header so we can tell if we're
+        // using localhost or a localhost.run tunnel
+        let hostHeader = Array.find<(Text, Text)>(request.headers, func pair { pair.0 == "host"});
+        
+        // We should never get the below error text. The host header should
+        // always be defined in requests.
+        Option.get(hostHeader, ("host","ERROR_NO_HOST_HEADER")).1;
+    };
+
     private func getVideateSettingsUri(request: HttpRequest, feedKey: Text): Text {
         // If this 'serve' canister is hosted on the IC, use the hard-coded IC
         // contributor_assets canister as the host for the videate settings
@@ -113,13 +131,7 @@ actor class Serve() = this {
         {
             "https://44ejt-7yaaa-aaaao-aabqa-cai.raw.ic0.app/?"
         } else { 
-            // Get the host from the request header so we can tell if we're
-            // using localhost or a localhost.run tunnel
-            let hostHeader = Array.find<(Text, Text)>(request.headers, func pair { pair.0 == "host"});
-            
-            // We should never get the below error. The host header should
-            // always be defined in requests.
-            let host = Option.get(hostHeader, ("host","ERROR_NO_HOST_HEADER")).1;
+            let host = getRequestHost(request);
 
             // Parse the contributor_assets canister cid from the query params,
             // which we specify if we're locally hosting. This is necessary
@@ -181,7 +193,7 @@ actor class Serve() = this {
         credits.getSampleFeed();
     };
 
-    func getFeedXml(key: Text, videateSettingsUri: Text) : Text {
+    func getFeedXml(key: Text, videateSettingsUri: Text, uriTransformers: [UriTransformer]) : Text {
         let feed: ?Feed = credits.getFeed(key);
         switch(feed) {
             case null "Unrecognized feed: " # key;

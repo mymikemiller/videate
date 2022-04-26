@@ -89,8 +89,8 @@ Use an existing feed key and the correct local canisterIds for the `serve` and
 
 localhost:8000/example_feed_key?canisterId=r7inp-6aaaa-aaaaa-aaabq-cai&contributorAssetsCid=ryjl3-tyaaa-aaaaa-aaaba-cai&principal=TEST_PRINCIPAL
 
-To test feeds on a phone, use localhost.run to expose the feed to outside
-networks:
+To test locally hosted feeds on a phone, use localhost.run to expose the feed
+to outside networks:
 
 ```
 ssh -R 80:localhost:8000 localhost.run
@@ -99,7 +99,7 @@ ssh -R 80:localhost:8000 localhost.run
 Then subscribe in a podcatcher to the address printed out after "tunneled with
 tls termination", e.g.:
 
-https://8d0116fb626db2.lhrtunnel.link/dfinity?canisterId=r7inp-6aaaa-aaaaa-aaabq-cai&contributorAssetsCid=ryjl3-tyaaa-aaaaa-aaaba-cai&principal=TEST_PRINCIPAL
+https://8d0116fb626db2.lhrtunnel.link/example_feed_key?canisterId=r7inp-6aaaa-aaaaa-aaabq-cai&contributorAssetsCid=ryjl3-tyaaa-aaaaa-aaaba-cai&principal=TEST_PRINCIPAL
 
 Make sure to specify the current cid for contributor_assets from
 .dfx/local/canister_ids.json so the generated videate settings links will work

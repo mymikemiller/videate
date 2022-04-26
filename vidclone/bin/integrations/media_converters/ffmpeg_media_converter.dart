@@ -1,6 +1,4 @@
-import 'package:vidlib/src/models/media_file.dart';
 import 'package:vidlib/vidlib.dart';
-import 'package:meta/meta.dart';
 import '../../media_converter.dart';
 
 class FfmpegMediaConverter extends MediaConverter {

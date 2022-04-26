@@ -1,6 +1,4 @@
 import 'package:file/local.dart';
-import 'package:vidlib/src/models/media_file.dart';
-import 'package:vidlib/src/models/media.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:vidlib/vidlib.dart';
 import 'dart:io';

@@ -9,6 +9,7 @@ import 'integrations/internet_archive/internet_archive_cli_uploader.dart';
 import 'integrations/internet_computer/internet_computer_feed_manager.dart';
 import 'integrations/local/json_file_feed_manager.dart';
 import 'integrations/local/local_downloader.dart';
+import 'integrations/local/null_uploader.dart';
 import 'integrations/local/save_to_disk_uploader.dart';
 import 'integrations/media_converters/ffmpeg_media_converter.dart';
 import 'integrations/media_converters/null_media_converter.dart';
@@ -53,10 +54,11 @@ void main(List<String> arguments) async {
     FfmpegMediaConverter(),
   ];
   final uploaders = [
+    NullUploader(mediaBaseDirectory),
+    SaveToDiskUploader(mediaBaseDirectory),
     Cdn77Uploader(),
     InternetArchiveCliUploader(
         internetArchiveAccessKey, internetArchiveSecretKey),
-    SaveToDiskUploader(mediaBaseDirectory),
   ];
   final feedManagers = [
     JsonFileFeedManager(),

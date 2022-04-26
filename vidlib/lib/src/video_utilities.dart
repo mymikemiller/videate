@@ -104,7 +104,7 @@ class FfmpegVideoConverter extends Converter<File, Future<File>> {
     ];
     // final command = args.join(' ');
 
-    // ffmpeg -i input.mp4 -vf scale=-2:240 -vcodec libx265 -qscale 3 -crf 28 output.mp4
+    // ffmpeg -i "input.mp4" -vf scale=-2:540 -vcodec libx264 -q:v 3 -crf 28 -movflags +faststart "output.mp4"
     await processStarter('ffmpeg', args).then((p) async {
       p.stderr.transform(Utf8Decoder()).listen((String data) {
         final timeFormat = r'\d{2}:\d{2}:\d{2}\.\d{2}';

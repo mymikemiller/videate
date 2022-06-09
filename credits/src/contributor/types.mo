@@ -1,5 +1,4 @@
 import Buffer "mo:base/Buffer";
-import List "mo:base/List";
 
 module {
   // Used to store the contents of the Contributor canister in stable types

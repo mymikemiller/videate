@@ -69,7 +69,7 @@ actor class Serve() = this {
         };
 
         let settingsUri = getVideateSettingsUri(request, feedKey);
-        let mediaHost = "videate.org"
+        let mediaHost = "videate.org";
 
         // Todo: Translate all media links that point to web/media to point to
         // whatever host was used in the rss request, which might be localhost

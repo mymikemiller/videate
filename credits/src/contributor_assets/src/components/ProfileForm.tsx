@@ -6,7 +6,7 @@ import {
   TextField,
 } from "@adobe/react-spectrum";
 import { ActorSubclass } from "@dfinity/agent";
-import React from "react";
+import React from "react"; // import * as React from 'react's
 import {
   Bio,
   ProfileUpdate,

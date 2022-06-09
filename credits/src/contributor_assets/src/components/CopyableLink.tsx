@@ -1,5 +1,5 @@
 import { Actor, ActorSubclass } from "@dfinity/agent";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; // import * as React from 'react'
 import {
   Feed,
   _SERVICE as _SERVE_SERVICE,

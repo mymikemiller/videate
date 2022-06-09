@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; // import * as React from 'react'
 import {
   ProfileUpdate,
   _SERVICE,
@@ -6,7 +6,7 @@ import {
 import ProfileForm from "./ProfileForm";
 import toast from "react-hot-toast";
 import { emptyProfile } from "../hooks";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react"; // import * as React from 'react'
 import { AppContext } from "../App";
 import { useNavigate } from "react-router-dom";
 

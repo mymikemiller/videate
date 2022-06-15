@@ -4,6 +4,7 @@ import Types "types";
 import Array "mo:base/Array";
 import List "mo:base/List";
 import Debug "mo:base/Debug";
+import Option "mo:base/Option";
 
 module {
   type Document = Xml.Document;
@@ -20,9 +21,43 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed, key: Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
-    let mediaList = List.fromArray(feed.mediaList);
-    let mediaListNewestToOldest = List.reverse(mediaList);
+	public func format(feed: Feed, key: Text, episodeGuid: ?Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
+    var mediaArray: [Media] = [];
+    switch(episodeGuid) {
+      case null {
+        // Normal case. Caller did not specify an episode, so use all media
+        mediaArray := feed.mediaList;
+      };
+      case (? guid) {
+        // Caller specified an episode, so generate a Document containing only
+        // that episode
+        let episodeMedia = Array.find<Media>(feed.mediaList, func(media: Media): Bool {
+          media.uri == guid; // Assume the guid is the media uri, though this may change
+        });
+
+        switch(episodeMedia) {
+          case null {
+            // Error. An episode guid was specified but we did not find that guid
+            return {
+              prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+              root = {
+                name = "Error";
+                attributes = [];
+                text = "Episode not found with guid: " # guid;
+                children = [];
+              }
+            };
+          };
+          case (? media) {
+            // Use an array containing only the single requested episode
+            mediaArray := [media];
+          };
+        };
+      };
+    };
+    let mediaList: List.List<Media> = List.fromArray<Media>(mediaArray);
+    let mediaListNewestToOldest: List.List<Media> = List.reverse(mediaList);
+
     // todo: Limit the media list to the most recent 3 episodes unless there is
     // a registered user making the request 
     // let splitMediaList = List.split(3, mediaListNewestToOldest); 
@@ -122,74 +157,8 @@ module {
                 text = "";
                 children = [];
               }]),
-              
-              // episode list
-              List.map(mediaListNewestToOldest, func(media: Media) : Element {
-                let mediaDescription: Text = media.description # "\n\nManage your Videate settings:\n" # videateSettingsUri # "\n\n";
-
-                let uri = transformUri(media.uri, mediaUriTransformers);
-                {
-                  name = "item";
-                  attributes = [];
-                  text = "";
-                  children = [
-                    {
-                      name = "title";
-                      attributes = [];
-                      text = media.title;
-                      children = [];
-                    }, {
-                      name = "itunes:summary";
-                      attributes = [];
-                      text = mediaDescription;
-                      children = [];
-                    }, {
-                      name = "description";
-                      attributes = [];
-                      text = mediaDescription;
-                      children = [];
-                    }, {
-                      name = "link";
-                      attributes = [];
-                      text = uri; // todo: this should link to a page describing the media, not the media itself
-                      children = [];
-                    }, {
-                      name = "enclosure";
-                      attributes = [
-                        ("url", uri), 
-                        ("type", "video/mpeg"), // todo: use correct media type
-                        ("length", "1024") // todo: use lengthInBytes
-                      ];
-                      text = "";
-                      children = [];
-                    }, {
-                      name = "pubDate";
-                      attributes = [];
-                      text = "21 Dec 2016 16:01:07 +0000"; // todo: use correct date
-                      children = [];
-                    }, {
-                      name = "itunes:author";
-                      attributes = [];
-                      text = "Mike Miller"; // todo: Use currect author name
-                      children = [];
-                    }, {
-                      name = "itunes:duration";
-                      attributes = [];
-                      text = "00:32:16"; // todo: Use correct duration
-                      children = [];
-                    }, {
-                      name = "itunes:explicit";
-                      attributes = [];
-                      text = "no"; // todo: use correct explicit
-                      children = [];
-                    }, {
-                      name = "guid";
-                      attributes = [];
-                      text = media.uri;
-                      children = [];
-                    }
-                  ];
-                }
+              List.map<Media, Element>(mediaListNewestToOldest, func(media: Media) : Element {
+                getMediaElement(media, videateSettingsUri, mediaUriTransformers);
               })
             ));
 					},
@@ -198,8 +167,77 @@ module {
 		};
 	};
 
+  func getMediaElement(media: Media, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
+    let mediaDescription: Text = media.description # "\n\nManage your Videate settings:\n" # videateSettingsUri # "\n\n";
+    let uri = transformUri(media.uri, mediaUriTransformers);
+    let guid = media.uri; // for now, use the media uri as the guid since that should be unique among a feed.
+
+    {
+      name = "item";
+      attributes = [];
+      text = "";
+      children = [
+        {
+          name = "title";
+          attributes = [];
+          text = media.title;
+          children = [];
+        }, {
+          name = "itunes:summary";
+          attributes = [];
+          text = mediaDescription;
+          children = [];
+        }, {
+          name = "description";
+          attributes = [];
+          text = mediaDescription;
+          children = [];
+        }, {
+          name = "link";
+          attributes = [];
+          text = uri; // todo: this should link to a page describing the media, not the media itself
+          children = [];
+        }, {
+          name = "enclosure";
+          attributes = [
+            ("url", uri), 
+            ("type", "video/mpeg"), // todo: use correct media type
+            ("length", "1024") // todo: use lengthInBytes
+          ];
+          text = "";
+          children = [];
+        }, {
+          name = "pubDate";
+          attributes = [];
+          text = "21 Dec 2016 16:01:07 +0000"; // todo: use correct date
+          children = [];
+        }, {
+          name = "itunes:author";
+          attributes = [];
+          text = "Mike Miller"; // todo: Use currect author name
+          children = [];
+        }, {
+          name = "itunes:duration";
+          attributes = [];
+          text = "00:32:16"; // todo: Use correct duration
+          children = [];
+        }, {
+          name = "itunes:explicit";
+          attributes = [];
+          text = "no"; // todo: use correct explicit
+          children = [];
+        }, {
+          name = "guid";
+          attributes = [];
+          text = guid;
+          children = [];
+        }
+      ];
+    };
+  };
+
   func transformUri(input: Text, uriTransformers: [UriTransformer]) : Text {
     // Run all the transformers in order
     return Array.foldLeft(uriTransformers, input, func (previousValue: Text, transformer: UriTransformer) : Text = transformer(previousValue) );
-  }
+  };
 };

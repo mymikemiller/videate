@@ -45,10 +45,6 @@ actor class Serve() = this {
     /* Serve */
 
     public query func http_request(request : HttpRequest) : async HttpResponse {
-        let splitUrl = Iter.toArray(Text.split(request.url, #text("?")));
-        let beforeQueryParams: Text = splitUrl[0];
-        let feedKey: Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[1];
-
         // Short-circuit simple requests
         if (request.url == "/favicon.ico") {
             return {
@@ -68,6 +64,20 @@ actor class Serve() = this {
             };
         };
 
+        let splitUrl = Iter.toArray(Text.split(request.url, #text("?")));
+        let beforeQueryParams: Text = Text.trim(splitUrl[0], #text("/"));
+        let feedKey: Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[0];
+        let episodeGuid: ?Text = if (Text.contains(beforeQueryParams, #text("/"))) {
+            // The url included a path beyond just the feed key, which is
+            // assumed to be the guid for an episode contained within the feed.
+            let afterFirstSlash: Text = Text.trimStart(beforeQueryParams, #text(feedKey # "/"));
+            Option.make(afterFirstSlash);
+        } else {
+            // Normal case. The url was just for the feed, not for an episode
+            // within the feed.
+            null;
+        };
+
         let settingsUri = getVideateSettingsUri(request, feedKey);
         let mediaHost = "videate.org";
 
@@ -81,7 +91,7 @@ actor class Serve() = this {
             func (input: Text): Text { Text.replace(input, #text("file:///Users/mikem/web/media/"), "https://" # mediaHost # "/"); },
         ];
 
-        var xml = getFeedXml(feedKey, settingsUri, uriTransformers);
+        var xml = getFeedXml(feedKey, episodeGuid, settingsUri, uriTransformers);
         Utils.generateFeedResponse(xml);
     };
 
@@ -193,12 +203,12 @@ actor class Serve() = this {
         credits.getSampleFeed();
     };
 
-    func getFeedXml(key: Text, videateSettingsUri: Text, uriTransformers: [UriTransformer]) : Text {
+    func getFeedXml(key: Text, episodeGuid: ?Text, videateSettingsUri: Text, uriTransformers: [UriTransformer]) : Text {
         let feed: ?Feed = credits.getFeed(key);
         switch(feed) {
             case null "Unrecognized feed: " # key;
             case (?feed) {
-                let doc: Document = Rss.format(feed, key, videateSettingsUri, uriTransformers);
+                let doc: Document = Rss.format(feed, key, episodeGuid, videateSettingsUri, uriTransformers);
                 Xml.stringifyDocument(doc);
             };
         };

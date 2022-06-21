@@ -32,6 +32,7 @@ import { canisterId as serveCanisterId, createActor as createServeActor } from "
 import { _SERVICE as _DIP721NFT_SERVICE, OwnerResult } from "../../declarations/Dip721NFT/Dip721NFT.did";
 import { canisterId as dip721NftCanisterId, createActor as createDip721NftActor } from "../../declarations/Dip721NFT";
 import { Principal } from "@dfinity/principal";
+import Logout from '../assets/logout.svg'
 
 const Header = styled.header`
   position: relative;
@@ -52,6 +53,7 @@ const Main = styled.main`
   display: flex;
   flex-direction: column;
   padding: 0 1rem;
+  position: relative;
 `;
 
 export const AppContext = React.createContext<{
@@ -198,7 +200,7 @@ const App = () => {
         });
       } else {
         // Just send the user to their account management page
-        navigate('/manage');
+        navigate('/loading');
       };
     };
   }, [profile]);
@@ -263,10 +265,22 @@ const App = () => {
                 <Route path="/loading" element={
                   <span />
                 } />
+                <Route path="/nft" element={isAuthenticated ? (
+                  <div style={{ display: 'flex', justifyContent: 'right', flexGrow: 1, fontWeight: 'bold', fontSize: '20px' }}>
+
+                    <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>
+                      <Logout />
+                    </button>
+                  </div>
+                ) : <span />
+                }>
+                </Route>
                 <Route path="*" element={isAuthenticated ? (
-                  <ActionButton id="logout" onPress={logout}>
-                    Log out
-                  </ActionButton>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
+                    <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>
+                      <Logout />
+                    </button>
+                  </div>
                 ) : <span />
                 }>
                 </Route>
@@ -282,10 +296,10 @@ const App = () => {
                   </ActionButton>
                 } /> */}
               </Routes>
-              <h2>Videate</h2>
             </Header>
+            <h2 style={{ textAlign: 'center', margin: 0 }}>Videate</h2>
             <Main>
-              <Flex maxWidth={700} margin="2rem auto" id="main-container">
+              <Flex maxWidth={700} id="main-container">
                 <Routes>
                   <Route path="/loading" element={<Loading />} />
                   <Route path="/" element={

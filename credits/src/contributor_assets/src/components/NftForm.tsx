@@ -24,6 +24,51 @@ import {
 import toast from "react-hot-toast";
 import { AppContext } from "../App";
 import { Principal } from "@dfinity/principal";
+import Money from '../../assets/money.svg'
+
+const NftFormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-top: 1em;
+`
+
+const DarkCard = styled.div`
+  display: flex;
+  background-color: #2E2E2E;
+  border: 1px solid #414141;
+  padding: 0.75em 1em;
+  border-radius: 5px;
+  width: 85vw;
+  margin: 2px auto;
+  position: relative;
+  font-weight: bold;
+`
+
+const Question = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 4em;
+  align-items: center;
+`
+
+const MoneyImg = styled(Money)`
+  height: 5em;
+  width: 5em;
+  margin-bottom: 1em;
+`
+
+const CallToAction = styled.button`
+  width: 85vw;
+  margin-top: 4em;
+  background: linear-gradient(92.35deg, #21A8B0 11.82%, #5D27F5 180.4%, #5D27F5 180.4%);
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: 0.75em 0;
+  font-size: 20px;
+  transform: translateX(3.5vw);
+  box-shadow: 0px 2px 4px #146A70;
+`
 
 const Section = styled.section`
   width: 100%;
@@ -126,24 +171,49 @@ const NftForm = () => {
     if (currentOwnerPrincipalText == authClient.getIdentity().getPrincipal().toText()) {
       currentOwnershipText = "You own this NFT!";
     } else {
-      currentOwnershipText = `The NFT for this episode is currently owned by ${state.currentOwnerName}`;
+      currentOwnershipText = `Owned by ${state.currentOwnerName}`;
+    }
+  }
+
+  const getPurchaseSection = () => {
+    if (currentOwnerPrincipalText == authClient.getIdentity().getPrincipal().toText()) {
+      return <></>
+    } else {
+      return <>
+        <Question>
+          <MoneyImg />
+          Would you like to buy this NFT?
+        </Question>
+        <CallToAction onClick={() => handleSubmit()}>
+          Purchase
+        </CallToAction>
+      </>
     }
   }
 
   return (
-    <section>
-      <Heading level={1}><>NFT for {state.feed.title} episode "{state.media.title}"</></Heading>
-      <Heading level={1}><>{currentOwnershipText}</></Heading>
-      <Heading level={1}><>Buy this NFT?</></Heading>
-      <Form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}>
+    // <section>
+    //   <Heading level={1}><>NFT for {state.feed.title} episode "{state.media.title}"</></Heading>
+    //   <Heading level={1}><>{currentOwnershipText}</></Heading>
+    //   <Heading level={1}><>Buy this NFT?</></Heading>
+    //   <Form
+    //     onSubmit={(e) => {
+    //       e.preventDefault();
+    //       handleSubmit();
+    //     }}>
 
-        <ActionButton type="submit">Buy</ActionButton>
-      </Form>
-    </section>
+    //     <ActionButton type="submit">Buy</ActionButton>
+    //   </Form>
+    // </section>
+    <NftFormContainer>
+      <DarkCard>
+        <img src={state.feed.imageUrl} style={{ height: '6.5em', width: '6.5em', position: 'absolute', top: 10, left: 10, borderRadius: '5px 0 0 5px' }} />
+        <div style={{ height: '5em', width: '22.5em' }} />
+        This NFT is for the "{state.feed.title}" episode titled "{state.media.title}"
+      </DarkCard>
+      <div style={{ marginTop: '1em', fontWeight: 'bold', textAlign: 'center' }}>{currentOwnershipText}</div>
+      {getPurchaseSection()}
+    </NftFormContainer >
   );
 };
 

@@ -121,7 +121,7 @@ abstract class Downloader extends ClonerTask {
 
   // Returns the most recently released media in the collection.
   Future<Media> mostRecentMedia() async {
-    return reverseChronologicalMedia().first;
+    return reverseChronologicalMedia().elementAt(1);
   }
 
   // Returns a string that is guaranteed to be unique among all media sourced

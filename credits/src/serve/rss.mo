@@ -23,7 +23,7 @@ module {
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
 	public func format(feed: Feed, key: Text, episodeGuid: ?Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
-     let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { ownerOfDip721: (token_id: Dip721NFTTypes.TokenId) -> async Dip721NFTTypes.OwnerResult };
+    // let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { ownerOfDip721: (token_id: Dip721NFTTypes.TokenId) -> async Dip721NFTTypes.OwnerResult };
 
     var mediaArray: [Media] = [];
     switch(episodeGuid) {
@@ -56,11 +56,9 @@ module {
             mediaArray := [media];
 
             // Find the owner of the NFT
-            let ownerPrincipal = Dip721NFT.ownerOfDip721(media.nftTokenId);
-            Debug.print("Owner of NFT for episode being fetched: ");
-            Debug.print(debug_show(ownerPrincipal));
-
-
+            // let nftOwnerName = if (media.nftTokenId % 2 == 0) "Mike" else "Nick";
+            // // let ownerPrincipal = Dip721NFT.ownerOfDip721(media.nftTokenId); // Ugh, can't do this because of "send capability required"
+            // Debug.print("Owner of NFT for episode: " # nftOwnerName);
           };
         };
       };
@@ -168,7 +166,7 @@ module {
                 children = [];
               }]),
               List.map<Media, Element>(mediaListNewestToOldest, func(media: Media) : Element {
-                getMediaElement(media, videateSettingsUri, mediaUriTransformers);
+                getMediaElement(media, key, videateSettingsUri, mediaUriTransformers);
               })
             ));
 					},
@@ -177,8 +175,23 @@ module {
 		};
 	};
 
-  func getMediaElement(media: Media, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
-    let mediaDescription: Text = media.description # "\n\nManage your Videate settings:\n" # videateSettingsUri # "\n\n";
+  func getMediaElement(media: Media, feedKey: Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
+    let videateSettingsMessage: Text = media.description # "\n\nManage your Videate settings:\n" # videateSettingsUri # "\n\n";
+    let nftPurchaseUri = "localhost:8000/nft?canisterId=rkp4c-7iaaa-aaaaa-aaaca-cai&feedKey=" # feedKey # "&episodeGuid=" # media.uri;
+
+    let nftOwnerMessage = switch(media.nftTokenId) {
+      case (null) {
+        "currently unclaimed!"
+      };
+      case (? nftTokenId) {
+        let owner = if (nftTokenId % 2 == 0) "Mike" else "Nick";
+        "owned by " # owner # ".";
+      };
+    };
+    let nftDescription = "\n\nThe NFT for this episode is " # nftOwnerMessage # " Click here to buy the NFT: " # nftPurchaseUri;
+
+    let mediaDescription = videateSettingsMessage # nftDescription;
+
     let uri = transformUri(media.uri, mediaUriTransformers);
     let guid = media.uri; // for now, use the media uri as the guid since that should be unique among a feed.
 

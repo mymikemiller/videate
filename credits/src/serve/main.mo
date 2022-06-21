@@ -45,6 +45,7 @@ actor class Serve() = this {
     /* Serve */
 
     public query func http_request(request : HttpRequest) : async HttpResponse {
+        Debug.print("in http_request");
         // Short-circuit simple requests
         if (request.url == "/favicon.ico") {
             return {
@@ -90,6 +91,8 @@ actor class Serve() = this {
         let uriTransformers: [UriTransformer] = [
             func (input: Text): Text { Text.replace(input, #text("file:///Users/mikem/web/media/"), "https://" # mediaHost # "/"); },
         ];
+
+        Debug.print("getting xml");
 
         var xml = getFeedXml(feedKey, episodeGuid, settingsUri, uriTransformers);
         Utils.generateFeedResponse(xml);

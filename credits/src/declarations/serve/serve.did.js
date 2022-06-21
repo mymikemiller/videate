@@ -13,6 +13,7 @@ export const idlFactory = ({ IDL }) => {
     'source' : Source,
     'etag' : IDL.Text,
     'description' : IDL.Text,
+    'nftTokenId' : IDL.Opt(IDL.Nat64),
     'durationInMicroseconds' : IDL.Nat,
   });
   const Feed = IDL.Record({
@@ -49,7 +50,7 @@ export const idlFactory = ({ IDL }) => {
     'streaming_strategy' : IDL.Opt(StreamingStrategy),
     'status_code' : IDL.Nat16,
   });
-  return IDL.Service({
+  const Serve = IDL.Service({
     'addFeed' : IDL.Func([IDL.Text, Feed], [IDL.Nat], []),
     'deleteFeed' : IDL.Func([IDL.Text], [], ['oneway']),
     'getAllFeedKeys' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
@@ -79,5 +80,6 @@ export const idlFactory = ({ IDL }) => {
     'http_request' : IDL.Func([HttpRequest], [HttpResponse], ['query']),
     'http_request_update' : IDL.Func([HttpRequest], [HttpResponse], []),
   });
+  return Serve;
 };
 export const init = ({ IDL }) => { return []; };

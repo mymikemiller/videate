@@ -8,10 +8,12 @@ import {
 import styled from "styled-components";
 import NotAuthenticated from "./components/NotAuthenticated";
 import Home from "./components/Home";
-import { _SERVICE, ProfileUpdate } from "../../declarations/contributor/contributor.did";
+import NftForm from "./components/NftForm";
+import { _SERVICE as _CONTRIBUTOR_SERVICE, ProfileUpdate } from "../../declarations/contributor/contributor.did";
 import toast, { Toaster } from "react-hot-toast";
 import ErrorBoundary from "./components/ErrorBoundary";
 import {
+  Outlet,
   Route,
   Routes,
   useNavigate,
@@ -23,8 +25,13 @@ import Loading from "./components/Loading";
 import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { compareProfiles } from "./utils";
+import { _SERVICE as _SERVE_SERVICE, Feed, Media } from "../../declarations/serve/serve.did";
+import { canisterId as serveCanisterId, createActor as createServeActor } from "../../declarations/serve";
+import { _SERVICE as _DIP721NFT_SERVICE, OwnerResult } from "../../declarations/Dip721NFT/Dip721NFT.did";
+import { canisterId as dip721NftCanisterId, createActor as createDip721NftActor } from "../../declarations/Dip721NFT";
+import { Principal } from "@dfinity/principal";
 
 const Header = styled.header`
   position: relative;
@@ -54,7 +61,7 @@ export const AppContext = React.createContext<{
   setIsAuthenticated?: React.Dispatch<React.SetStateAction<boolean>>;
   login: () => void;
   logout: () => void;
-  actor?: ActorSubclass<_SERVICE>;
+  actor?: ActorSubclass<_CONTRIBUTOR_SERVICE>;
   profile?: ProfileUpdate;
   setProfile: React.Dispatch<ProfileUpdate>;
 }>({
@@ -63,6 +70,29 @@ export const AppContext = React.createContext<{
   profile: emptyProfile,
   setProfile: () => { },
 });
+
+// Stores the specified search param value in local storage if it was, indeed,
+// in the search params list. If not, removes the existing value in local
+// storage if there is one.
+const storeOrRemoveSearchParam = (searchParams: URLSearchParams, paramName: string) => {
+  const value = searchParams.get(paramName);
+  if (value) {
+    localStorage.setItem(paramName, value);
+  } else {
+    localStorage.removeItem(paramName);
+  }
+};
+
+const getMedia = async (serveActor: ActorSubclass<_SERVE_SERVICE>, feedKey: string, episodeGuid: string): Promise<{ feed: Feed | undefined; media: Media | undefined; }> => {
+  const feedResult: [Feed] | [] = await serveActor.getFeed(feedKey);
+  const feed: Feed = feedResult[0]!;
+  if (feed == undefined) {
+    return { feed: undefined, media: undefined };
+  };
+  // For now, assume the episodeGuid will always match the media's uri
+  const media: Media | undefined = feed.mediaList.find((media) => media.uri == episodeGuid);
+  return { feed, media };
+};
 
 const App = () => {
   const {
@@ -79,32 +109,96 @@ const App = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  const [serveActor, setServeActor] = useState<ActorSubclass<_SERVE_SERVICE>>();
+  const [dip721NftActor, setDip721NftActor] = useState<ActorSubclass<_DIP721NFT_SERVICE>>();
+
+  const initServeActor = () => {
+    const sActor = createServeActor(serveCanisterId as string);
+    setServeActor(sActor);
+  };
+  const initDip721NftActor = async () => {
+    const sActor = createDip721NftActor(dip721NftCanisterId as string) as ActorSubclass<_DIP721NFT_SERVICE>;
+    setDip721NftActor(sActor);
+  };
+
   // At the page we first land on, record the key from the search params so we
-  // know which rss feed the user was watching when they clicked the link to
-  // launch this site.
+  // know which rss feed and episode the user was watching when they clicked
+  // the link to launch this site.
   useEffect(() => {
-    const feedKey = searchParams.get("feedKey");
-    if (feedKey) {
-      localStorage.setItem('incomingFeedKey', feedKey);
-    } else {
-      localStorage.removeItem('incomingFeedKey');
-    }
+    storeOrRemoveSearchParam(searchParams, "feedKey");
+    storeOrRemoveSearchParam(searchParams, "episodeGuid");
+
+    initServeActor();
+    initDip721NftActor();
   }, []);
 
   useEffect(() => {
     if (profile && actor) {
-      const incomingFeedKey = localStorage.getItem('incomingFeedKey');
-      if (incomingFeedKey) {
-        console.log("adding feedKey: " + incomingFeedKey);
-        actor.addFeedKey(incomingFeedKey).then((result) => {
+      if (compareProfiles(profile, emptyProfile)) {
+        // Authenticated but no profile
+        navigate('/create');
+      }
+
+      console.log("got a profile, eventually going to /nft");
+
+      const feedKey = localStorage.getItem('feedKey');
+      if (feedKey) {
+        localStorage.removeItem("feedKey");
+
+        console.log("had feedKey");
+
+        actor.addFeedKey(feedKey).then(async (result) => {
           if ("ok" in result) {
             setProfile(result.ok);
-            navigate('/manage');
-          } else {
-            toast.error("Error: " + Object.keys(result.err)[0]);
-          };
+
+            console.log("set the profile");
+
+            // Go to the NFT page if the original link contained an episodeGuid
+            const episodeGuid = localStorage.getItem('episodeGuid');
+            if (episodeGuid) {
+              localStorage.removeItem("episodeGuid");
+
+              console.log("had episodeGuid");
+
+              // Note that feed and media might come back undefined if the feed
+              // isn't found
+              const { feed, media } = await getMedia(serveActor!, feedKey, episodeGuid);
+
+              var currentOwnerPrincipalText: string | undefined = undefined;
+              var currentOwnerName: string | undefined = undefined;
+
+              // Find the current owner name if there is one
+              if (media != undefined && media.nftTokenId.length == 1) {
+                const nftTokenId = media.nftTokenId[0]!;
+                const ownerResult: OwnerResult = await dip721NftActor!.ownerOfDip721(nftTokenId);
+                if ("Ok" in ownerResult) {
+                  const currentOwner = ownerResult.Ok;
+                  console.log("got and set currentOwner:");
+                  console.dir(currentOwner);
+                  console.log("currentOwner principal as text:");
+                  console.log(currentOwner.toText());
+                  currentOwnerPrincipalText = currentOwner.toText();
+                  const ownerNameResult = await actor.getName(currentOwner);
+                  console.log("ownerNameResult:");
+                  console.dir(ownerNameResult);
+                  if (ownerNameResult.length == 1) {
+                    console.log("had an element:");
+                    currentOwnerName = ownerNameResult[0];
+                    console.log(currentOwnerName);
+                  }
+                }
+              }
+
+
+              console.log("navigating to /nft and setting state");
+
+              navigate('/nft', { state: { feedKey, feed, media, currentOwnerPrincipalText, currentOwnerName } });
+            }
+          }
         });
-        localStorage.removeItem("incomingFeedKey");
+      } else {
+        // Just send the user to their account management page
+        navigate('/manage');
       };
     };
   }, [profile]);
@@ -113,15 +207,8 @@ const App = () => {
     if (actor) {
       actor.read().then((result) => {
         if ("ok" in result) {
-          // Found contributor profile in IC. Load Home Page.
-          setProfile(result.ok);
-          if (compareProfiles(result.ok, emptyProfile)) {
-            // Authenticated but no profile
-            navigate('/create');
-          } else {
-            // Logged in with profile
-            navigate('/manage');
-          }
+          // Found contributor profile in IC. 
+          setProfile(result.ok); // This causes the profile useEffect above, which will redirect us appropriately
         } else {
           if ("NotAuthorized" in result.err) {
             // Clear local delegation and log in
@@ -176,18 +263,24 @@ const App = () => {
                 <Route path="/loading" element={
                   <span />
                 } />
-                <Route path="/manage" element={
+                <Route path="*" element={isAuthenticated ? (
+                  <ActionButton id="logout" onPress={logout}>
+                    Log out
+                  </ActionButton>
+                ) : <span />
+                }>
+                </Route>
+                {/* <Route path="/create" element={
                   <ActionButton id="logout" onPress={logout}>
                     Log out
                   </ActionButton>
                 }>
                 </Route>
-                <Route path="/create" element={
+                <Route path="/nft" element={
                   <ActionButton id="logout" onPress={logout}>
                     Log out
                   </ActionButton>
-                }>
-                </Route>
+                } /> */}
               </Routes>
               <h2>Videate</h2>
             </Header>
@@ -203,6 +296,7 @@ const App = () => {
                   } />
                   <Route path="/manage" element={<ManageProfile />} />
                   <Route path="/create" element={<CreateProfile />} />
+                  <Route path="/nft" element={<NftForm />} />
                 </Routes>
               </Flex>
             </Main>

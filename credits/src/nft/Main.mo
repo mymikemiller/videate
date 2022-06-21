@@ -31,12 +31,17 @@ shared actor class Dip721NFT(custodian: Principal, init : Types.Dip721NonFungibl
   };
 
   public query func ownerOfDip721(token_id: Types.TokenId) : async Types.OwnerResult {
+    Debug.print("in ownerOfDip721 for token_id " # token_id);
     let item = List.get(nfts, Nat64.toNat(token_id));
     switch (item) {
       case (null) {
+        Debug.print("invalid token id");
         return #Err(#InvalidTokenId);
       };
       case (?token) {
+        Debug.print("valid token");
+        Debug.print("owner:");
+        Debug.print(debug_show(token.owner));
         return #Ok(token.owner);
       };
     };

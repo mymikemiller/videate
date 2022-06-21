@@ -28,4 +28,14 @@ module {
     #AlreadyExists;
     #NotAuthorized;
   };
+
+  public type BuyNftResult = {
+    #Ok : Nat64;
+    #Err : {
+      #NotAuthorized;
+      #FeedNotFound;
+      #MediaNotFound;
+      #Other;
+    };
+  }
 }

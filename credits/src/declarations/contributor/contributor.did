@@ -50,6 +50,16 @@ type Error =
    NotAuthorized;
    NotFound;
  };
+type BuyNftResult = 
+ variant {
+   Err: variant {
+          FeedNotFound;
+          MediaNotFound;
+          NotAuthorized;
+          Other;
+        };
+   Ok: nat64;
+ };
 type Branch = 
  record {
    left: Trie;
@@ -67,9 +77,11 @@ type AssocList =
      };
 service : {
   addFeedKey: (text) -> (Result_1);
+  buyNft: (text, text) -> (BuyNftResult);
   create: (ProfileUpdate) -> (Result);
   delete: () -> (Result);
   getAllProfiles: () -> (Trie);
+  getName: (principal) -> (opt text);
   read: () -> (Result_1);
   update: (ProfileUpdate) -> (Result);
 }

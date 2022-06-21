@@ -14,7 +14,7 @@ git clone git@github.com:dfinity/examples.git
 
 ## Navigate to DIP721 Project root
 ```
-cd examples/motoko/dip-721-nft-container
+cd credits/src/nft
 ```
 
 ## Run Local Internet Computer
@@ -45,9 +45,9 @@ dfx deploy --argument "(
       logo_type = \"image/png\";
       data = \"\";
     };
-    name = \"My DIP721\";
-    symbol = \"DFXB\";
-    maxLimit = 10;
+    name = \"Videate NFTs\";
+    symbol = \"VNFT\";
+    maxLimit = 0;
   }
 )"
 ```
@@ -55,16 +55,16 @@ dfx deploy --argument "(
 ## Mint an NFT
 
 ```
-dfx canister call dip721_nft_container mintDip721 \
+dfx canister call nft mintDip721 \
 "(
   principal\"$(dfx identity get-principal)\", 
   vec { 
     record {
       purpose = variant{Rendered};
-      data = blob\"hello\";
+      data = blob\"https://rss.videate.org/dfinity/https://1928422091.rsc.cdn77.org/media/youtube/dfinity/M_cO-Fmh8ZI.mp4\";
       key_val_data = vec {
-        record { key = \"description\"; val = variant{TextContent=\"The NFT metadata can hold arbitrary metadata\"}; };
-        record { key = \"tag\"; val = variant{TextContent=\"anime\"}; };
+        record { key = \"description\"; val = variant{TextContent=\"Episode of a Videate podcast\"}; };
+        record { key = \"tag\"; val = variant{TextContent=\"episode\"}; };
         record { key = \"contentType\"; val = variant{TextContent=\"text/plain\"}; };
         record { key = \"locationType\"; val = variant{Nat8Content=4:nat8} };
       }
@@ -107,13 +107,13 @@ Here the arguments are:
 `token_id`: the id of the token to transfer
 
 ```
-dfx canister call dip721_nft_container transferFromDip721 "(principal\"$(dfx identity get-principal)\", principal\"$ALICE\", 0)"
+dfx canister call nft transferFromDip721 "(principal\"$(dfx identity get-principal)\", principal\"$ALICE\", 0)"
 ```
 
 Transfer the NFT from from `ALICE` back to the default user.
 
 ```
-dfx canister call dip721_nft_container safeTransferFromDip721 "(principal\"$ALICE\", principal\"$(dfx identity get-principal)\", 0)"
+dfx canister call nft safeTransferFromDip721 "(principal\"$ALICE\", principal\"$(dfx identity get-principal)\", 0)"
 ```
 Note the second transfer works because the caller is in the list of custodians, i.e. the default user has admin rights to modify the NFT collection.
 
@@ -121,12 +121,12 @@ Note the second transfer works because the caller is in the list of custodians, 
 
 ### balanceOfDip721
 ```
-dfx canister call dip721_nft_container balanceOfDip721 "(principal\"$(dfx identity get-principal)\")"
+dfx canister call nft balanceOfDip721 "(principal\"$(dfx identity get-principal)\")"
 ```
 
 ### getMaxLimitDip721
 ```
-dfx canister call dip721_nft_container getMaxLimitDip721
+dfx canister call nft getMaxLimitDip721
 ```
 
 ### getMetadataDip721
@@ -134,42 +134,42 @@ Provide a token ID.
 The token ID was provided to you when you ran `mintDip721`, e.g. `(variant { Ok = record { id = 1 : nat; token_id = 0 : nat64 } })` So, the token ID is 0 in this case.
 
 ```
-dfx canister call dip721_nft_container getMetadataDip721 "0"
+dfx canister call nft getMetadataDip721 "0"
 ```
 
 ### getMetadataForUserDip721
 ```
-dfx canister call dip721_nft_container getMetadataForUserDip721 "(principal\"$(dfx identity get-principal)\")"
+dfx canister call nft getMetadataForUserDip721 "(principal\"$(dfx identity get-principal)\")"
 ```
 
 ### getTokenIdsForUserDip721
 ```
-dfx canister call dip721_nft_container getTokenIdsForUserDip721 "(principal\"$(dfx identity get-principal)\")"
+dfx canister call nft getTokenIdsForUserDip721 "(principal\"$(dfx identity get-principal)\")"
 ```
 
 ### logoDip721
 ```
-dfx canister call dip721_nft_container logoDip721
+dfx canister call nft logoDip721
 ```
 
 ### nameDip721
 ```
-dfx canister call dip721_nft_container nameDip721
+dfx canister call nft nameDip721
 ```
 
 ### supportedInterfacesDip721
 ```
-dfx canister call dip721_nft_container supportedInterfacesDip721
+dfx canister call nft supportedInterfacesDip721
 ```
 
 ### symbolDip721
 ```
-dfx canister call dip721_nft_container symbolDip721
+dfx canister call nft symbolDip721
 ```
 
 ### totalSupplyDip721
 ```
-dfx canister call dip721_nft_container totalSupplyDip721
+dfx canister call nft totalSupplyDip721
 ```
 
 ### ownerOfDip721
@@ -177,7 +177,7 @@ Provide a token ID.
 The token ID was provided to you when you ran `mintDip721`, e.g. `(variant { Ok = record { id = 1 : nat; token_id = 0 : nat64 } })` So, the token ID is 0 in this case.
 
 ```
-dfx canister call dip721_nft_container ownerOfDip721 "0"
+dfx canister call nft ownerOfDip721 "0"
 ```
 
 You should see something like this:

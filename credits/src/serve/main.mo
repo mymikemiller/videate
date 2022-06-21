@@ -183,6 +183,10 @@ actor class Serve() = this {
         credits.getFeed(key);
     };
 
+    public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: Nat64) : async Types.MediaSearchResult {
+        credits.setNftTokenId(feedKey, episodeGuid, tokenId);
+    };
+
     public func getFeedSummary(key: Text) : async (Text, Text) {
         credits.getFeedSummary(key);
     };

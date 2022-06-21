@@ -19,6 +19,36 @@ type Source =
    releaseDate: text;
    uri: text;
  };
+type Serve = 
+ service {
+   addFeed: (text, Feed) -> (nat);
+   deleteFeed: (text) -> () oneway;
+   getAllFeedKeys: () -> (vec text) query;
+   getAllFeedMediaDetails: () -> (vec record {
+                                        text;
+                                        vec record {
+                                              text;
+                                              text;
+                                            };
+                                      });
+   getAllFeedSummaries: () -> (vec record {
+                                     text;
+                                     text;
+                                   });
+   getAllFeeds: () -> (vec record {
+                             text;
+                             Feed;
+                           }) query;
+   getFeed: (text) -> (opt Feed) query;
+   getFeedMediaDetails: (text) -> (text, vec record {
+                                               text;
+                                               text;
+                                             });
+   getFeedSummary: (text) -> (text, text);
+   getSampleFeed: () -> (Feed) query;
+   http_request: (HttpRequest) -> (HttpResponse) query;
+   http_request_update: (HttpRequest) -> (HttpResponse);
+ };
 type Platform = 
  record {
    id: text;
@@ -30,6 +60,7 @@ type Media =
    durationInMicroseconds: nat;
    etag: text;
    lengthInBytes: nat;
+   nftTokenId: opt nat64;
    source: Source;
    title: text;
    uri: text;
@@ -64,32 +95,4 @@ type Feed =
    subtitle: text;
    title: text;
  };
-service : {
-  addFeed: (text, Feed) -> (nat);
-  deleteFeed: (text) -> () oneway;
-  getAllFeedKeys: () -> (vec text) query;
-  getAllFeedMediaDetails: () -> (vec record {
-                                       text;
-                                       vec record {
-                                             text;
-                                             text;
-                                           };
-                                     });
-  getAllFeedSummaries: () -> (vec record {
-                                    text;
-                                    text;
-                                  });
-  getAllFeeds: () -> (vec record {
-                            text;
-                            Feed;
-                          }) query;
-  getFeed: (text) -> (opt Feed) query;
-  getFeedMediaDetails: (text) -> (text, vec record {
-                                              text;
-                                              text;
-                                            });
-  getFeedSummary: (text) -> (text, text);
-  getSampleFeed: () -> (Feed) query;
-  http_request: (HttpRequest) -> (HttpResponse) query;
-  http_request_update: (HttpRequest) -> (HttpResponse);
-}
+service : () -> Serve

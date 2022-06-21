@@ -5,6 +5,7 @@ import Array "mo:base/Array";
 import List "mo:base/List";
 import Debug "mo:base/Debug";
 import Option "mo:base/Option";
+import Dip721NFTTypes "../Dip721NFT/types";
 
 module {
   type Document = Xml.Document;
@@ -22,6 +23,8 @@ module {
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
 	public func format(feed: Feed, key: Text, episodeGuid: ?Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
+     let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { ownerOfDip721: (token_id: Dip721NFTTypes.TokenId) -> async Dip721NFTTypes.OwnerResult };
+
     var mediaArray: [Media] = [];
     switch(episodeGuid) {
       case null {
@@ -51,6 +54,13 @@ module {
           case (? media) {
             // Use an array containing only the single requested episode
             mediaArray := [media];
+
+            // Find the owner of the NFT
+            let ownerPrincipal = Dip721NFT.ownerOfDip721(media.nftTokenId);
+            Debug.print("Owner of NFT for episode being fetched: ");
+            Debug.print(debug_show(ownerPrincipal));
+
+
           };
         };
       };

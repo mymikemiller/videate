@@ -2,6 +2,13 @@ import type { Principal } from '@dfinity/principal';
 export type AssocList = [] | [[[Key, Profile], List]];
 export interface Bio { 'name' : [] | [string] }
 export interface Branch { 'left' : Trie, 'size' : bigint, 'right' : Trie }
+export type BuyNftResult = { 'Ok' : bigint } |
+  {
+    'Err' : { 'MediaNotFound' : null } |
+      { 'NotAuthorized' : null } |
+      { 'FeedNotFound' : null } |
+      { 'Other' : null }
+  };
 export type Error = { 'NotFound' : null } |
   { 'NotAuthorized' : null } |
   { 'AlreadyExists' : null };
@@ -24,9 +31,11 @@ export type Trie = { 'branch' : Branch } |
   { 'empty' : null };
 export interface _SERVICE {
   'addFeedKey' : (arg_0: string) => Promise<Result_1>,
+  'buyNft' : (arg_0: string, arg_1: string) => Promise<BuyNftResult>,
   'create' : (arg_0: ProfileUpdate) => Promise<Result>,
   'delete' : () => Promise<Result>,
   'getAllProfiles' : () => Promise<Trie>,
+  'getName' : (arg_0: Principal) => Promise<[] | [string]>,
   'read' : () => Promise<Result_1>,
   'update' : (arg_0: ProfileUpdate) => Promise<Result>,
 }

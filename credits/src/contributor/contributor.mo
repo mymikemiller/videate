@@ -4,6 +4,7 @@ import Nat "mo:base/Nat";
 import Result "mo:base/Result";
 import Principal "mo:base/Principal";
 import Buffer "mo:base/Buffer";
+import Text "mo:base/Text";
 import Iter "mo:base/Iter";
 import List "mo:base/List";
 import Array "mo:base/Array";
@@ -11,7 +12,18 @@ import Debug "mo:base/Debug";
 import Option "mo:base/Option";
 import Types "types";
 
+import Dip721NFTTypes "../Dip721NFT/types";
+import ServeTypes "../Serve/types";
+// import Dip721NFT "ic:canisters/Dip721NFT";
+// import Dip721NFT "ic:{cid on mainnet IC}"; // Switch to this when deploying to the IC
+
+// public shared({ caller }) func mintDip721(to: Principal, metadata: Types.MetadataDesc) : async Types.MintReceipt {
+
 actor Contributor {
+  // let cowsay = actor(“7igbu-3qaaa-aaaaa-qaapq-cai”): actor { cowsay: (Text) -> async Text };
+
+  let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { mintDip721: (Principal, Dip721NFTTypes.MetadataDesc) -> async Dip721NFTTypes.MintReceipt };
+  let Serve = actor("rrkah-fqaaa-aaaaa-aaaaq-cai"): actor { setNftTokenId: (feedKey: Text, episodeGuid: Text, tokenId: Nat64) -> async ServeTypes.MediaSearchResult };
   public type Bio = Types.Bio;
   public type Profile = Types.Profile;
   public type ProfileUpdate = Types.ProfileUpdate;
@@ -70,6 +82,21 @@ actor Contributor {
       key(principal),    // Key
       Principal.equal,   // Equality checker
     );
+  };
+
+  public func getName(principal: Principal) : async ?Text {
+    Debug.print("in getName. principal:");
+    Debug.print(debug_show(principal));
+    switch (getProfile(principal)) {
+      case (null) null;
+      case (? profile) {
+        Debug.print("found profile");
+        Debug.print(debug_show(profile));
+        Debug.print(debug_show(profile.bio));
+        Debug.print(debug_show(profile.bio.name));
+        profile.bio.name;
+      };
+    };
   };
 
   // Update the profile associated with the given principal, returning the new
@@ -239,6 +266,77 @@ actor Contributor {
           null              //Replace specified profile with null
         ).0;
         #ok(());
+      };
+    };
+  };
+
+  public shared(msg) func buyNft(feedKey: Text, episodeGuid: Text) : async Types.BuyNftResult {
+    let callerId = msg.caller;
+    let metadata: [Dip721NFTTypes.MetadataPart] = [
+      {
+        purpose = #Rendered;
+        key_val_data = [
+          {
+            key = "description"; 
+            val = #TextContent ("Episode of a Videate podcast");
+          },
+          {
+            key = "tag"; 
+            val = #TextContent ("episode");
+          },
+          {
+            key = "contentType";
+            val = #TextContent ("text/plain");
+          },
+          {
+            key = "locationType"; 
+            val = #Nat8Content (4);
+          }
+        ];
+        data = Text.encodeUtf8("https://rss.videate.org/" # feedKey # "/" # episodeGuid);
+      }
+    ];
+    Debug.print("Minting NFT " # feedKey # " " # episodeGuid);
+    Debug.print("callerId: " # debug_show(callerId));
+    Debug.print("metadata: " # debug_show(metadata));
+    let result = await Dip721NFT.mintDip721(callerId, metadata);
+    Debug.print("Done minting.");
+
+    switch(result) {
+      case (#Ok(mintReceiptPart: Dip721NFTTypes.MintReceiptPart)) {
+        // Associate the Media with the new new tokenId
+        let setNftResult = await Serve.setNftTokenId(feedKey, episodeGuid, mintReceiptPart.token_id);
+        switch(setNftResult) {
+          case (#Ok(media: ServeTypes.Media)) {
+            return #Ok(mintReceiptPart.token_id);
+          };
+          case (#Err(e)) {
+            switch (e) {
+              case (#FeedNotFound) {
+                return #Err(#FeedNotFound);
+              };
+              case (#MediaNotFound) {
+                return #Err(#MediaNotFound);
+              };
+            };
+          };
+        };
+      };
+      case (#Err(e)) {
+        switch(e) {
+          case (#Unauthorized) {
+            return #Err(#NotAuthorized);
+          };
+          case (#InvalidTokenId) {
+            return #Err(#Other);
+          };
+          case (#ZeroAddress) {
+            return #Err(#Other);
+          };
+          case (#Other) {
+            return #Err(#Other);
+          };
+        };
       };
     };
   };

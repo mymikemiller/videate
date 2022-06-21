@@ -13,6 +13,15 @@ export const idlFactory = ({ IDL }) => {
     'AlreadyExists' : IDL.Null,
   });
   const Result_1 = IDL.Variant({ 'ok' : Profile, 'err' : Error });
+  const BuyNftResult = IDL.Variant({
+    'Ok' : IDL.Nat64,
+    'Err' : IDL.Variant({
+      'MediaNotFound' : IDL.Null,
+      'NotAuthorized' : IDL.Null,
+      'FeedNotFound' : IDL.Null,
+      'Other' : IDL.Null,
+    }),
+  });
   const ProfileUpdate = IDL.Record({
     'bio' : Bio,
     'feedKeys' : IDL.Vec(IDL.Text),
@@ -33,9 +42,11 @@ export const idlFactory = ({ IDL }) => {
   );
   return IDL.Service({
     'addFeedKey' : IDL.Func([IDL.Text], [Result_1], []),
+    'buyNft' : IDL.Func([IDL.Text, IDL.Text], [BuyNftResult], []),
     'create' : IDL.Func([ProfileUpdate], [Result], []),
     'delete' : IDL.Func([], [Result], []),
     'getAllProfiles' : IDL.Func([], [Trie], []),
+    'getName' : IDL.Func([IDL.Principal], [IDL.Opt(IDL.Text)], []),
     'read' : IDL.Func([], [Result_1], []),
     'update' : IDL.Func([ProfileUpdate], [Result], []),
   });

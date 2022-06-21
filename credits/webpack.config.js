@@ -103,8 +103,9 @@ module.exports = {
       CONTRIBUTOR_ASSETS_CANISTER_ID: canisters["contributor_assets"],
       CONTRIBUTOR_CANISTER_ID: canisters["contributor"],
       SERVE_CANISTER_ID: canisters["serve"],
+      DIP721NFT_CANISTER_ID: canisters["Dip721NFT"],
       II_URL: isDevelopment
-        ? "{origin}?canisterId=rno2w-sqaaa-aaaaa-aaacq-cai#authorize"
+        ? "{origin}?canisterId=renrk-eyaaa-aaaaa-aaada-cai#authorize"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({

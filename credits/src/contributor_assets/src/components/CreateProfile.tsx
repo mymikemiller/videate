@@ -28,14 +28,13 @@ const CreateProfile = () => {
         const profileResponse = await actor.read();
         if ("ok" in profileResponse) {
           setProfile(profileResponse.ok);
-          navigate('/manage');
+          // navigate('/manage');
         } else {
           console.error(profileResponse.err);
           handleCreationError();
         }
       } else {
         handleCreationError();
-        console.log("there was an error in profile creation:");
         console.error(createResponse.err);
       }
     });

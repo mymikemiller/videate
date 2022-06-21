@@ -29,24 +29,11 @@ export interface Media {
   'source' : Source,
   'etag' : string,
   'description' : string,
+  'nftTokenId' : [] | [bigint],
   'durationInMicroseconds' : bigint,
 }
 export interface Platform { 'id' : string, 'uri' : string }
-export interface Source {
-  'id' : string,
-  'uri' : string,
-  'platform' : Platform,
-  'releaseDate' : string,
-}
-export interface StreamingCallbackHttpResponse {
-  'token' : Token,
-  'body' : Array<number>,
-}
-export type StreamingStrategy = {
-    'Callback' : { 'token' : Token, 'callback' : [Principal, string] }
-  };
-export type Token = {};
-export interface _SERVICE {
+export interface Serve {
   'addFeed' : (arg_0: string, arg_1: Feed) => Promise<bigint>,
   'deleteFeed' : (arg_0: string) => Promise<undefined>,
   'getAllFeedKeys' : () => Promise<Array<string>>,
@@ -64,3 +51,18 @@ export interface _SERVICE {
   'http_request' : (arg_0: HttpRequest) => Promise<HttpResponse>,
   'http_request_update' : (arg_0: HttpRequest) => Promise<HttpResponse>,
 }
+export interface Source {
+  'id' : string,
+  'uri' : string,
+  'platform' : Platform,
+  'releaseDate' : string,
+}
+export interface StreamingCallbackHttpResponse {
+  'token' : Token,
+  'body' : Array<number>,
+}
+export type StreamingStrategy = {
+    'Callback' : { 'token' : Token, 'callback' : [Principal, string] }
+  };
+export type Token = {};
+export interface _SERVICE extends Serve {}

@@ -121,3 +121,21 @@ https://mvjun-2yaaa-aaaah-aac3q-cai.raw.ic0.app/example_feed_key?principal=TEST_
 ## Authors
 
 * **Mike Miller** - *Initial work* - [mymikemiller](https://github.com/mymikemiller)
+
+
+Deploy order:
+
+dfx deploy serve; dfx deploy contributor; dfx deploy contributor_assets; dfx deploy Dip721NFT --argument "(
+  principal\"$(dfx identity get-principal)\", 
+  record {
+    logo = record {
+      logo_type = \"image/png\";
+      data = \"\";
+    };
+    name = \"Videate NFTs\";
+    symbol = \"VNFT\";
+    maxLimit = 0;
+  }
+)"; 
+
+dfx canister call Dip721NFT addCustodian principal\"$(dfx canister id contributor)\"

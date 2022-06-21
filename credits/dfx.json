@@ -21,8 +21,8 @@
       ],
       "type": "assets"
     },
-    "dip721_nft_container": {
-      "main": "src/dip-721-nft-container/Main.mo",
+    "Dip721NFT": {
+      "main": "src/Dip721NFT/main.mo",
       "type": "motoko"
     }
   },

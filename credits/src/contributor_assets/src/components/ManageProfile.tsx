@@ -56,7 +56,6 @@ function ManageProfile() {
     ) {
       const result = await actor?.delete();
       toast.success("Contributor profile successfully deleted");
-      console.log(result);
       navigate("/");
     }
   };
@@ -120,7 +119,6 @@ function ManageProfile() {
           {feedKeys.length == 0 && <Text>No feed keys found. Please click the Videate link in the shownotes to populate.</Text>}
           <ul style={{ padding: 0 }} >
             {feedKeys.map((feedKey, index) => {
-              console.log(`${index}: ${feedKey}`)
               return (
                 <li key={feedKey} style={{ listStyleType: 'none', marginBottom: '1em' }} >
                   <CopyableLink serveActor={serveActor!} feedKey={feedKey} />

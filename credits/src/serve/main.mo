@@ -80,6 +80,7 @@ actor class Serve() = this {
         };
 
         let settingsUri = getVideateSettingsUri(request, feedKey);
+        let nftPurchaseUri = getNftPurchaseUri(request, feedKey);
         let mediaHost = "videate.org";
 
         // Todo: Translate all media links that point to web/media to point to
@@ -94,7 +95,7 @@ actor class Serve() = this {
 
         Debug.print("getting xml");
 
-        var xml = getFeedXml(feedKey, episodeGuid, settingsUri, uriTransformers);
+        var xml = getFeedXml(feedKey, episodeGuid, settingsUri, nftPurchaseUri, uriTransformers);
         Utils.generateFeedResponse(xml);
     };
 
@@ -163,6 +164,35 @@ actor class Serve() = this {
         return settingsBaseUri # "feedKey=" # feedKey;
     };
 
+    private func getNftPurchaseUri(request: HttpRequest, feedKey: Text): Text {
+        // If this 'serve' canister is hosted on the IC, use the hard-coded IC
+        // contributor_assets canister as the host for the videate settings
+        // page. Otherwise, use the same host as in the request, since that
+        // host should also work for the contributor_assets canister (i.e. when
+        // dfx is running locally, even when accessed through localhost.run)
+        let settingsBaseUri = if(Principal.toText(Principal.fromActor(this)) == "mvjun-2yaaa-aaaah-aac3q-cai")
+        {
+            "https://44ejt-7yaaa-aaaao-aabqa-cai.raw.ic0.app/?"
+        } else { 
+            let host = getRequestHost(request);
+
+            // Parse the contributor_assets canister cid from the query params,
+            // which we specify if we're locally hosting. This is necessary
+            // since there's no way, from motoko, to examine
+            // .dfx/local/canister_ids.json file or the generated files under
+            // ../declarations to find the cid, so we have to specify it
+            // manually in the url when subscribing to a feed. See
+            // https://forum.dfinity.org/t/programmatically-find-the-canister-id-of-a-frontend-canister
+            let contributorAssetsCid = Option.get(
+                getQueryParam("contributorAssetsCid", request.url),
+                "ERROR_NO_CONTRIBUTOR_ASSETS_CID_QUERY_PARAM"
+            );
+
+            "https://" # host # "/nft?canisterId=" # contributorAssetsCid # "&";
+        };
+        return settingsBaseUri # "feedKey=" # feedKey;
+    };
+
     /* Credits interface */
 
     // Feeds
@@ -186,7 +216,7 @@ actor class Serve() = this {
         credits.getFeed(key);
     };
 
-    public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: Nat64) : async Types.MediaSearchResult {
+    public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: ?Nat64) : async Types.MediaSearchResult {
         credits.setNftTokenId(feedKey, episodeGuid, tokenId);
     };
 
@@ -210,12 +240,12 @@ actor class Serve() = this {
         credits.getSampleFeed();
     };
 
-    func getFeedXml(key: Text, episodeGuid: ?Text, videateSettingsUri: Text, uriTransformers: [UriTransformer]) : Text {
+    func getFeedXml(key: Text, episodeGuid: ?Text, videateSettingsUri: Text, nftPurchaseUri: Text, uriTransformers: [UriTransformer]) : Text {
         let feed: ?Feed = credits.getFeed(key);
         switch(feed) {
             case null "Unrecognized feed: " # key;
             case (?feed) {
-                let doc: Document = Rss.format(feed, key, episodeGuid, videateSettingsUri, uriTransformers);
+                let doc: Document = Rss.format(feed, key, episodeGuid, videateSettingsUri, nftPurchaseUri, uriTransformers);
                 Xml.stringifyDocument(doc);
             };
         };

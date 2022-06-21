@@ -105,7 +105,7 @@ module.exports = {
       SERVE_CANISTER_ID: canisters["serve"],
       DIP721NFT_CANISTER_ID: canisters["Dip721NFT"],
       II_URL: isDevelopment
-        ? "{origin}?canisterId=renrk-eyaaa-aaaaa-aaada-cai#authorize"
+        ? "{origin}?canisterId=renrk-eyaaa-aaaaa-aaada-cai#authorize" //"{origin}?canisterId=renrk-eyaaa-aaaaa-aaada-cai#authorize"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({

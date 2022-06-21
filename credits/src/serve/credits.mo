@@ -95,7 +95,7 @@ module {
             };
         };
         
-        public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: Nat64) : Types.MediaSearchResult {
+        public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: ?Nat64) : Types.MediaSearchResult {
             let mediaResult = getMedia(feedKey, episodeGuid);
             switch (mediaResult) {
                 case (#Ok(media)) {
@@ -108,7 +108,7 @@ module {
                         etag = media.etag;
                         lengthInBytes = media.lengthInBytes;
 
-                        nftTokenId = Option.make(tokenId);
+                        nftTokenId = tokenId;
                     };
 
                     let _ = updateMedia(feedKey, episodeGuid, newMedia);

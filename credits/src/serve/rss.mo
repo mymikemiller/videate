@@ -22,7 +22,7 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed, key: Text, episodeGuid: ?Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
+	public func format(feed: Feed, key: Text, episodeGuid: ?Text, videateSettingsUri: Text, nftPurchaseUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
     // let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { ownerOfDip721: (token_id: Dip721NFTTypes.TokenId) -> async Dip721NFTTypes.OwnerResult };
 
     var mediaArray: [Media] = [];
@@ -166,7 +166,7 @@ module {
                 children = [];
               }]),
               List.map<Media, Element>(mediaListNewestToOldest, func(media: Media) : Element {
-                getMediaElement(media, key, videateSettingsUri, mediaUriTransformers);
+                getMediaElement(media, key, videateSettingsUri, nftPurchaseUri, mediaUriTransformers);
               })
             ));
 					},
@@ -175,20 +175,19 @@ module {
 		};
 	};
 
-  func getMediaElement(media: Media, feedKey: Text, videateSettingsUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
+  func getMediaElement(media: Media, feedKey: Text, videateSettingsUri: Text, nftPurchaseUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
     let videateSettingsMessage: Text = media.description # "\n\nManage your Videate settings:\n" # videateSettingsUri # "\n\n";
-    let nftPurchaseUri = "localhost:8000/nft?canisterId=rkp4c-7iaaa-aaaaa-aaaca-cai&feedKey=" # feedKey # "&episodeGuid=" # media.uri;
+    let fullNftPurchaseUri = nftPurchaseUri # "&episodeGuid=" # media.uri;
 
     let nftOwnerMessage = switch(media.nftTokenId) {
       case (null) {
-        "currently unclaimed!"
+        "The NFT for this episode is currently unclaimed! Click here to by the NFT: "
       };
       case (? nftTokenId) {
-        let owner = if (nftTokenId % 2 == 0) "Mike" else "Nick";
-        "owned by " # owner # ".";
+        if (nftTokenId % 2 == 1) "You own the NFT for this video. Click here to manage your NFTs: " else "Nick Ristagno owns the NFT for this video. Click here to buy it: ";
       };
     };
-    let nftDescription = "\n\nThe NFT for this episode is " # nftOwnerMessage # " Click here to buy the NFT: " # nftPurchaseUri;
+    let nftDescription = nftOwnerMessage # "\n" # fullNftPurchaseUri;
 
     let mediaDescription = videateSettingsMessage # nftDescription;
 

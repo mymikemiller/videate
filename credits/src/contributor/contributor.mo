@@ -12,17 +12,17 @@ import Debug "mo:base/Debug";
 import Option "mo:base/Option";
 import Types "types";
 
-import Dip721NFTTypes "../Dip721NFT/types";
+import NftTypes "../Serve/nft_types";
 import ServeTypes "../Serve/types";
-// import Dip721NFT "ic:canisters/Dip721NFT";
-// import Dip721NFT "ic:{cid on mainnet IC}"; // Switch to this when deploying to the IC
+// import NFT "ic:canisters/NFT";
+// import NFT "ic:{cid on mainnet IC}"; // Switch to this when deploying to the IC
 
-// public shared({ caller }) func mintDip721(to: Principal, metadata: Types.MetadataDesc) : async Types.MintReceipt {
+// public shared({ caller }) func mint(to: Principal, metadata: Types.MetadataDesc) : async Types.MintReceipt {
 
 actor Contributor {
   // let cowsay = actor(“7igbu-3qaaa-aaaaa-qaapq-cai”): actor { cowsay: (Text) -> async Text };
 
-  let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { mintDip721: (Principal, Dip721NFTTypes.MetadataDesc) -> async Dip721NFTTypes.MintReceipt };
+  // let NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { mint: (Principal, NFTTypes.MetadataDesc) -> async NFTTypes.MintReceipt };
   let Serve = actor("rrkah-fqaaa-aaaaa-aaaaq-cai"): actor { setNftTokenId: (feedKey: Text, episodeGuid: Text, tokenId: Nat64) -> async ServeTypes.MediaSearchResult };
   public type Bio = Types.Bio;
   public type Profile = Types.Profile;
@@ -270,9 +270,9 @@ actor Contributor {
     };
   };
 
-  public shared(msg) func buyNft(feedKey: Text, episodeGuid: Text) : async Types.BuyNftResult {
+  public shared(msg) func buyNft(feedKey: Text, episodeGuid: Text) : async NftTypes.BuyNftResult {
     let callerId = msg.caller;
-    let metadata: [Dip721NFTTypes.MetadataPart] = [
+    let metadata: [NftTypes.MetadataPart] = [
       {
         purpose = #Rendered;
         key_val_data = [
@@ -299,11 +299,11 @@ actor Contributor {
     Debug.print("Minting NFT " # feedKey # " " # episodeGuid);
     Debug.print("callerId: " # debug_show(callerId));
     Debug.print("metadata: " # debug_show(metadata));
-    let result = await Dip721NFT.mintDip721(callerId, metadata);
+    let result = await Serve.mintDip721(callerId, metadata);
     Debug.print("Done minting.");
 
     switch(result) {
-      case (#Ok(mintReceiptPart: Dip721NFTTypes.MintReceiptPart)) {
+      case (#Ok(mintReceiptPart: NftTypes.MintReceiptPart)) {
         // Associate the Media with the new new tokenId
         let setNftResult = await Serve.setNftTokenId(feedKey, episodeGuid, mintReceiptPart.token_id);
         switch(setNftResult) {

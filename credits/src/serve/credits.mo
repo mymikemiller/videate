@@ -17,7 +17,6 @@ import Text "mo:base/Text";
 import Types "types";
 
 module {
-
     public type Platform = Types.Platform;
     public type Source = Types.Source;
     public type Media = Types.Media;

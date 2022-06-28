@@ -38,7 +38,7 @@ This deploys the DIP721 NFT canister with the following initialization arguments
 - maxLimit: The maximum number of NFTs that are allowed in this collection.
 
 ```
-dfx deploy Dip721NFT --argument "(
+dfx deploy --argument "(
   principal\"$(dfx identity get-principal)\", 
   record {
     logo = record {
@@ -52,16 +52,10 @@ dfx deploy Dip721NFT --argument "(
 )"
 ```
 
-Then add the `contributor` canister as a custodian since it needs to mint NFTs. 
-
-```
-dfx canister call Dip721NFT addCustodian principal\"$(dfx canister id contributor)\"
-```
-
 ## Mint an NFT
 
 ```
-dfx canister call Dip721NFT mintDip721 \
+dfx canister call nft mintDip721 \
 "(
   principal\"$(dfx identity get-principal)\", 
   vec { 

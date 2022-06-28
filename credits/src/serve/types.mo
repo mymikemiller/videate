@@ -80,9 +80,9 @@ module {
     // The duration of the media in microseconds
     durationInMicroseconds: Nat;
 
-    // The token_id that was provided when an NFT for this Media was
-    // minted. This corresponds to an NFT in the "Dip721NFT" canister.
-    // "Null" implies that no NFT for this Media has yet been minted.
+    // The token_id that was provided when an NFT for this Media was minted.
+    // This corresponds to an NFT stored in the "nft" module. "Null" implies
+    // that no NFT for this Media has yet been minted.
     nftTokenId: ?Nat64;
 
     // From ServedMedia when cloning, but all media on the InternetComputer

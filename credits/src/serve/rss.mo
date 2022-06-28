@@ -5,7 +5,7 @@ import Array "mo:base/Array";
 import List "mo:base/List";
 import Debug "mo:base/Debug";
 import Option "mo:base/Option";
-import Dip721NFTTypes "../Dip721NFT/types";
+import NftTypes "nft_types";
 
 module {
   type Document = Xml.Document;

@@ -20,10 +20,6 @@
         "dist/contributor_assets/"
       ],
       "type": "assets"
-    },
-    "Dip721NFT": {
-      "main": "src/Dip721NFT/main.mo",
-      "type": "motoko"
     }
   },
   "defaults": {

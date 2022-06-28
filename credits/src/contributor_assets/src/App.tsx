@@ -265,16 +265,7 @@ const App = () => {
                 <Route path="/loading" element={
                   <span />
                 } />
-                <Route path="/nft" element={isAuthenticated ? (
-                  <div style={{ display: 'flex', justifyContent: 'right', flexGrow: 1, fontWeight: 'bold', fontSize: '20px' }}>
-
-                    <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>
-                      <Logout />
-                    </button>
-                  </div>
-                ) : <span />
-                }>
-                </Route>
+                <Route path="/nft" element={<span />} />
                 <Route path="*" element={isAuthenticated ? (
                   <div style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
                     <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>

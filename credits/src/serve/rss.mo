@@ -176,7 +176,7 @@ module {
 	};
 
   func getMediaElement(media: Media, feedKey: Text, videateSettingsUri: Text, nftPurchaseUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
-    let videateSettingsMessage: Text = media.description # "\n\nManage your Videate settings:\n" # videateSettingsUri # "\n\n";
+    let videateSettingsMessage: Text = media.description # "\n\nManage your Videate settings:\n\n" # videateSettingsUri # "\n\n";
     let fullNftPurchaseUri = nftPurchaseUri # "&episodeGuid=" # media.uri;
 
     let nftOwnerMessage = switch(media.nftTokenId) {
@@ -184,10 +184,10 @@ module {
         "The NFT for this episode is currently unclaimed! Click here to by the NFT: "
       };
       case (? nftTokenId) {
-        if (nftTokenId % 2 == 1) "You own the NFT for this video. Click here to manage your NFTs: " else "Nick Ristagno owns the NFT for this video. Click here to buy it: ";
+        if (nftTokenId % 2 == 1) "Mike Miller owns the NFT for this video. Click here to buy it: " else "Nick Ristagno owns the NFT for this video. Click here to buy it: ";
       };
     };
-    let nftDescription = nftOwnerMessage # "\n" # fullNftPurchaseUri;
+    let nftDescription = nftOwnerMessage # "\n\n" # fullNftPurchaseUri;
 
     let mediaDescription = videateSettingsMessage # nftDescription;
 

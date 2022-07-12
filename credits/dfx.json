@@ -1,7 +1,7 @@
 {
   "canisters": {
     "serve": {
-      "main": "src/serve/main.mo",
+      "main": "src/serve/serve.mo",
       "type": "motoko"
     },
     "contributor": {

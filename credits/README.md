@@ -125,7 +125,7 @@ https://mvjun-2yaaa-aaaah-aac3q-cai.raw.ic0.app/example_feed_key?principal=TEST_
 
 Deploy order:
 
-dfx deploy serve; dfx deploy contributor; dfx deploy contributor_assets; dfx deploy Dip721NFT --argument "(
+dfx deploy contributor; dfx deploy contributor_assets; dfx deploy serve --argument "(
   principal\"$(dfx identity get-principal)\", 
   record {
     logo = record {
@@ -138,4 +138,4 @@ dfx deploy serve; dfx deploy contributor; dfx deploy contributor_assets; dfx dep
   }
 )"; 
 
-dfx canister call Dip721NFT addCustodian principal\"$(dfx canister id contributor)\"
+dfx canister call serve addNftCustodian "(principal\"$(dfx canister id contributor)\")

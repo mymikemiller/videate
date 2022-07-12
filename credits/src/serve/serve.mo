@@ -13,21 +13,21 @@ import Option "mo:base/Option";
 import HashMap "mo:base/HashMap";
 import Error "mo:base/Error";
 import Principal "mo:base/Principal";
-import Credits "credits";
-import Nft "nft";
-import Xml "xml";
+import Credits "credits/credits";
+import Nft "nft/nft";
+import Rss "rss/rss";
+import Xml "rss/xml";
 import Types "types";
 import Utils "utils";
-import Rss "rss";
 
 actor class Serve(custodian: Principal) = Self {
   type HttpRequest = Types.HttpRequest;
   type HttpResponse = Types.HttpResponse;
-  type StableCredits = Types.StableCredits;
+  type StableCredits = Credits.StableCredits;
   type Feed = Credits.Feed;
   type Document = Xml.Document;
   type UriTransformer = Types.UriTransformer;
-  type Media = Types.Media;
+  type Media = Credits.Media;
 
   let sampleFeed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" version=\"2.0\"> <channel> <atom:link href=\"http://mikem-18bd0e1e.localhost.run/\" rel=\"self\" type=\"application/rss+xml\"></atom:link> <title>Sample Feed</title> <link>http://example.com</link> <language>en-us</language> <itunes:subtitle>Just a sample</itunes:subtitle> <itunes:author>Mike Miller</itunes:author> <itunes:summary>A sample feed hosted on the Internet Computer</itunes:summary> <description>A sample feed hosted on the Internet Computer</description> <itunes:owner> <itunes:name>Mike Miller</itunes:name> <itunes:email>mike@videate.org</itunes:email> </itunes:owner> <itunes:explicit>no</itunes:explicit> <itunes:image href=\"https://brianchristner.io/content/images/2016/01/Success-loading.jpg\"></itunes:image> <itunes:category text=\"Arts\"></itunes:category> <item> <title>test</title> <itunes:summary>test</itunes:summary> <description>test</description> <link>http://example.com/podcast-1</link> <enclosure url=\"https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4\" type=\"video/mpeg\" length=\"1024\"></enclosure> <pubDate>21 Dec 2016 16:01:07 +0000</pubDate> <itunes:author>Mike Miller</itunes:author> <itunes:duration>00:32:16</itunes:duration> <itunes:explicit>no</itunes:explicit> <guid></guid> </item> </channel> </rss>";
   
@@ -85,7 +85,7 @@ actor class Serve(custodian: Principal) = Self {
     };
 
     let settingsUri = getVideateSettingsUri(request, feedKey);
-    let nftPurchaseUri = getNftPurchaseUri(request, feedKey);
+    let nftPurchaseBaseUri = getNftPurchaseBaseUri(request, feedKey);
     let mediaHost = "videate.org";
 
     // Todo: Translate all media links that point to web/media to point to
@@ -100,7 +100,7 @@ actor class Serve(custodian: Principal) = Self {
 
     Debug.print("getting xml");
 
-    var xml = getFeedXml(feedKey, episodeGuid, settingsUri, nftPurchaseUri, uriTransformers);
+    var xml = getFeedXml(feedKey, episodeGuid, settingsUri, nftPurchaseBaseUri, uriTransformers);
     Utils.generateFeedResponse(xml);
   };
 
@@ -168,7 +168,7 @@ actor class Serve(custodian: Principal) = Self {
     return settingsBaseUri # "feedKey=" # feedKey;
   };
 
-  private func getNftPurchaseUri(request: HttpRequest, feedKey: Text): Text {
+  private func getNftPurchaseBaseUri(request: HttpRequest, feedKey: Text): Text {
     // If this 'serve' canister is hosted on the IC, use the hard-coded IC
     // contributor_assets canister as the host for the videate settings page.
     // Otherwise, use the same host as in the request, since that host should
@@ -219,7 +219,7 @@ actor class Serve(custodian: Principal) = Self {
     credits.getFeed(key);
   };
 
-  public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: ?Nat64) : async Types.MediaSearchResult {
+  public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: ?Nat64) : async Credits.MediaSearchResult {
     credits.setNftTokenId(feedKey, episodeGuid, tokenId);
   };
 
@@ -243,12 +243,12 @@ actor class Serve(custodian: Principal) = Self {
     credits.getSampleFeed();
   };
 
-  func getFeedXml(key: Text, episodeGuid: ?Text, videateSettingsUri: Text, nftPurchaseUri: Text, uriTransformers: [UriTransformer]) : Text {
+  func getFeedXml(key: Text, episodeGuid: ?Text, videateSettingsUri: Text, nftPurchaseBaseUri: Text, uriTransformers: [UriTransformer]) : Text {
     let feed: ?Feed = credits.getFeed(key);
     switch(feed) {
       case null "Unrecognized feed: " # key;
       case (?feed) {
-        let doc: Document = Rss.format(feed, key, episodeGuid, videateSettingsUri, nftPurchaseUri, uriTransformers);
+        let doc: Document = Rss.format(feed, key, episodeGuid, videateSettingsUri, nftPurchaseBaseUri, uriTransformers);
         Xml.stringifyDocument(doc);
       };
     };
@@ -274,7 +274,7 @@ actor class Serve(custodian: Principal) = Self {
   };
 
   public query func supportedInterfacesDip721() : async [Nft.InterfaceId] {
-    Nft.supportedInterfacesDip721(nft);
+    Nft.supportedInterfacesDip721();
   };
 
   public query func logoDip721() : async Nft.LogoResult {
@@ -294,7 +294,7 @@ actor class Serve(custodian: Principal) = Self {
   };
 
   public query func getMetadataDip721(token_id: Nft.TokenId) : async Nft.MetadataResult {
-    Nft.getMetadataDip721(nft);
+    Nft.getMetadataDip721(nft, token_id);
   };
 
   public query func getMaxLimitDip721() : async Nat16 {
@@ -310,6 +310,11 @@ actor class Serve(custodian: Principal) = Self {
   };
 
   public shared({ caller }) func mintDip721(to: Principal, metadata: Nft.MetadataDesc) : async Nft.MintReceipt {
+    Debug.print("Serve is calling into Nft.mintDip721");
     Nft.mintDip721(nft, caller, to, metadata);
+  };
+
+  public shared({ caller }) func addNftCustodian(newCustodian: Principal) : async Nft.Result<(), Nft.ApiError> {
+    return await Nft.addCustodian(nft, caller, newCustodian);
   };
 };

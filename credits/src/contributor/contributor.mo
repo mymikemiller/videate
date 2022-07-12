@@ -23,11 +23,16 @@ actor Contributor {
   // let cowsay = actor(“7igbu-3qaaa-aaaaa-qaapq-cai”): actor { cowsay: (Text) -> async Text };
 
   // let NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { mint: (Principal, NFTTypes.MetadataDesc) -> async NFTTypes.MintReceipt };
-  let Serve = actor("rrkah-fqaaa-aaaaa-aaaaq-cai"): actor { setNftTokenId: (feedKey: Text, episodeGuid: Text, tokenId: Nat64) -> async ServeTypes.MediaSearchResult };
+  let Serve = actor("rrkah-fqaaa-aaaaa-aaaaq-cai"): 
+    actor { 
+      setNftTokenId: (feedKey: Text, episodeGuid: Text, tokenId: Nat64) -> async ServeTypes.MediaSearchResult;
+      mintDip721: (to: Principal, metadata: NftTypes.MetadataDesc) -> async NftTypes.MintReceipt;
+  };
   public type Bio = Types.Bio;
   public type Profile = Types.Profile;
   public type ProfileUpdate = Types.ProfileUpdate;
   public type Error = Types.Error;
+  public type BuyNftResult = Types.BuyNftResult;
   type StableContributor = Types.StableContributor;
 
   private func key(x: Principal) : Trie.Key<Principal> {
@@ -270,7 +275,7 @@ actor Contributor {
     };
   };
 
-  public shared(msg) func buyNft(feedKey: Text, episodeGuid: Text) : async NftTypes.BuyNftResult {
+  public shared(msg) func buyNft(feedKey: Text, episodeGuid: Text) : async BuyNftResult {
     let callerId = msg.caller;
     let metadata: [NftTypes.MetadataPart] = [
       {
@@ -323,6 +328,8 @@ actor Contributor {
         };
       };
       case (#Err(e)) {
+        Debug.print("result:");
+        Debug.print(debug_show(result));
         switch(e) {
           case (#Unauthorized) {
             return #Err(#NotAuthorized);

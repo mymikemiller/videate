@@ -9,33 +9,33 @@ import Option "mo:base/Option";
 import Bool "mo:base/Bool";
 import Debug "mo:base/Debug";
 import Principal "mo:base/Principal";
-import NftTypes "./nft_types";
+import Types "types";
 
 module {
-  public type Dip721NonFungibleToken = NftTypes.Dip721NonFungibleToken;
-  public type ApiError = NftTypes.ApiError;
-  public type Result<S, E> = NftTypes.Result<S, E>;
-  public type OwnerResult = NftTypes.OwnerResult;
-  public type TxReceipt =  NftTypes.Result<Nat, ApiError>;
-  public type TransactionId = NftTypes.TransactionId;
-  public type TokenId = NftTypes.TokenId;
-  public type InterfaceId = NftTypes.InterfaceId;
-  public type LogoResult = NftTypes.LogoResult;
-  public type ExtendedMetadataResult = NftTypes.ExtendedMetadataResult;
-  public type MetadataResult = NftTypes.MetadataResult;
-  public type MetadataDesc = NftTypes.MetadataDesc;
-  public type MetadataPart = NftTypes.MetadataPart;
-  public type MetadataPurpose = NftTypes.MetadataPurpose;
-  public type MetadataKeyVal = NftTypes.MetadataKeyVal;
-  public type MetadataVal = NftTypes.MetadataVal;
-  public type MintReceipt = NftTypes.MintReceipt;
-  public type MintReceiptPart = NftTypes.MintReceiptPart;
+  public type Dip721NonFungibleToken = Types.Dip721NonFungibleToken;
+  public type ApiError = Types.ApiError;
+  public type Result<S, E> = Types.Result<S, E>;
+  public type OwnerResult = Types.OwnerResult;
+  public type TxReceipt =  Types.Result<Nat, ApiError>;
+  public type TransactionId = Types.TransactionId;
+  public type TokenId = Types.TokenId;
+  public type InterfaceId = Types.InterfaceId;
+  public type LogoResult = Types.LogoResult;
+  public type ExtendedMetadataResult = Types.ExtendedMetadataResult;
+  public type MetadataResult = Types.MetadataResult;
+  public type MetadataDesc = Types.MetadataDesc;
+  public type MetadataPart = Types.MetadataPart;
+  public type MetadataPurpose = Types.MetadataPurpose;
+  public type MetadataKeyVal = Types.MetadataKeyVal;
+  public type MetadataVal = Types.MetadataVal;
+  public type MintReceipt = Types.MintReceipt;
+  public type MintReceiptPart = Types.MintReceiptPart;
 
   public class Nft(custodian: Principal) = Self {
-    public var transactionId: NftTypes.TransactionId = 0;
-    public var nfts = List.nil<NftTypes.Nft>();
+    public var transactionId: Types.TransactionId = 0;
+    public var nfts = List.nil<Types.Nft>();
     public var custodians = List.make<Principal>(custodian);
-    public var logo : NftTypes.LogoResult = {
+    public var logo : Types.LogoResult = {
       logo_type = "image/png";
       data = "";
     };
@@ -50,12 +50,12 @@ module {
   public func balanceOfDip721(nft: Nft, user: Principal) : Nat64 {
     return Nat64.fromNat(
       List.size(
-        List.filter(nft.nfts, func(token: NftTypes.Nft) : Bool { token.owner == user })
+        List.filter(nft.nfts, func(token: Types.Nft) : Bool { token.owner == user })
       )
     );
   };
 
-  public func ownerOfDip721(nft: Nft, token_id: NftTypes.TokenId) : NftTypes.OwnerResult {
+  public func ownerOfDip721(nft: Nft, token_id: Types.TokenId) : Types.OwnerResult {
     Debug.print("in ownerOfDip721 for token_id " # debug_show(token_id));
     let item = List.get(nft.nfts, Nat64.toNat(token_id));
     switch (item) {
@@ -72,7 +72,7 @@ module {
     };
   };
 
-  public func safeTransferFromDip721(nft: Nft, caller: Principal, from: Principal, to: Principal, token_id: NftTypes.TokenId) : NftTypes.TxReceipt {  
+  public func safeTransferFromDip721(nft: Nft, caller: Principal, from: Principal, to: Principal, token_id: Types.TokenId) : Types.TxReceipt {  
     if (to == nft.null_address) {
       return #Err(#ZeroAddress);
     } else {
@@ -80,11 +80,11 @@ module {
     };
   };
 
-  public func transferFromDip721(nft: Nft, caller: Principal, from: Principal, to: Principal, token_id: NftTypes.TokenId) : NftTypes.TxReceipt {
+  public func transferFromDip721(nft: Nft, caller: Principal, from: Principal, to: Principal, token_id: Types.TokenId) : Types.TxReceipt {
     return transferFrom(nft, from, to, token_id, caller);
   };
 
-  public func transferFrom(nft: Nft, from: Principal, to: Principal, token_id: NftTypes.TokenId, caller: Principal) : NftTypes.TxReceipt {
+  public func transferFrom(nft: Nft, from: Principal, to: Principal, token_id: Types.TokenId, caller: Principal) : Types.TxReceipt {
     let item = List.get(nft.nfts, Nat64.toNat(token_id));
     switch (item) {
       case null {
@@ -99,9 +99,9 @@ module {
         } else if (Principal.notEqual(from, token.owner)) {
           return #Err(#Other);
         } else {
-          nft.nfts := List.map(nft.nfts, func (item : NftTypes.Nft) : NftTypes.Nft {
+          nft.nfts := List.map(nft.nfts, func (item : Types.Nft) : Types.Nft {
             if (item.id == token.id) {
-              let update : NftTypes.Nft = {
+              let update : Types.Nft = {
                 owner = to;
                 id = item.id;
                 metadata = token.metadata;
@@ -118,11 +118,11 @@ module {
     };
   };
   
-  public func supportedInterfacesDip721() : [NftTypes.InterfaceId] {
+  public func supportedInterfacesDip721() : [Types.InterfaceId] {
     return [#TransferNotification, #Burn, #Mint];
   };
 
-  public func logoDip721(nft: Nft) : NftTypes.LogoResult {
+  public func logoDip721(nft: Nft) : Types.LogoResult {
     return nft.logo;
   };
 
@@ -140,7 +140,7 @@ module {
     );
   };
 
-  public func getMetadataDip721(nft: Nft, token_id: NftTypes.TokenId) : NftTypes.MetadataResult {
+  public func getMetadataDip721(nft: Nft, token_id: Types.TokenId) : Types.MetadataResult {
     let item = List.get(nft.nfts, Nat64.toNat(token_id));
     switch (item) {
       case null {
@@ -156,8 +156,8 @@ module {
     return nft.maxLimit;
   };
 
-  public func getMetadataForUserDip721(nft: Nft, user: Principal) : NftTypes.ExtendedMetadataResult {
-    let item = List.find(nft.nfts, func(token: NftTypes.Nft) : Bool { token.owner == user });
+  public func getMetadataForUserDip721(nft: Nft, user: Principal) : Types.ExtendedMetadataResult {
+    let item = List.find(nft.nfts, func(token: Types.Nft) : Bool { token.owner == user });
     switch (item) {
       case null {
         return #Err(#Other);
@@ -171,19 +171,24 @@ module {
     };
   };
 
-  public func getTokenIdsForUserDip721(nft: Nft, user: Principal) : [NftTypes.TokenId] {
-    let items = List.filter(nft.nfts, func(token: NftTypes.Nft) : Bool { token.owner == user });
-    let tokenIds = List.map(items, func (item : NftTypes.Nft) : NftTypes.TokenId { item.id });
+  public func getTokenIdsForUserDip721(nft: Nft, user: Principal) : [Types.TokenId] {
+    let items = List.filter(nft.nfts, func(token: Types.Nft) : Bool { token.owner == user });
+    let tokenIds = List.map(items, func (item : Types.Nft) : Types.TokenId { item.id });
     return List.toArray(tokenIds);
   };
 
-  public func mintDip721(nft: Nft, caller: Principal, to: Principal, metadata: NftTypes.MetadataDesc) : NftTypes.MintReceipt {
+  public func mintDip721(nft: Nft, caller: Principal, to: Principal, metadata: Types.MetadataDesc) : Types.MintReceipt {
+    
+    Debug.print("mintDip721");
+    Debug.print("custodians:");
+    List.iterate(nft.custodians, func(principal: Principal) { (Debug.print(debug_show(principal))) });
+    
     if (not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
       return #Err(#Unauthorized);
     };
 
     let newId = Nat64.fromNat(List.size(nft.nfts));
-    let newNft : NftTypes.Nft = {
+    let newNft : Types.Nft = {
       owner = to;
       id = newId;
       metadata = metadata;
@@ -197,5 +202,19 @@ module {
       token_id = newId;
       id = nft.transactionId;
     });
+  };
+
+  public func addCustodian(nft: Nft, caller: Principal, newCustodian: Principal) : async Result<(), ApiError> {
+    // Only current custodians can add a new custodian
+    if (not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
+      return #Err(#Unauthorized);
+    };
+
+    // Add the new custodian if it's not already in the list
+    if (not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == newCustodian })) {
+      nft.custodians := List.push(newCustodian, nft.custodians);
+    };
+
+    return #Ok();
   };
 };

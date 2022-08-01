@@ -3,13 +3,11 @@ import {
   Provider,
   defaultTheme,
   Flex,
-  ActionButton,
 } from "@adobe/react-spectrum";
 import styled from "styled-components";
 import NotAuthenticated from "./components/NotAuthenticated";
 import Home from "./components/Home";
 import NftForm from "./components/NftForm";
-import { _SERVICE as _CONTRIBUTOR_SERVICE, ProfileUpdate } from "../../declarations/contributor/contributor.did";
 import toast, { Toaster } from "react-hot-toast";
 import ErrorBoundary from "./components/ErrorBoundary";
 import {
@@ -27,11 +25,7 @@ import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
 import { useEffect, useState } from "react";
 import { compareProfiles } from "./utils";
-import { _SERVICE as _SERVE_SERVICE, Feed, Media } from "../../declarations/serve/serve.did";
-import { canisterId as serveCanisterId, createActor as createServeActor } from "../../declarations/serve";
-import { _SERVICE as _DIP721NFT_SERVICE, OwnerResult } from "../../declarations/Dip721NFT/Dip721NFT.did";
-import { canisterId as dip721NftCanisterId, createActor as createDip721NftActor } from "../../declarations/Dip721NFT";
-import { Principal } from "@dfinity/principal";
+import { _SERVICE, Feed, Media, OwnerResult, ProfileUpdate } from "../../declarations/serve/serve.did";
 import Logout from '../assets/logout.svg'
 
 const Header = styled.header`
@@ -63,7 +57,7 @@ export const AppContext = React.createContext<{
   setIsAuthenticated?: React.Dispatch<React.SetStateAction<boolean>>;
   login: () => void;
   logout: () => void;
-  actor?: ActorSubclass<_CONTRIBUTOR_SERVICE>;
+  actor?: ActorSubclass<_SERVICE>;
   profile?: ProfileUpdate;
   setProfile: React.Dispatch<ProfileUpdate>;
 }>({
@@ -85,8 +79,8 @@ const storeOrRemoveSearchParam = (searchParams: URLSearchParams, paramName: stri
   }
 };
 
-const getMedia = async (serveActor: ActorSubclass<_SERVE_SERVICE>, feedKey: string, episodeGuid: string): Promise<{ feed: Feed | undefined; media: Media | undefined; }> => {
-  const feedResult: [Feed] | [] = await serveActor.getFeed(feedKey);
+const getMedia = async (actor: ActorSubclass<_SERVICE>, feedKey: string, episodeGuid: string): Promise<{ feed: Feed | undefined; media: Media | undefined; }> => {
+  const feedResult: [Feed] | [] = await actor.getFeed(feedKey);
   const feed: Feed = feedResult[0]!;
   if (feed == undefined) {
     return { feed: undefined, media: undefined };
@@ -111,27 +105,12 @@ const App = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [serveActor, setServeActor] = useState<ActorSubclass<_SERVE_SERVICE>>();
-  const [dip721NftActor, setDip721NftActor] = useState<ActorSubclass<_DIP721NFT_SERVICE>>();
-
-  const initServeActor = () => {
-    const sActor = createServeActor(serveCanisterId as string);
-    setServeActor(sActor);
-  };
-  const initDip721NftActor = async () => {
-    const sActor = createDip721NftActor(dip721NftCanisterId as string) as ActorSubclass<_DIP721NFT_SERVICE>;
-    setDip721NftActor(sActor);
-  };
-
   // At the page we first land on, record the key from the search params so we
   // know which rss feed and episode the user was watching when they clicked
   // the link to launch this site.
   useEffect(() => {
     storeOrRemoveSearchParam(searchParams, "feedKey");
     storeOrRemoveSearchParam(searchParams, "episodeGuid");
-
-    initServeActor();
-    initDip721NftActor();
   }, []);
 
   useEffect(() => {
@@ -141,73 +120,41 @@ const App = () => {
         navigate('/create');
       }
 
-      console.log("got a profile, eventually going to /nft");
-
       const feedKey = localStorage.getItem('feedKey');
       if (feedKey) {
         localStorage.removeItem("feedKey");
 
-        console.log("had feedKey");
-
-        actor.addFeedKey(feedKey).then(async (result) => {
+        actor.addRequestedFeedKey(feedKey).then(async (result) => {
           if ("ok" in result) {
             setProfile(result.ok);
 
-            console.log("set the profile");
-
-            // Go to the NFT page if the original link contained an episodeGuid
+            // Go to the NFT page if the original link contained an
+            // episodeGuid, otherwise go to profile management page
             const episodeGuid = localStorage.getItem('episodeGuid');
             if (episodeGuid) {
               localStorage.removeItem("episodeGuid");
 
-              console.log("had episodeGuid");
-
               // Note that feed and media might come back undefined if the feed
               // isn't found
-              const { feed, media } = await getMedia(serveActor!, feedKey, episodeGuid);
+              const { feed, media } = await getMedia(actor, feedKey, episodeGuid);
 
-              var currentOwnerPrincipalText: string | undefined = undefined;
-              var currentOwnerName: string | undefined = undefined;
-
-              // Find the current owner name if there is one
-              if (media != undefined && media.nftTokenId.length == 1) {
-                const nftTokenId = media.nftTokenId[0]!;
-                const ownerResult: OwnerResult = await dip721NftActor!.ownerOfDip721(nftTokenId);
-                if ("Ok" in ownerResult) {
-                  const currentOwner = ownerResult.Ok;
-                  console.log("got and set currentOwner:");
-                  console.dir(currentOwner);
-                  console.log("currentOwner principal as text:");
-                  console.log(currentOwner.toText());
-                  currentOwnerPrincipalText = currentOwner.toText();
-                  const ownerNameResult = await actor.getName(currentOwner);
-                  console.log("ownerNameResult:");
-                  console.dir(ownerNameResult);
-                  if (ownerNameResult.length == 1) {
-                    console.log("had an element:");
-                    currentOwnerName = ownerNameResult[0];
-                    console.log(currentOwnerName);
-                  }
-                }
-              }
-
-
-              console.log("navigating to /nft and setting state");
-
-              navigate('/nft', { state: { feedKey, feed, media, currentOwnerPrincipalText, currentOwnerName } });
+              navigate('/nft', { state: { feedKey, feed, media } });
+            } else {
+              navigate('/manage');
             }
           }
         });
       } else {
-        // Just send the user to their account management page
-        navigate('/loading');
+        // Just send the user to their management page even without a feedKey
+        // to add
+        navigate('/manage');
       };
     };
   }, [profile]);
 
   useEffect(() => {
     if (actor) {
-      actor.read().then((result) => {
+      actor.readContributor().then((result) => {
         if ("ok" in result) {
           // Found contributor profile in IC. 
           setProfile(result.ok); // This causes the profile useEffect above, which will redirect us appropriately
@@ -265,9 +212,15 @@ const App = () => {
                 <Route path="/loading" element={
                   <span />
                 } />
-                <Route path="/nft" element={<span />} />
+                <Route path="/nft" element={
+                  <h5>
+                    {authClient.getIdentity().getPrincipal().toString()}
+                  </h5>} />
                 <Route path="*" element={isAuthenticated ? (
                   <div style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
+                    <h5>
+                      {authClient.getIdentity().getPrincipal().toString()}
+                    </h5>
                     <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>
                       <Logout />
                     </button>

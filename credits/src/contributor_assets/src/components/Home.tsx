@@ -1,5 +1,5 @@
 import * as React from "react";
-import { _SERVICE } from "../../../declarations/contributor/contributor.did";
+import { _SERVICE } from "../../../declarations/serve/serve.did";
 import { Button, Text } from "@adobe/react-spectrum";
 import ImageProfile from "@spectrum-icons/workflow/ImageProfile";
 

@@ -7,16 +7,14 @@ export type ApiError__1 = { 'ZeroAddress' : null } |
   { 'InvalidTokenId' : null } |
   { 'Unauthorized' : null } |
   { 'Other' : null };
-export type ApiError__2 = { 'ZeroAddress' : null } |
-  { 'InvalidTokenId' : null } |
-  { 'Unauthorized' : null } |
-  { 'Other' : null };
 export interface Bio { 'name' : [] | [string] }
-export type BuyNftResult = {
-    'Ok' : { 'MintReceiptPart' : MintReceiptPart } |
-      { 'TransferTransactionId' : bigint }
-  } |
-  { 'Err' : { 'ApiError' : ApiError__1 } | { 'SearchError' : SearchError } };
+export type BuyNftResult = { 'Ok' : bigint } |
+  {
+    'Err' : { 'MediaNotFound' : null } |
+      { 'NotAuthorized' : null } |
+      { 'FeedNotFound' : null } |
+      { 'Other' : null }
+  };
 export type Error = { 'NotFound' : null } |
   { 'NotAuthorized' : null } |
   { 'AlreadyExists' : null };
@@ -63,16 +61,8 @@ export interface Media {
   'nftTokenId' : [] | [bigint],
   'durationInMicroseconds' : bigint,
 }
-export interface Media__1 {
-  'uri' : string,
-  'title' : string,
-  'lengthInBytes' : bigint,
-  'source' : Source,
-  'etag' : string,
-  'description' : string,
-  'nftTokenId' : [] | [bigint],
-  'durationInMicroseconds' : bigint,
-}
+export type MediaSearchResult = { 'Ok' : Media } |
+  { 'Err' : SearchError };
 export type MetadataDesc = Array<MetadataPart>;
 export type MetadataDesc__1 = Array<MetadataPart>;
 export interface MetadataKeyVal { 'key' : string, 'val' : MetadataVal }
@@ -110,7 +100,7 @@ export type Result = { 'ok' : null } |
 export type Result_1 = { 'ok' : Profile } |
   { 'err' : Error };
 export type Result__1 = { 'Ok' : null } |
-  { 'Err' : ApiError__2 };
+  { 'Err' : ApiError };
 export type SearchError = { 'MediaNotFound' : null } |
   { 'FeedNotFound' : null };
 export interface Serve {
@@ -118,9 +108,9 @@ export interface Serve {
   'addNftCustodian' : (arg_0: Principal) => Promise<Result__1>,
   'addRequestedFeedKey' : (arg_0: string) => Promise<Result_1>,
   'balanceOfDip721' : (arg_0: Principal) => Promise<bigint>,
-  'buyNft' : (arg_0: string, arg_1: Media__1) => Promise<BuyNftResult>,
-  'createContributor' : (arg_0: ProfileUpdate__1) => Promise<Result>,
-  'deleteContributor' : () => Promise<Result>,
+  'buyNft' : (arg_0: string, arg_1: string) => Promise<BuyNftResult>,
+  'create' : (arg_0: ProfileUpdate__1) => Promise<Result>,
+  'delete' : () => Promise<Result>,
   'deleteFeed' : (arg_0: string) => Promise<undefined>,
   'getAllFeedKeys' : () => Promise<Array<string>>,
   'getAllFeedMediaDetails' : () => Promise<
@@ -128,7 +118,6 @@ export interface Serve {
     >,
   'getAllFeedSummaries' : () => Promise<Array<[string, string]>>,
   'getAllFeeds' : () => Promise<Array<[string, Feed]>>,
-  'getContributorName' : (arg_0: Principal) => Promise<[] | [string]>,
   'getFeed' : (arg_0: string) => Promise<[] | [Feed]>,
   'getFeedMediaDetails' : (arg_0: string) => Promise<
       [string, Array<[string, string]>]
@@ -143,19 +132,23 @@ export interface Serve {
   'getTokenIdsForUserDip721' : (arg_0: Principal) => Promise<Array<TokenId>>,
   'http_request' : (arg_0: HttpRequest) => Promise<HttpResponse>,
   'http_request_update' : (arg_0: HttpRequest) => Promise<HttpResponse>,
-  'initializeNft' : () => Promise<Result__1>,
   'logoDip721' : () => Promise<LogoResult>,
   'mintDip721' : (arg_0: Principal, arg_1: MetadataDesc) => Promise<
       MintReceipt
     >,
   'nameDip721' : () => Promise<string>,
   'ownerOfDip721' : (arg_0: TokenId) => Promise<OwnerResult>,
-  'readContributor' : () => Promise<Result_1>,
+  'read' : () => Promise<Result_1>,
   'safeTransferFromDip721' : (
       arg_0: Principal,
       arg_1: Principal,
       arg_2: TokenId,
     ) => Promise<TxReceipt>,
+  'setNftTokenId' : (
+      arg_0: string,
+      arg_1: string,
+      arg_2: [] | [bigint],
+    ) => Promise<MediaSearchResult>,
   'supportedInterfacesDip721' : () => Promise<Array<InterfaceId>>,
   'symbolDip721' : () => Promise<string>,
   'totalSupplyDip721' : () => Promise<bigint>,
@@ -164,7 +157,7 @@ export interface Serve {
       arg_1: Principal,
       arg_2: TokenId,
     ) => Promise<TxReceipt>,
-  'updateContributor' : (arg_0: ProfileUpdate) => Promise<Result>,
+  'update' : (arg_0: ProfileUpdate) => Promise<Result>,
 }
 export interface Source {
   'id' : string,

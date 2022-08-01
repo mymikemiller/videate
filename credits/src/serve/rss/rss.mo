@@ -1,10 +1,13 @@
 import Xml "xml";
 import Credits "../credits/credits";
+import Nft "../nft/nft";
+import Contributors "../contributors/contributors";
 import Types "../types";
 import Array "mo:base/Array";
 import List "mo:base/List";
 import Debug "mo:base/Debug";
 import Option "mo:base/Option";
+import Principal "mo:base/Principal";
 
 module {
   type Document = Xml.Document;
@@ -21,7 +24,7 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed, key: Text, episodeGuid: ?Text, videateSettingsUri: Text, nftPurchaseBaseUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
+	public func format(feed: Feed, key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, videateSettingsUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, nftPurchaseBaseUri: Text, mediaUriTransformers: [UriTransformer]) : Document {
     // let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { ownerOfDip721: (token_id: Dip721NFTTypes.TokenId) -> async Dip721NFTTypes.OwnerResult };
 
     var mediaArray: [Media] = [];
@@ -53,11 +56,6 @@ module {
           case (? media) {
             // Use an array containing only the single requested episode
             mediaArray := [media];
-
-            // Find the owner of the NFT
-            // let nftOwnerName = if (media.nftTokenId % 2 == 0) "Mike" else "Nick";
-            // // let ownerPrincipal = Dip721NFT.ownerOfDip721(media.nftTokenId); // Ugh, can't do this because of "send capability required"
-            // Debug.print("Owner of NFT for episode: " # nftOwnerName);
           };
         };
       };
@@ -165,7 +163,7 @@ module {
                 children = [];
               }]),
               List.map<Media, Element>(mediaListNewestToOldest, func(media: Media) : Element {
-                getMediaElement(media, key, videateSettingsUri, nftPurchaseBaseUri, mediaUriTransformers);
+                getMediaElement(media, key, requestorPrincipal, videateSettingsUri, contributors, nft, nftPurchaseBaseUri, mediaUriTransformers);
               })
             ));
 					},
@@ -174,16 +172,36 @@ module {
 		};
 	};
 
-  func getMediaElement(media: Media, feedKey: Text, videateSettingsUri: Text, nftPurchaseBaseUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
+  func getMediaElement(media: Media, feedKey: Text, requestorPrincipal: ?Text, videateSettingsUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, nftPurchaseBaseUri: Text, mediaUriTransformers: [UriTransformer]) : Element {
     let videateSettingsMessage: Text = media.description # "\n\nManage your Videate settings:\n\n" # videateSettingsUri # "\n\n";
     let nftPurchaseUri = nftPurchaseBaseUri # "&episodeGuid=" # media.uri;
 
     let nftOwnerMessage = switch(media.nftTokenId) {
       case (null) {
-        "The NFT for this episode is currently unclaimed! Click here to by the NFT: "
+        "The NFT for this episode is currently unclaimed! Click here to by the NFT: ";
       };
       case (? nftTokenId) {
-        if (nftTokenId % 2 == 1) "Mike Miller owns the NFT for this video. Click here to buy it: " else "Nick Ristagno owns the NFT for this video. Click here to buy it: ";
+        switch(Nft.ownerOfDip721(nft, nftTokenId)) {
+          case (#Err(e)) {
+            "Error retrieving NFT owner. See NFT details here: ";
+          };
+          case (#Ok(nftOwnerPrincipal: Principal)) {
+            let msg = if (Option.get(requestorPrincipal, "null") == Principal.toText(nftOwnerPrincipal)) {
+              "You own the NFT for this episode! See details here: ";
+            } else {
+              let nftOwnerName = contributors.getName(nftOwnerPrincipal);
+              switch(nftOwnerName) {
+                case (null) {
+                  "Error retrieving NFT owner name. See NFT details here: ";
+                };
+                case (? name) {
+                  name # " owns the NFT for this video. Click here to buy it: ";
+                };
+              };
+            };
+            msg;
+          };
+        };
       };
     };
     let nftDescription = nftOwnerMessage # "\n\n" # nftPurchaseUri;

@@ -4,15 +4,11 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import styled from "styled-components";
 import Loop from "../../assets/loop.svg";
 import {
-  Profile,
-  _SERVICE as _CONTRIBUTOR_SERVICE,
-} from "../../../declarations/contributor/contributor.did";
-import {
   Feed,
   Media,
+  OwnerResult,
   _SERVICE as _SERVE_SERVICE,
 } from "../../../declarations/serve/serve.did";
-import { Dip721NFT } from "../../../declarations/Dip721NFT/Dip721NFT.did";
 import { Actor, ActorSubclass } from "@dfinity/agent";
 import {
   ActionButton,
@@ -81,13 +77,12 @@ interface NftFormState {
   feedKey: string,
   feed: Feed,
   media: Media,
-  currentOwnerPrincipalText: string | undefined,
-  currentOwnerName: string | undefined,
-  // serveActor: ActorSubclass<_SERVE_SERVICE>;
 };
 
 const NftForm = () => {
   const { actor, login, authClient, profile } = useContext(AppContext);
+
+
 
   if (authClient == null || actor == null) {
     return (
@@ -105,9 +100,50 @@ const NftForm = () => {
 
   const location = useLocation();
   const state = location.state as NftFormState;
-  console.log("state:");
-  console.dir(state);
-  const [currentOwnerPrincipalText, setCurrentOwnerPrincipalText] = useState(state.currentOwnerPrincipalText);
+
+  const [currentOwner, setCurrentOwner] = useState<Principal>();
+  const [currentOwnerName, setCurrentOwnerName] = useState<string>();
+  const [currentOwnershipText, setCurrentOwnershipText] = useState<string>();
+
+  useEffect(() => {
+    updateCurrentOwnershipMessage();
+  }, [currentOwnerName, currentOwner]);
+
+  useEffect(() => {
+    setCurrentOwnerInfo();
+  }, []);
+
+  const setCurrentOwnerInfo = async () => {
+    // Find the current owner name if there is one
+    if (state.media != undefined && state.media.nftTokenId.length == 1) {
+      const nftTokenId = state.media.nftTokenId[0]!;
+      const ownerResult: OwnerResult = await actor.ownerOfDip721(nftTokenId);
+      if ("Ok" in ownerResult) {
+        const owner = ownerResult.Ok;
+        setCurrentOwner(owner);
+        const currentOwnerNameResult = await actor.getContributorName(owner!);
+        if (currentOwnerNameResult.length == 1) {
+          setCurrentOwnerName(currentOwnerNameResult[0]);
+        };
+      };
+    };
+  };
+
+  const updateCurrentOwnershipMessage = () => {
+    if (currentOwner == undefined) {
+      setCurrentOwnershipText("No one has claimed this NFT yet!");
+    } else {
+      if (currentOwner.toString() == authClient.getIdentity().getPrincipal().toString()) {
+        setCurrentOwnershipText("You own this NFT!");
+      } else {
+        if (currentOwnerName == undefined) {
+          setCurrentOwnershipText(`Fetching NFT owner name...`);
+        } else {
+          setCurrentOwnershipText(`Owned by ${currentOwnerName}`);
+        }
+      }
+    }
+  }
 
   if (state.feed == undefined) {
     return (
@@ -121,62 +157,19 @@ const NftForm = () => {
     );
   };
 
-  // var currentOwnerName = "";
-
-  // // Set currentOwnerName when the currentOwner changes
-  // useEffect(() => {
-  //   const setCurrentOwnerName = async (owner: string) => {
-  //     console.log("setting current owner name:");
-  //     console.dir(owner);
-  //     console.log("typeof owner: " + typeof (owner));
-
-  //     const ownerNameResult = await actor.getName(Principal.fromText(owner));
-  //     console.log("ownerNameResult:");
-  //     console.dir(ownerNameResult);
-  //     if (ownerNameResult.length == 1) {
-  //       console.log("had an element:");
-  //       currentOwnerName = ownerNameResult[0];
-  //       console.log(currentOwnerName);
-  //     }
-  //   }
-  //   if (currentOwner != undefined) {
-  //     console.log("setting current owner name using principal: ");
-  //     console.dir(currentOwner);
-  //     console.dir(currentOwner.toText());
-  //     setCurrentOwnerName(currentOwner.toText());
-  //   }
-  // }, [currentOwner]);
-
-
   const handleSubmit = async () => {
-    let result = await actor.buyNft(state.feedKey, state.media.uri); // For now, assume the media uri is the guid
+    let userPrincipal = authClient.getIdentity().getPrincipal();
+    let result = await actor.buyNft(state.feedKey, state.media);
     if ("Ok" in result) {
       toast.success("NFT successfully purchased!");
-      setCurrentOwnerPrincipalText(authClient.getIdentity().getPrincipal().toText());
+      setCurrentOwner(userPrincipal);
     } else {
-      console.error("Error purchasing NFT:");
-      console.dir(result);
       toast.error("Error purchasing NFT.");
     };
   };
 
-  var currentOwnershipText = "No one has claimed this NFT yet!";
-  if (currentOwnerPrincipalText != undefined) {
-    // console.log(`typeof currentOwner: ${typeof currentOwner}`);
-    // console.log(`currentOwner: ${currentOwner}`);
-    // console.log(`state.currentOwner: ${state.currentOwner}`);
-    // console.log(`user: ${authClient.getIdentity().getPrincipal()}`);
-    // console.log("currentOwner.toText(): " + (currentOwner as Principal).toText());
-    // console.log("authClient.getIdentity().getPrincipal().toText(): " + authClient.getIdentity().getPrincipal().toText());
-    if (currentOwnerPrincipalText == authClient.getIdentity().getPrincipal().toText()) {
-      currentOwnershipText = "You own this NFT!";
-    } else {
-      currentOwnershipText = `Owned by ${state.currentOwnerName}`;
-    }
-  }
-
   const getPurchaseSection = () => {
-    if (currentOwnerPrincipalText == authClient.getIdentity().getPrincipal().toText()) {
+    if (currentOwner?.toString() == authClient.getIdentity().getPrincipal().toString()) {
       return <></>
     } else {
       return <>
@@ -192,19 +185,6 @@ const NftForm = () => {
   }
 
   return (
-    // <section>
-    //   <Heading level={1}><>NFT for {state.feed.title} episode "{state.media.title}"</></Heading>
-    //   <Heading level={1}><>{currentOwnershipText}</></Heading>
-    //   <Heading level={1}><>Buy this NFT?</></Heading>
-    //   <Form
-    //     onSubmit={(e) => {
-    //       e.preventDefault();
-    //       handleSubmit();
-    //     }}>
-
-    //     <ActionButton type="submit">Buy</ActionButton>
-    //   </Form>
-    // </section>
     <NftFormContainer>
       <DarkCard>
         <img src={state.feed.imageUrl} style={{ height: '6.5em', width: '6.5em', position: 'absolute', top: 10, left: 10, borderRadius: '5px 0 0 5px' }} />

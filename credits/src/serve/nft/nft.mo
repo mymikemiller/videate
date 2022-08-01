@@ -1,3 +1,13 @@
+// The "database" of Videate Nfts. Implements the Dip721 standard.
+
+// This file is set up like many in the Motoko base library, where the
+// functions accept an Nft object instead of operating on the module's data.
+// This is so that an object of this class can be made stable even though it
+// contains non-stable types (the List of Nfts) since no functions operate on
+// the member data. This is important to reduce upgrade time of canisters that
+// use Nft objects, since they don't have to convert to/from a stable version.
+// See https://forum.dfinity.org/t/clarification-on-stable-types-with-examples/11075/5
+
 import Nat "mo:base/Nat";
 import Nat8 "mo:base/Nat8";
 import Nat16 "mo:base/Nat16";
@@ -31,10 +41,14 @@ module {
   public type MintReceipt = Types.MintReceipt;
   public type MintReceiptPart = Types.MintReceiptPart;
 
-  public class Nft(custodian: Principal) = Self {
+  // After creating an instance of this class, call addCustodian on it to add
+  // the identity that can manage the entire class. Usually this should be the
+  // results of `dfx identity get-principal` so the class can be managed from
+  // the command line.
+  public class Nft() = Self {
     public var transactionId: Types.TransactionId = 0;
     public var nfts = List.nil<Types.Nft>();
-    public var custodians = List.make<Principal>(custodian);
+    public var custodians = List.nil<Principal>();
     public var logo : Types.LogoResult = {
       logo_type = "image/png";
       data = "";
@@ -56,17 +70,12 @@ module {
   };
 
   public func ownerOfDip721(nft: Nft, token_id: Types.TokenId) : Types.OwnerResult {
-    Debug.print("in ownerOfDip721 for token_id " # debug_show(token_id));
     let item = List.get(nft.nfts, Nat64.toNat(token_id));
     switch (item) {
       case (null) {
-        Debug.print("invalid token id");
         return #Err(#InvalidTokenId);
       };
       case (?token) {
-        Debug.print("valid token");
-        Debug.print("owner:");
-        Debug.print(debug_show(token.owner));
         return #Ok(token.owner);
       };
     };
@@ -76,15 +85,15 @@ module {
     if (to == nft.null_address) {
       return #Err(#ZeroAddress);
     } else {
-      return transferFrom(nft, from, to, token_id, caller);
+      return transferFrom(nft, caller, from, to, token_id);
     };
   };
 
   public func transferFromDip721(nft: Nft, caller: Principal, from: Principal, to: Principal, token_id: Types.TokenId) : Types.TxReceipt {
-    return transferFrom(nft, from, to, token_id, caller);
+    return transferFrom(nft, caller, from, to, token_id);
   };
 
-  public func transferFrom(nft: Nft, from: Principal, to: Principal, token_id: Types.TokenId, caller: Principal) : Types.TxReceipt {
+  public func transferFrom(nft: Nft, caller: Principal, from: Principal, to: Principal, token_id: Types.TokenId) : Types.TxReceipt {
     let item = List.get(nft.nfts, Nat64.toNat(token_id));
     switch (item) {
       case null {
@@ -178,11 +187,6 @@ module {
   };
 
   public func mintDip721(nft: Nft, caller: Principal, to: Principal, metadata: Types.MetadataDesc) : Types.MintReceipt {
-    
-    Debug.print("mintDip721");
-    Debug.print("custodians:");
-    List.iterate(nft.custodians, func(principal: Principal) { (Debug.print(debug_show(principal))) });
-    
     if (not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
       return #Err(#Unauthorized);
     };
@@ -204,9 +208,17 @@ module {
     });
   };
 
-  public func addCustodian(nft: Nft, caller: Principal, newCustodian: Principal) : async Result<(), ApiError> {
-    // Only current custodians can add a new custodian
-    if (not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
+  public func addCustodian(nft: Nft, caller: Principal, newCustodian: Principal) : Result<(), ApiError> {
+    // We allow anyone (usually the deployer since this should be done
+    // immediately after deploying or else there won't be a custodian and none
+    // of the functions in this class will work) to specify the first
+    // custodian, usually the identity for their dfx so they can manage this
+    // class via the console.
+    let isInitialized = nft.transactionId > 0 or List.size(nft.nfts) > 0 or List.size(nft.custodians) > 0;
+
+    // Once we've been initialized, only current custodians can add a new
+    // custodian
+    if (isInitialized and not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
       return #Err(#Unauthorized);
     };
 

@@ -101,11 +101,9 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: "development",
       CONTRIBUTOR_ASSETS_CANISTER_ID: canisters["contributor_assets"],
-      CONTRIBUTOR_CANISTER_ID: canisters["contributor"],
       SERVE_CANISTER_ID: canisters["serve"],
-      DIP721NFT_CANISTER_ID: canisters["Dip721NFT"],
       II_URL: isDevelopment
-        ? "{origin}?canisterId=renrk-eyaaa-aaaaa-aaada-cai#authorize" //"{origin}?canisterId=renrk-eyaaa-aaaaa-aaada-cai#authorize"
+        ? "{origin}?canisterId=q4eej-kyaaa-aaaaa-aaaha-cai#authorize"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({

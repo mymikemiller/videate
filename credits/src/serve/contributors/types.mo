@@ -1,9 +1,11 @@
 import Buffer "mo:base/Buffer";
+import NftTypes "../nft/types";
+import CreditsTypes "../credits/types";
 
 module {
-  // Used to store the contents of the Contributor canister in stable types
+  // Used to store the contents of the Contributors "database" in stable types
   // between upgrades
-  public type StableContributor = {
+  public type StableContributors = {
       profileEntries: [(Principal, Profile)];
   };
 
@@ -30,12 +32,13 @@ module {
   };
 
   public type BuyNftResult = {
-    #Ok : Nat64;
-    #Err : {
-      #NotAuthorized;
-      #FeedNotFound;
-      #MediaNotFound;
-      #Other;
+    #Ok : {
+      #MintReceiptPart : NftTypes.MintReceiptPart;
+      #TransferTransactionId : Nat;
     };
-  }
-}
+    #Err : {
+      #ApiError : NftTypes.ApiError;
+      #SearchError : CreditsTypes.SearchError;
+    };
+  };
+};

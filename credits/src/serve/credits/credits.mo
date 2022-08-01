@@ -15,13 +15,16 @@ import Option "mo:base/Option";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Types "types";
+import Nft "../nft/nft";
 
 module {
     public type Platform = Types.Platform;
     public type Source = Types.Source;
     public type Media = Types.Media;
     public type Feed = Types.Feed;
-    type StableCredits = Types.StableCredits;
+    public type StableCredits = Types.StableCredits;
+    public type MediaSearchResult = Types.MediaSearchResult;
+    public type SearchError = Types.SearchError;
 
     public class Credits(init: StableCredits) {
         let feeds: Map.HashMap<Text, Feed> = Map.fromIter<Text, Feed>(init.feedEntries.vals(), 1, Text.equal, Text.hash);
@@ -94,7 +97,7 @@ module {
             };
         };
         
-        public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: ?Nat64) : Types.MediaSearchResult {
+        public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: Nft.TokenId) : Types.MediaSearchResult {
             let mediaResult = getMedia(feedKey, episodeGuid);
             switch (mediaResult) {
                 case (#Ok(media)) {
@@ -107,7 +110,7 @@ module {
                         etag = media.etag;
                         lengthInBytes = media.lengthInBytes;
 
-                        nftTokenId = tokenId;
+                        nftTokenId = Option.make(tokenId);
                     };
 
                     let _ = updateMedia(feedKey, episodeGuid, newMedia);

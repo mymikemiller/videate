@@ -45,7 +45,7 @@ http://localhost:8000/authorize?canisterId=[cid found above]
 
 `localhost:8000/canisterId={__CANDID_UI cid from .dfx/local/canisters}`
 
-### Launch the frontend, hosted in the credits_assets canister
+### Launch the frontend, hosted in the contributor_assets canister
 
 #### Locally:
 
@@ -80,6 +80,13 @@ Run dfx and deploy the `serve` canister
 cd videate/credits
 dfx start --background
 dfx deploy serve
+```
+
+After the initial deploy, initialize the serve canister to give us (the dfx
+user) authorization to manage the NFTs as a custodian:
+
+```
+dfx canister call serve initialize
 ```
 
 Navigate to a feed!
@@ -121,21 +128,3 @@ https://mvjun-2yaaa-aaaah-aac3q-cai.raw.ic0.app/example_feed_key?principal=TEST_
 ## Authors
 
 * **Mike Miller** - *Initial work* - [mymikemiller](https://github.com/mymikemiller)
-
-
-Deploy order:
-
-dfx deploy contributor; dfx deploy contributor_assets; dfx deploy serve --argument "(
-  principal\"$(dfx identity get-principal)\", 
-  record {
-    logo = record {
-      logo_type = \"image/png\";
-      data = \"\";
-    };
-    name = \"Videate NFTs\";
-    symbol = \"VNFT\";
-    maxLimit = 0;
-  }
-)"; 
-
-dfx canister call serve addNftCustodian "(principal\"$(dfx canister id contributor)\")

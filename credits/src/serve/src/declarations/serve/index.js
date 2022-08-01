@@ -1,16 +1,16 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 
 // Imports and re-exports candid interface
-import { idlFactory } from './contributor.did.js';
-export { idlFactory } from './contributor.did.js';
+import { idlFactory } from './serve.did.js';
+export { idlFactory } from './serve.did.js';
 // CANISTER_ID is replaced by webpack based on node environment
-export const canisterId = process.env.CONTRIBUTOR_CANISTER_ID;
+export const canisterId = process.env.SERVE_CANISTER_ID;
 
 /**
  * 
  * @param {string | import("@dfinity/principal").Principal} canisterId Canister ID of Agent
  * @param {{agentOptions?: import("@dfinity/agent").HttpAgentOptions; actorOptions?: import("@dfinity/agent").ActorConfig}} [options]
- * @return {import("@dfinity/agent").ActorSubclass<import("./contributor.did.js")._SERVICE>}
+ * @return {import("@dfinity/agent").ActorSubclass<import("./serve.did.js")._SERVICE>}
  */
  export const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
@@ -32,7 +32,7 @@ export const canisterId = process.env.CONTRIBUTOR_CANISTER_ID;
 };
   
 /**
- * A ready-to-use agent for the contributor canister
- * @type {import("@dfinity/agent").ActorSubclass<import("./contributor.did.js")._SERVICE>}
+ * A ready-to-use agent for the serve canister
+ * @type {import("@dfinity/agent").ActorSubclass<import("./serve.did.js")._SERVICE>}
  */
- export const contributor = createActor(canisterId);
+ export const serve = createActor(canisterId);

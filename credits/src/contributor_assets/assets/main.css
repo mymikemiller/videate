@@ -15,12 +15,10 @@ main {
     justify-content: center;
     align-items: top;
     min-height: 400px;
-    padding: 2rem;
+    padding: 2rem 0;
 }
 
 img {
-    max-width: 50vw;
-    max-height: 25vw;
     display: block;
     margin: auto;
 }

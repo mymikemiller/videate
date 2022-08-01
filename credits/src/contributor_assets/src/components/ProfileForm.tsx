@@ -2,16 +2,15 @@ import {
   ActionButton,
   Form,
   Heading,
-  TextArea,
   TextField,
 } from "@adobe/react-spectrum";
 import { ActorSubclass } from "@dfinity/agent";
-import React from "react"; // import * as React from 'react's
+import React from "react";
 import {
   Bio,
   ProfileUpdate,
   _SERVICE,
-} from "../../../declarations/contributor/contributor.did";
+} from "../../../declarations/serve/serve.did";
 import { emptyProfile } from "../hooks";
 
 interface Props {

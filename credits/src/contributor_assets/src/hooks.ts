@@ -1,8 +1,8 @@
 import { ActorSubclass } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import { useState, useEffect } from "react";
-import { canisterId, createActor } from "../../declarations/contributor";
-import { ProfileUpdate, _SERVICE } from "../../declarations/contributor/contributor.did";
+import { canisterId, createActor } from "../../declarations/serve";
+import { ProfileUpdate, _SERVICE } from "../../declarations/serve/serve.did";
 import { useNavigate } from "react-router-dom";
 
 type UseAuthClientProps = {};

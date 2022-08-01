@@ -32,9 +32,9 @@ type Serve =
    addNftCustodian: (principal) -> (Result__1);
    addRequestedFeedKey: (text) -> (Result_1);
    balanceOfDip721: (principal) -> (nat64) query;
-   buyNft: (text, Media__1) -> (BuyNftResult);
-   createContributor: (ProfileUpdate__1) -> (Result);
-   deleteContributor: () -> (Result);
+   buyNft: (text, text) -> (BuyNftResult);
+   create: (ProfileUpdate__1) -> (Result);
+   delete: () -> (Result);
    deleteFeed: (text) -> () oneway;
    getAllFeedKeys: () -> (vec text) query;
    getAllFeedMediaDetails: () -> (vec record {
@@ -52,7 +52,6 @@ type Serve =
                              text;
                              Feed;
                            }) query;
-   getContributorName: (principal) -> (opt text);
    getFeed: (text) -> (opt Feed) query;
    getFeedMediaDetails: (text) -> (text, vec record {
                                                text;
@@ -66,18 +65,18 @@ type Serve =
    getTokenIdsForUserDip721: (principal) -> (vec TokenId) query;
    http_request: (HttpRequest) -> (HttpResponse) query;
    http_request_update: (HttpRequest) -> (HttpResponse);
-   initializeNft: () -> (Result__1);
    logoDip721: () -> (LogoResult) query;
    mintDip721: (principal, MetadataDesc) -> (MintReceipt);
    nameDip721: () -> (text) query;
    ownerOfDip721: (TokenId) -> (OwnerResult) query;
-   readContributor: () -> (Result_1);
+   read: () -> (Result_1);
    safeTransferFromDip721: (principal, principal, TokenId) -> (TxReceipt);
+   setNftTokenId: (text, text, opt nat64) -> (MediaSearchResult);
    supportedInterfacesDip721: () -> (vec InterfaceId) query;
    symbolDip721: () -> (text) query;
    totalSupplyDip721: () -> (nat64) query;
    transferFromDip721: (principal, principal, TokenId) -> (TxReceipt);
-   updateContributor: (ProfileUpdate) -> (Result);
+   update: (ProfileUpdate) -> (Result);
  };
 type SearchError = 
  variant {
@@ -86,7 +85,7 @@ type SearchError =
  };
 type Result__1 = 
  variant {
-   Err: ApiError__2;
+   Err: ApiError;
    Ok;
  };
 type Result_1 = 
@@ -168,16 +167,10 @@ type MetadataKeyVal =
  };
 type MetadataDesc__1 = vec MetadataPart;
 type MetadataDesc = vec MetadataPart;
-type Media__1 = 
- record {
-   description: text;
-   durationInMicroseconds: nat;
-   etag: text;
-   lengthInBytes: nat;
-   nftTokenId: opt nat64;
-   source: Source;
-   title: text;
-   uri: text;
+type MediaSearchResult = 
+ variant {
+   Err: SearchError;
+   Ok: Media;
  };
 type Media = 
  record {
@@ -250,22 +243,14 @@ type Error =
 type BuyNftResult = 
  variant {
    Err: variant {
-          ApiError: ApiError__1;
-          SearchError: SearchError;
+          FeedNotFound;
+          MediaNotFound;
+          NotAuthorized;
+          Other;
         };
-   Ok: variant {
-         MintReceiptPart: MintReceiptPart;
-         TransferTransactionId: nat;
-       };
+   Ok: nat64;
  };
 type Bio = record {name: opt text;};
-type ApiError__2 = 
- variant {
-   InvalidTokenId;
-   Other;
-   Unauthorized;
-   ZeroAddress;
- };
 type ApiError__1 = 
  variant {
    InvalidTokenId;
@@ -280,4 +265,4 @@ type ApiError =
    Unauthorized;
    ZeroAddress;
  };
-service : () -> Serve
+service : (principal) -> Serve

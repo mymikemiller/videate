@@ -18,7 +18,7 @@ import {
   Profile,
   ProfileUpdate,
   _SERVICE,
-} from "../../../declarations/contributor/contributor.did";
+} from "../../../declarations/serve/serve.did";
 import { AppContext } from "../App";
 import { emptyProfile } from "../hooks";
 import { pushProfileUpdate } from "../utils";
@@ -54,9 +54,8 @@ function ManageProfile() {
         "Are you sure you want to delete your contributor profile? This will be permanent!"
       )
     ) {
-      const result = await actor?.delete();
+      const result = await actor?.deleteContributor();
       toast.success("Contributor profile successfully deleted");
-      console.log(result);
       navigate("/");
     }
   };
@@ -81,7 +80,6 @@ function ManageProfile() {
   };
 
   if (!profile) {
-    console.log('There is no profile, so returning null for ManageProfile component');
     return null;
   }
 
@@ -93,7 +91,6 @@ function ManageProfile() {
   if (name[0]) fallbackDisplayName = name;
 
   if (serveActor == undefined) {
-    console.log('serveActor is undefined when trying to render ManageProfile');
     return null;
   }
 
@@ -120,7 +117,6 @@ function ManageProfile() {
           {feedKeys.length == 0 && <Text>No feed keys found. Please click the Videate link in the shownotes to populate.</Text>}
           <ul style={{ padding: 0 }} >
             {feedKeys.map((feedKey, index) => {
-              console.log(`${index}: ${feedKey}`)
               return (
                 <li key={feedKey} style={{ listStyleType: 'none', marginBottom: '1em' }} >
                   <CopyableLink serveActor={serveActor!} feedKey={feedKey} />

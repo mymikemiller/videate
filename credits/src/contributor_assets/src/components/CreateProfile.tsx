@@ -2,7 +2,7 @@ import React from "react"; // import * as React from 'react'
 import {
   ProfileUpdate,
   _SERVICE,
-} from "../../../declarations/contributor/contributor.did";
+} from "../../../declarations/serve/serve.did";
 import ProfileForm from "./ProfileForm";
 import toast from "react-hot-toast";
 import { emptyProfile } from "../hooks";
@@ -23,19 +23,17 @@ const CreateProfile = () => {
 
   const submitCallback = async (profileUpdate: ProfileUpdate) => {
     // Handle creation and verification async
-    actor?.create(profileUpdate).then(async (createResponse) => {
+    actor?.createContributor(profileUpdate).then(async (createResponse) => {
       if ("ok" in createResponse) {
-        const profileResponse = await actor.read();
+        const profileResponse = await actor.readContributor();
         if ("ok" in profileResponse) {
           setProfile(profileResponse.ok);
-          navigate('/manage');
         } else {
           console.error(profileResponse.err);
           handleCreationError();
         }
       } else {
         handleCreationError();
-        console.log("there was an error in profile creation:");
         console.error(createResponse.err);
       }
     });

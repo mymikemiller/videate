@@ -36,13 +36,11 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
       })
       .catch(err => {
         toast.error('Error copying URL. Try selecting the text and copying manually.');
-        console.error(err);
       })
   };
 
   const setFeedInfo = async (feedKey: string) => {
     if (!authClient) {
-      console.error('null authClient when trying to set CopyableLink feed info');
       return;
     }
 

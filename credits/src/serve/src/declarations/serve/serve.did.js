@@ -26,13 +26,13 @@ export const idlFactory = ({ IDL }) => {
     'mediaList' : IDL.Vec(Media),
     'subtitle' : IDL.Text,
   });
-  const ApiError__2 = IDL.Variant({
+  const ApiError = IDL.Variant({
     'ZeroAddress' : IDL.Null,
     'InvalidTokenId' : IDL.Null,
     'Unauthorized' : IDL.Null,
     'Other' : IDL.Null,
   });
-  const Result__1 = IDL.Variant({ 'Ok' : IDL.Null, 'Err' : ApiError__2 });
+  const Result__1 = IDL.Variant({ 'Ok' : IDL.Null, 'Err' : ApiError });
   const Bio = IDL.Record({ 'name' : IDL.Opt(IDL.Text) });
   const Profile = IDL.Record({
     'id' : IDL.Principal,
@@ -45,39 +45,13 @@ export const idlFactory = ({ IDL }) => {
     'AlreadyExists' : IDL.Null,
   });
   const Result_1 = IDL.Variant({ 'ok' : Profile, 'err' : Error });
-  const Media__1 = IDL.Record({
-    'uri' : IDL.Text,
-    'title' : IDL.Text,
-    'lengthInBytes' : IDL.Nat,
-    'source' : Source,
-    'etag' : IDL.Text,
-    'description' : IDL.Text,
-    'nftTokenId' : IDL.Opt(IDL.Nat64),
-    'durationInMicroseconds' : IDL.Nat,
-  });
-  const TokenId__1 = IDL.Nat64;
-  const MintReceiptPart = IDL.Record({
-    'id' : IDL.Nat,
-    'token_id' : TokenId__1,
-  });
-  const ApiError__1 = IDL.Variant({
-    'ZeroAddress' : IDL.Null,
-    'InvalidTokenId' : IDL.Null,
-    'Unauthorized' : IDL.Null,
-    'Other' : IDL.Null,
-  });
-  const SearchError = IDL.Variant({
-    'MediaNotFound' : IDL.Null,
-    'FeedNotFound' : IDL.Null,
-  });
   const BuyNftResult = IDL.Variant({
-    'Ok' : IDL.Variant({
-      'MintReceiptPart' : MintReceiptPart,
-      'TransferTransactionId' : IDL.Nat,
-    }),
+    'Ok' : IDL.Nat64,
     'Err' : IDL.Variant({
-      'ApiError' : ApiError__1,
-      'SearchError' : SearchError,
+      'MediaNotFound' : IDL.Null,
+      'NotAuthorized' : IDL.Null,
+      'FeedNotFound' : IDL.Null,
+      'Other' : IDL.Null,
     }),
   });
   const ProfileUpdate__1 = IDL.Record({
@@ -106,10 +80,17 @@ export const idlFactory = ({ IDL }) => {
     'purpose' : MetadataPurpose,
   });
   const MetadataDesc__1 = IDL.Vec(MetadataPart);
+  const ApiError__1 = IDL.Variant({
+    'ZeroAddress' : IDL.Null,
+    'InvalidTokenId' : IDL.Null,
+    'Unauthorized' : IDL.Null,
+    'Other' : IDL.Null,
+  });
   const MetadataResult = IDL.Variant({
     'Ok' : MetadataDesc__1,
     'Err' : ApiError__1,
   });
+  const TokenId__1 = IDL.Nat64;
   const ExtendedMetadataResult = IDL.Variant({
     'Ok' : IDL.Record({
       'token_id' : TokenId__1,
@@ -143,6 +124,10 @@ export const idlFactory = ({ IDL }) => {
   });
   const LogoResult = IDL.Record({ 'data' : IDL.Text, 'logo_type' : IDL.Text });
   const MetadataDesc = IDL.Vec(MetadataPart);
+  const MintReceiptPart = IDL.Record({
+    'id' : IDL.Nat,
+    'token_id' : TokenId__1,
+  });
   const MintReceipt = IDL.Variant({
     'Ok' : MintReceiptPart,
     'Err' : ApiError__1,
@@ -151,13 +136,12 @@ export const idlFactory = ({ IDL }) => {
     'Ok' : IDL.Principal,
     'Err' : ApiError__1,
   });
-  const ApiError = IDL.Variant({
-    'ZeroAddress' : IDL.Null,
-    'InvalidTokenId' : IDL.Null,
-    'Unauthorized' : IDL.Null,
-    'Other' : IDL.Null,
-  });
   const TxReceipt = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : ApiError });
+  const SearchError = IDL.Variant({
+    'MediaNotFound' : IDL.Null,
+    'FeedNotFound' : IDL.Null,
+  });
+  const MediaSearchResult = IDL.Variant({ 'Ok' : Media, 'Err' : SearchError });
   const InterfaceId = IDL.Variant({
     'Burn' : IDL.Null,
     'Mint' : IDL.Null,
@@ -174,9 +158,9 @@ export const idlFactory = ({ IDL }) => {
     'addNftCustodian' : IDL.Func([IDL.Principal], [Result__1], []),
     'addRequestedFeedKey' : IDL.Func([IDL.Text], [Result_1], []),
     'balanceOfDip721' : IDL.Func([IDL.Principal], [IDL.Nat64], ['query']),
-    'buyNft' : IDL.Func([IDL.Text, Media__1], [BuyNftResult], []),
-    'createContributor' : IDL.Func([ProfileUpdate__1], [Result], []),
-    'deleteContributor' : IDL.Func([], [Result], []),
+    'buyNft' : IDL.Func([IDL.Text, IDL.Text], [BuyNftResult], []),
+    'create' : IDL.Func([ProfileUpdate__1], [Result], []),
+    'delete' : IDL.Func([], [Result], []),
     'deleteFeed' : IDL.Func([IDL.Text], [], ['oneway']),
     'getAllFeedKeys' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getAllFeedMediaDetails' : IDL.Func(
@@ -194,7 +178,6 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(IDL.Text, Feed))],
         ['query'],
       ),
-    'getContributorName' : IDL.Func([IDL.Principal], [IDL.Opt(IDL.Text)], []),
     'getFeed' : IDL.Func([IDL.Text], [IDL.Opt(Feed)], ['query']),
     'getFeedMediaDetails' : IDL.Func(
         [IDL.Text],
@@ -217,15 +200,19 @@ export const idlFactory = ({ IDL }) => {
       ),
     'http_request' : IDL.Func([HttpRequest], [HttpResponse], ['query']),
     'http_request_update' : IDL.Func([HttpRequest], [HttpResponse], []),
-    'initializeNft' : IDL.Func([], [Result__1], []),
     'logoDip721' : IDL.Func([], [LogoResult], ['query']),
     'mintDip721' : IDL.Func([IDL.Principal, MetadataDesc], [MintReceipt], []),
     'nameDip721' : IDL.Func([], [IDL.Text], ['query']),
     'ownerOfDip721' : IDL.Func([TokenId], [OwnerResult], ['query']),
-    'readContributor' : IDL.Func([], [Result_1], []),
+    'read' : IDL.Func([], [Result_1], []),
     'safeTransferFromDip721' : IDL.Func(
         [IDL.Principal, IDL.Principal, TokenId],
         [TxReceipt],
+        [],
+      ),
+    'setNftTokenId' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Opt(IDL.Nat64)],
+        [MediaSearchResult],
         [],
       ),
     'supportedInterfacesDip721' : IDL.Func(
@@ -240,8 +227,8 @@ export const idlFactory = ({ IDL }) => {
         [TxReceipt],
         [],
       ),
-    'updateContributor' : IDL.Func([ProfileUpdate], [Result], []),
+    'update' : IDL.Func([ProfileUpdate], [Result], []),
   });
   return Serve;
 };
-export const init = ({ IDL }) => { return []; };
+export const init = ({ IDL }) => { return [IDL.Principal]; };

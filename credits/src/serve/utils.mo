@@ -8,7 +8,7 @@ import Char "mo:base/Char";
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
-import Xml "xml";
+import Xml "rss/xml";
 import Types "types";
 
 module {

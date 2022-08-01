@@ -101,10 +101,9 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: "development",
       CONTRIBUTOR_ASSETS_CANISTER_ID: canisters["contributor_assets"],
-      CONTRIBUTOR_CANISTER_ID: canisters["contributor"],
       SERVE_CANISTER_ID: canisters["serve"],
       II_URL: isDevelopment
-        ? "{origin}?canisterId=rno2w-sqaaa-aaaaa-aaacq-cai#authorize"
+        ? "{origin}?canisterId=q4eej-kyaaa-aaaaa-aaaha-cai#authorize"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({

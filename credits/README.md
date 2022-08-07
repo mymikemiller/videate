@@ -3,17 +3,27 @@
 A set of Internet Computer canisters (see https://dfinity.org/) that act as a
 sort of database to handle and track users` media requests.
 
-## Running Locally
+# Running Locally
 
 ```
 cd credits
+```
+In one terminal:
+```
 dfx start --background
+```
+In another:
+```
 dfx canister create --all
 dfx build
 dfx canister install --all
 ```
+An alternative to the above commands:
+```
+dfx deploy
+```
 
-Note the canister IDs printed out for `credits` and `credits_assets`
+Note the canister IDs printed out for `credits` and `credits_assets`, or located in .dfx/local/canister_ids.
 
 ## Running Internet Identity Locally
 
@@ -23,8 +33,8 @@ the actual Internet Identity service), you need to build and start the
 [Internet Identity canister](https://github.com/dfinity/internet-identity).
 Clone that repository and build and start according to the instructions. The
 startup command is duplicated here for convenience but the Internet Identity
-readme's command should be used (and this should be updated) if they differ.
-
+readme's command should be used (and this README should be updated) if they differ.
+dd
 Run this, updating the path to point to your local copy of internet-identity:
 
 ```bash
@@ -94,7 +104,7 @@ Navigate to a feed!
 Use an existing feed key and the correct local canisterIds for the `serve` and
 `contributor_assets` canister)
 
-localhost:8000/example_feed_key?canisterId=r7inp-6aaaa-aaaaa-aaabq-cai&contributorAssetsCid=ryjl3-tyaaa-aaaaa-aaaba-cai&principal=TEST_PRINCIPAL
+localhost:8000/nsp?canisterId=rrkah-fqaaa-aaaaa-aaaaq-cai&contributorAssetsCid=r7inp-6aaaa-aaaaa-aaabq-cai&principal=s7v5n-xcubz-fcpgx-bmtwn-a7gvr-eigeg-idpzg-bsiuv-3th53-uee3c-2qe
 
 To test locally hosted feeds on a phone, use localhost.run to expose the feed
 to outside networks:
@@ -112,12 +122,16 @@ Make sure to specify the current cid for contributor_assets from
 .dfx/local/canister_ids.json so the generated videate settings links will work
 properly, e.g.:
 
-Deploy to the Internet Computer:
+## Using Hot Reload for frontend development
 
+After starting dfx, deploy with `npm start` then launch the proper URL using port 3000 instead of 8000.
+
+# Deploy to the Internet Computer:
+```
 dfx deploy --network ic --no-wallet
-
-Navigate to a feed hosted on the Internet Computer. Note that ".raw.ic0.app"
-must be used, not just ".ic0.app" since we're not hosting static files.
+```
+## Navigate to a feed hosted on the Internet Computer. 
+### Note that ".raw.ic0.app" must be used, not just ".ic0.app" since we're not hosting static files.
 
 https://mvjun-2yaaa-aaaah-aac3q-cai.raw.ic0.app/example_feed_key?principal=TEST_PRINCIPAL
 

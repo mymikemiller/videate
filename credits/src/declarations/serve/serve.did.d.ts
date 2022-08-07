@@ -1,4 +1,6 @@
 import type { Principal } from '@dfinity/principal';
+import type { ActorMethod } from '@dfinity/agent';
+
 export type ApiError = { 'ZeroAddress' : null } |
   { 'InvalidTokenId' : null } |
   { 'Unauthorized' : null } |
@@ -114,57 +116,53 @@ export type Result__1 = { 'Ok' : null } |
 export type SearchError = { 'MediaNotFound' : null } |
   { 'FeedNotFound' : null };
 export interface Serve {
-  'addFeed' : (arg_0: string, arg_1: Feed) => Promise<bigint>,
-  'addNftCustodian' : (arg_0: Principal) => Promise<Result__1>,
-  'addRequestedFeedKey' : (arg_0: string) => Promise<Result_1>,
-  'balanceOfDip721' : (arg_0: Principal) => Promise<bigint>,
-  'buyNft' : (arg_0: string, arg_1: Media__1) => Promise<BuyNftResult>,
-  'createContributor' : (arg_0: ProfileUpdate__1) => Promise<Result>,
-  'deleteContributor' : () => Promise<Result>,
-  'deleteFeed' : (arg_0: string) => Promise<undefined>,
-  'getAllFeedKeys' : () => Promise<Array<string>>,
-  'getAllFeedMediaDetails' : () => Promise<
-      Array<[string, Array<[string, string]>]>
-    >,
-  'getAllFeedSummaries' : () => Promise<Array<[string, string]>>,
-  'getAllFeeds' : () => Promise<Array<[string, Feed]>>,
-  'getContributorName' : (arg_0: Principal) => Promise<[] | [string]>,
-  'getFeed' : (arg_0: string) => Promise<[] | [Feed]>,
-  'getFeedMediaDetails' : (arg_0: string) => Promise<
-      [string, Array<[string, string]>]
-    >,
-  'getFeedSummary' : (arg_0: string) => Promise<[string, string]>,
-  'getMaxLimitDip721' : () => Promise<number>,
-  'getMetadataDip721' : (arg_0: TokenId) => Promise<MetadataResult>,
-  'getMetadataForUserDip721' : (arg_0: Principal) => Promise<
-      ExtendedMetadataResult
-    >,
-  'getSampleFeed' : () => Promise<Feed>,
-  'getTokenIdsForUserDip721' : (arg_0: Principal) => Promise<Array<TokenId>>,
-  'http_request' : (arg_0: HttpRequest) => Promise<HttpResponse>,
-  'http_request_update' : (arg_0: HttpRequest) => Promise<HttpResponse>,
-  'initializeNft' : () => Promise<Result__1>,
-  'logoDip721' : () => Promise<LogoResult>,
-  'mintDip721' : (arg_0: Principal, arg_1: MetadataDesc) => Promise<
-      MintReceipt
-    >,
-  'nameDip721' : () => Promise<string>,
-  'ownerOfDip721' : (arg_0: TokenId) => Promise<OwnerResult>,
-  'readContributor' : () => Promise<Result_1>,
-  'safeTransferFromDip721' : (
-      arg_0: Principal,
-      arg_1: Principal,
-      arg_2: TokenId,
-    ) => Promise<TxReceipt>,
-  'supportedInterfacesDip721' : () => Promise<Array<InterfaceId>>,
-  'symbolDip721' : () => Promise<string>,
-  'totalSupplyDip721' : () => Promise<bigint>,
-  'transferFromDip721' : (
-      arg_0: Principal,
-      arg_1: Principal,
-      arg_2: TokenId,
-    ) => Promise<TxReceipt>,
-  'updateContributor' : (arg_0: ProfileUpdate) => Promise<Result>,
+  'addFeed' : ActorMethod<[string, Feed], bigint>,
+  'addNftCustodian' : ActorMethod<[Principal], Result__1>,
+  'addRequestedFeedKey' : ActorMethod<[string], Result_1>,
+  'balanceOfDip721' : ActorMethod<[Principal], bigint>,
+  'buyNft' : ActorMethod<[string, Media__1], BuyNftResult>,
+  'createContributor' : ActorMethod<[ProfileUpdate__1], Result>,
+  'deleteContributor' : ActorMethod<[], Result>,
+  'deleteFeed' : ActorMethod<[string], undefined>,
+  'getAllFeedKeys' : ActorMethod<[], Array<string>>,
+  'getAllFeedMediaDetails' : ActorMethod<
+    [],
+    Array<[string, Array<[string, string]>]>,
+  >,
+  'getAllFeedSummaries' : ActorMethod<[], Array<[string, string]>>,
+  'getAllFeeds' : ActorMethod<[], Array<[string, Feed]>>,
+  'getContributorName' : ActorMethod<[Principal], [] | [string]>,
+  'getFeed' : ActorMethod<[string], [] | [Feed]>,
+  'getFeedMediaDetails' : ActorMethod<
+    [string],
+    [string, Array<[string, string]>],
+  >,
+  'getFeedSummary' : ActorMethod<[string], [string, string]>,
+  'getMaxLimitDip721' : ActorMethod<[], number>,
+  'getMetadataDip721' : ActorMethod<[TokenId], MetadataResult>,
+  'getMetadataForUserDip721' : ActorMethod<[Principal], ExtendedMetadataResult>,
+  'getSampleFeed' : ActorMethod<[], Feed>,
+  'getTokenIdsForUserDip721' : ActorMethod<[Principal], Array<TokenId>>,
+  'http_request' : ActorMethod<[HttpRequest], HttpResponse>,
+  'http_request_update' : ActorMethod<[HttpRequest], HttpResponse>,
+  'initializeNft' : ActorMethod<[], Result__1>,
+  'logoDip721' : ActorMethod<[], LogoResult>,
+  'mintDip721' : ActorMethod<[Principal, MetadataDesc], MintReceipt>,
+  'nameDip721' : ActorMethod<[], string>,
+  'ownerOfDip721' : ActorMethod<[TokenId], OwnerResult>,
+  'readContributor' : ActorMethod<[], Result_1>,
+  'safeTransferFromDip721' : ActorMethod<
+    [Principal, Principal, TokenId],
+    TxReceipt,
+  >,
+  'supportedInterfacesDip721' : ActorMethod<[], Array<InterfaceId>>,
+  'symbolDip721' : ActorMethod<[], string>,
+  'totalSupplyDip721' : ActorMethod<[], bigint>,
+  'transferFromDip721' : ActorMethod<
+    [Principal, Principal, TokenId],
+    TxReceipt,
+  >,
+  'updateContributor' : ActorMethod<[ProfileUpdate], Result>,
 }
 export interface Source {
   'id' : string,

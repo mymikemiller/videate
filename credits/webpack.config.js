@@ -37,7 +37,7 @@ initCanisterIds();
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
-const assetsDirectory = "contributor_assets";
+const assetsDirectory = "frontend";
 
 const asset_entry = path.join("src", assetsDirectory, "src", "index.html");
 
@@ -66,7 +66,7 @@ module.exports = {
   },
   output: {
     filename: "index.js",
-    path: path.join(__dirname, "dist", "contributor_assets"),
+    path: path.join(__dirname, "dist", "frontend"),
   },
 
   // Depending in the language or framework you are using for
@@ -96,14 +96,14 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "src", "contributor_assets", "assets"),
-          to: path.join(__dirname, "dist", "contributor_assets"),
+          from: path.join(__dirname, "src", "frontend", "assets"),
+          to: path.join(__dirname, "dist", "frontend"),
         },
       ],
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: "development",
-      CONTRIBUTOR_ASSETS_CANISTER_ID: canisters["contributor_assets"],
+      FRONTEND_CANISTER_ID: canisters["frontend"],
       SERVE_CANISTER_ID: canisters["serve"],
       II_URL: isDevelopment
         ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000/"
@@ -136,7 +136,7 @@ module.exports = {
       // Don't be confused with `devMiddleware.publicPath`, it is `publicPath` for static directory
       // Can be:
       // publicPath: ['/static-public-path-one/', '/static-public-path-two/'],
-      publicPath: "./src/contributor_assets",
+      publicPath: "./src/frontend",
       // Can be:
       // serveIndex: {} (options for the `serveIndex` option you can find https://github.com/expressjs/serve-index)
       serveIndex: true,

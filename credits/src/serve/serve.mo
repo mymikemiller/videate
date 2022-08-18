@@ -98,7 +98,7 @@ actor class Serve() = Self {
     let requestorPrincipal = getQueryParam("principal", request.url);
     let episodeGuid = getQueryParam("episodeGuid", request.url);
   
-    let contributorAssetsUri = getContributorAssetsUri(request);
+    let frontendUri = getFrontendUri(request);
 
     let mediaHost = "videate.org";
 
@@ -112,7 +112,7 @@ actor class Serve() = Self {
       func (input: Text): Text { Text.replace(input, #text("file:///Users/mikem/web/media/"), "https://" # mediaHost # "/"); },
     ];
 
-    var xml = getFeedXml(feedKey, episodeGuid, requestorPrincipal, contributorAssetsUri, contributors, nft, uriTransformers);
+    var xml = getFeedXml(feedKey, episodeGuid, requestorPrincipal, frontendUri, contributors, nft, uriTransformers);
 
     Utils.generateFeedResponse(xml);
   };
@@ -158,33 +158,33 @@ actor class Serve() = Self {
     Option.get(hostHeader, ("host","ERROR_NO_HOST_HEADER")).1;
   };
 
-  private func getContributorAssetsUri(request: HttpRequest): Text {
+  private func getFrontendUri(request: HttpRequest): Text {
     // If this 'serve' canister is hosted on the IC, use the hard-coded IC
-    // contributor_assets canister as the host for the videate settings page.
-    // Otherwise, use the same host as in the request, since that host should
-    // also work for the contributor_assets canister (i.e. when dfx is running
-    // locally, even when accessed through localhost.run)
+    // frontend canister as the host for the videate settings page. Otherwise,
+    // use the same host as in the request, since that host should also work
+    // for the frontend canister (i.e. when dfx is running locally, even when
+    // accessed through localhost.run)
     let thisActorCid = Principal.toText(Principal.fromActor(Self));
     let baseUri = if(thisActorCid == "mvjun-2yaaa-aaaah-aac3q-cai")
     {
-      // Hard-code the IC network contributor_assets cid if we're responding
+      // Hard-code the IC network frontend cid if we're responding
       // from within the IC network serve canister
       "https://44ejt-7yaaa-aaaao-aabqa-cai.raw.ic0.app"
     } else { 
-      // Parse the contributor_assets canister cid from the query params, which
-      // we specify if we're locally hosting. This is necessary since there's
-      // no way, from motoko, to examine .dfx/local/canister_ids.json file or
-      // the generated files under ../declarations to find the cid, so we have
-      // to specify it manually in the url when subscribing to a feed. See
+      // Parse the frontend canister cid from the query params, which we
+      // specify if we're locally hosting. This is necessary since there's no
+      // way, from motoko, to examine .dfx/local/canister_ids.json file or the
+      // generated files under ../declarations to find the cid, so we have to
+      // specify it manually in the url when subscribing to a feed. See
       // https://forum.dfinity.org/t/programmatically-find-the-canister-id-of-a-frontend-canister
-      let contributorAssetsCid = Option.get(
-        getQueryParam("contributorAssetsCid", request.url),
-        "ERROR_NO_CONTRIBUTOR_ASSETS_CID_QUERY_PARAM"
+      let frontendCid = Option.get(
+        getQueryParam("frontendCid", request.url),
+        "ERROR_NO_FRONTEND_CID_QUERY_PARAM"
       );
 
-      // Replace this server's cid in the host with the contributor assets cid
+      // Replace this server's cid in the host with the frontend cid
       let requestHost = getRequestHost(request);
-      let correctedUri = Text.replace(requestHost, #text(thisActorCid), contributorAssetsCid);
+      let correctedUri = Text.replace(requestHost, #text(thisActorCid), frontendCid);
 
       // If the 'port' query param was specified, use that port for frontend
       // urls. This way we can generate links to the hot-reload enabled
@@ -337,12 +337,12 @@ actor class Serve() = Self {
     credits.getSampleFeed();
   };
 
-  func getFeedXml(key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, contributorAssetsUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, uriTransformers: [UriTransformer]) : Text {
+  func getFeedXml(key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, uriTransformers: [UriTransformer]) : Text {
     let feed: ?Feed = credits.getFeed(key);
     switch(feed) {
       case null Xml.stringifyError("Unrecognized feed: " # key);
       case (?feed) {
-        let doc: Document = Rss.format(feed, key, episodeGuid, requestorPrincipal, contributorAssetsUri, contributors, nft, uriTransformers);
+        let doc: Document = Rss.format(feed, key, episodeGuid, requestorPrincipal, frontendUri, contributors, nft, uriTransformers);
         Xml.stringifyDocument(doc);
       };
     };

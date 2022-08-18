@@ -24,7 +24,7 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed, key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, contributorAssetsUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, mediaUriTransformers: [UriTransformer]) : Document {
+	public func format(feed: Feed, key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, mediaUriTransformers: [UriTransformer]) : Document {
     // let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { ownerOfDip721: (token_id: Dip721NFTTypes.TokenId) -> async Dip721NFTTypes.OwnerResult };
 
     var mediaArray: [Media] = [];
@@ -163,7 +163,7 @@ module {
                 children = [];
               }]),
               List.map<Media, Element>(mediaListNewestToOldest, func(media: Media) : Element {
-                getMediaElement(media, key, requestorPrincipal, contributorAssetsUri, contributors, nft, mediaUriTransformers);
+                getMediaElement(media, key, requestorPrincipal, frontendUri, contributors, nft, mediaUriTransformers);
               })
             ));
 					},
@@ -172,9 +172,9 @@ module {
 		};
 	};
 
-  func getMediaElement(media: Media, feedKey: Text, requestorPrincipal: ?Text, contributorAssetsUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, mediaUriTransformers: [UriTransformer]) : Element {
-    let videateSettingsUri = contributorAssetsUri # "?feedKey=" # feedKey;
-    let nftPurchaseUri = contributorAssetsUri # "/nft?feedKey=" # feedKey # "&episodeGuid=" # media.uri;
+  func getMediaElement(media: Media, feedKey: Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, mediaUriTransformers: [UriTransformer]) : Element {
+    let videateSettingsUri = frontendUri # "?feedKey=" # feedKey;
+    let nftPurchaseUri = frontendUri # "/nft?feedKey=" # feedKey # "&episodeGuid=" # media.uri;
 
     let videateSettingsMessage: Text = media.description # "\n\nManage your Videate settings:\n\n" # videateSettingsUri # "\n\n";
 

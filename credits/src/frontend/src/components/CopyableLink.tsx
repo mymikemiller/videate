@@ -4,15 +4,16 @@ import {
   Feed,
   _SERVICE as _SERVE_SERVICE,
 } from "../../../declarations/serve/serve.did";
-import { canisterId as assetsCanisterId } from "../../../declarations/contributor_assets";
+// import { canisterId as frontendCid } from "../../../declarations/frontend";
 import { useContext } from "react";
 import { AppContext } from "../App";
 import toast from "react-hot-toast";
+import { frontend } from "../../../declarations/frontend";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const urlTemplate = isDevelopment ?
-  '{origin}/{feedKey}?contributorAssetsCid={contributorAssetsCid}&principal={principal}'
-  : 'https://{serveCanisterId}.raw.ic0.app/{feedKey}?contributorAssetsCid={contributorAssetsCid}&principal={principal}';
+  '{origin}/{feedKey}?frontendCid={frontendCid}&principal={principal}'
+  : 'https://{serveCid}.raw.ic0.app/{feedKey}?frontendCid={frontendCid}&principal={principal}';
 
 interface CopyableLinkProps {
   serveActor: ActorSubclass<_SERVE_SERVICE>;
@@ -60,18 +61,20 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
   }, [mountedRef]);
 
   const setFeedInfo = (feed: Feed) => {
-    const serveCanisterId = Actor.canisterIdOf(serveActor).toText();
+    const serveCid = Actor.canisterIdOf(serveActor).toText();
 
     // The url needs to point to the serve canister, but we want to keep the
     // other details of the host in tact (i.e. let the latter half of the host
     // stay as either .localhost or .ic0.app). So we want
     // window.location.origin, but we switch out the cid to point to serve.
-    const origin = window.location.origin.replace(assetsCanisterId!, serveCanisterId)
+    const frontendCid = window.location.origin.split('//')[1].split('.')[0];
+    console.log("got frontend Cid: ", frontendCid);
+    const origin = window.location.origin.replace(frontendCid, serveCid)
     const url = urlTemplate
       .replace('{origin}', origin)
       .replace('{feedKey}', feedKey)
-      .replace('{serveCanisterId}', serveCanisterId)
-      .replace('{contributorAssetsCid}', assetsCanisterId!)
+      .replace('{serveCid}', serveCid)
+      .replace('{frontendCid}', frontendCid)
       .replace('{principal}', authClient!.getIdentity().getPrincipal().toText());
 
     setExists(true);

@@ -35,7 +35,7 @@ npm start
 
 Remember to use port 3000 when loading the site you're testing.
 
-Note the canister IDs printed out for `serve` and `contributor_assets`, or located in .dfx/local/canister_ids.
+Note the canister IDs printed out for `serve` and `frontend`, or located in .dfx/local/canister_ids.
 
 ## Running Internet Identity Locally
 
@@ -59,7 +59,7 @@ internet-identity/.dfx/local/canister_ids.json under "internet_identity") is
 written in webpack.config.js for the development II_URL.
 
 Once that is running locally (and so are this package's canisters), navigating
-to http://localhost:8000?canisterId=[local contributor_assets cid] will load
+to http://localhost:8000?canisterId=[local frontend cid] will load
 the login UI and authenticating with Internet Identity will redirect to
 http://localhost:8000/authorize?canisterId=[cid found above]
 
@@ -67,11 +67,11 @@ http://localhost:8000/authorize?canisterId=[cid found above]
 
 `localhost:8000/canisterId={__CANDID_UI cid from .dfx/local/canisters}`
 
-### Launch the frontend, hosted in the contributor_assets canister
+### Launch the frontend, hosted in the frontend canister
 
 #### Locally:
 
-`localhost:8000/?canisterId={contributor_assets cid from .dfx/local/canisters}`
+`localhost:8000/?canisterId={frontend cid from .dfx/local/canisters}`
 
 If you get a "Register Device. This user does not have access to this wallet."
 page when clicking the login link (likely after a `dfx start --clean`),
@@ -114,9 +114,9 @@ dfx canister call serve initialize
 Navigate to a feed!
 
 Use an existing feed key and the correct local canisterIds for the `serve` and
-`contributor_assets` canister)
+`frontend` canister)
 
-localhost:8000/nsp?canisterId=rrkah-fqaaa-aaaaa-aaaaq-cai&contributorAssetsCid=r7inp-6aaaa-aaaaa-aaabq-cai&principal=s7v5n-xcubz-fcpgx-bmtwn-a7gvr-eigeg-idpzg-bsiuv-3th53-uee3c-2qe
+localhost:8000/nsp?canisterId=rrkah-fqaaa-aaaaa-aaaaq-cai&frontendCid=r7inp-6aaaa-aaaaa-aaabq-cai&principal=s7v5n-xcubz-fcpgx-bmtwn-a7gvr-eigeg-idpzg-bsiuv-3th53-uee3c-2qe
 
 To test locally hosted feeds on a phone, use localhost.run to expose the feed
 to outside networks:
@@ -128,9 +128,9 @@ ssh -R 80:localhost:8000 localhost.run
 Then subscribe in a podcatcher to the address printed out after "tunneled with
 tls termination", e.g.:
 
-https://8d0116fb626db2.lhrtunnel.link/example_feed_key?canisterId=r7inp-6aaaa-aaaaa-aaabq-cai&contributorAssetsCid=ryjl3-tyaaa-aaaaa-aaaba-cai&principal=TEST_PRINCIPAL
+https://8d0116fb626db2.lhrtunnel.link/example_feed_key?canisterId=r7inp-6aaaa-aaaaa-aaabq-cai&frontendCid=ryjl3-tyaaa-aaaaa-aaaba-cai&principal=TEST_PRINCIPAL
 
-Make sure to specify the current cid for contributor_assets from
+Make sure to specify the current cid for frontend from
 .dfx/local/canister_ids.json so the generated videate settings links will work
 properly, e.g.:
 

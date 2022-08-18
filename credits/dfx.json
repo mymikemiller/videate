@@ -4,16 +4,16 @@
       "main": "src/serve/serve.mo",
       "type": "motoko"
     },
-    "contributor_assets": {
+    "frontend": {
       "dependencies": [
         "serve"
       ],
       "frontend": {
-        "entrypoint": "src/contributor_assets/src/index.html"
+        "entrypoint": "src/frontend/src/index.html"
       },
       "source": [
-        "src/contributor_assets/assets",
-        "dist/contributor_assets/"
+        "src/frontend/assets",
+        "dist/frontend/"
       ],
       "type": "assets"
     },

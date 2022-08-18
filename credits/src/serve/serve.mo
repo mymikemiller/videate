@@ -16,7 +16,7 @@ import Error "mo:base/Error";
 import Principal "mo:base/Principal";
 import Credits "credits/credits";
 import Contributors "contributors/contributors";
-import Nft "nft/nft";
+import NftDb "nft_db/nft_db";
 import Rss "rss/rss";
 import Xml "rss/xml";
 import Types "types";
@@ -34,14 +34,14 @@ actor class Serve() = Self {
   type Document = Xml.Document;
   type UriTransformer = Types.UriTransformer;
   type Media = Credits.Media;
-  type OwnerResult = Nft.OwnerResult;
+  type OwnerResult = NftDb.OwnerResult;
   type Profile = Contributors.Profile;
   type ProfileUpdate = Contributors.ProfileUpdate;
   type BuyNftResult = Contributors.BuyNftResult;
-  type ApiError = Nft.ApiError;
+  type ApiError = NftDb.ApiError;
   type SearchError = Credits.SearchError;
-  type MintReceiptPart = Nft.MintReceiptPart;
-  type MintReceipt = Nft.MintReceipt;
+  type MintReceiptPart = NftDb.MintReceiptPart;
+  type MintReceipt = NftDb.MintReceipt;
 
   let sampleFeed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" version=\"2.0\"> <channel> <atom:link href=\"http://mikem-18bd0e1e.localhost.run/\" rel=\"self\" type=\"application/rss+xml\"></atom:link> <title>Sample Feed</title> <link>http://example.com</link> <language>en-us</language> <itunes:subtitle>Just a sample</itunes:subtitle> <itunes:author>Mike Miller</itunes:author> <itunes:summary>A sample feed hosted on the Internet Computer</itunes:summary> <description>A sample feed hosted on the Internet Computer</description> <itunes:owner> <itunes:name>Mike Miller</itunes:name> <itunes:email>mike@videate.org</itunes:email> </itunes:owner> <itunes:explicit>no</itunes:explicit> <itunes:image href=\"https://brianchristner.io/content/images/2016/01/Success-loading.jpg\"></itunes:image> <itunes:category text=\"Arts\"></itunes:category> <item> <title>test</title> <itunes:summary>test</itunes:summary> <description>test</description> <link>http://example.com/podcast-1</link> <enclosure url=\"https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4\" type=\"video/mpeg\" length=\"1024\"></enclosure> <pubDate>21 Dec 2016 16:01:07 +0000</pubDate> <itunes:author>Mike Miller</itunes:author> <itunes:duration>00:32:16</itunes:duration> <itunes:explicit>no</itunes:explicit> <guid></guid> </item> </channel> </rss>";
   
@@ -53,8 +53,9 @@ actor class Serve() = Self {
   stable var stableContributors: StableContributors = { profileEntries = []; };
   var contributors : Contributors.Contributors = Contributors.Contributors(stableContributors);
 
-  // nft can be stable since it does not have functions that manipulate data
-  stable var nft: Nft.Nft = Nft.Nft();
+  // nftDb can be stable since it does not have functions that manipulate its
+  // own data
+  stable var nftDb: NftDb.NftDb = NftDb.NftDb();
 
   system func preupgrade() {
     stableCredits := credits.asStable();
@@ -112,7 +113,7 @@ actor class Serve() = Self {
       func (input: Text): Text { Text.replace(input, #text("file:///Users/mikem/web/media/"), "https://" # mediaHost # "/"); },
     ];
 
-    var xml = getFeedXml(feedKey, episodeGuid, requestorPrincipal, frontendUri, contributors, nft, uriTransformers);
+    var xml = getFeedXml(feedKey, episodeGuid, requestorPrincipal, frontendUri, contributors, nftDb, uriTransformers);
 
     Utils.generateFeedResponse(xml);
   };
@@ -204,15 +205,15 @@ actor class Serve() = Self {
   // Mint or transfer the NFT for the given episode into the logged-in user
   // (msg.caller)'s name
   public shared(msg) func buyNft(feedKey: Text, media: Media) : async BuyNftResult {
-    if (not Nft.isInitialized(nft)) {
-      Debug.print("Nft module is uninitialized. Please execute `dfx canister call serve initializeNft` after initial deploy.");
-      return #Err(#ApiError(#Other("Nft module has not been initialized. See dfx output for details.")));
+    if (not NftDb.isInitialized(nftDb)) {
+      Debug.print("NftDb module is uninitialized. Please execute `dfx canister call serve initializeNftDb` after initial deploy.");
+      return #Err(#ApiError(#Other("NftDb module has not been initialized. See dfx output for details.")));
     };
 
     switch(media.nftTokenId) {
       case (? tokenId) {
         // The NFT's been minted already, do a transfer
-        let currentOwner = switch(Nft.ownerOfDip721(nft, tokenId)) {
+        let currentOwner = switch(NftDb.ownerOfDip721(nftDb, tokenId)) {
           case (#Ok(currentOwnerPrincipal: Principal)) {
             currentOwnerPrincipal;
           };
@@ -221,8 +222,8 @@ actor class Serve() = Self {
           };
         };
       
-        let txReceipt : Nft.TxReceipt = Nft.safeTransferFromDip721(
-          nft, 
+        let txReceipt : NftDb.TxReceipt = NftDb.safeTransferFromDip721(
+          nftDb,
           /* Caller. Note that to transfer, we can't pass msg.caller because
           that refers to the logged-in new owner, not the previous owner who is
           the only one who has the right to transfer their NFT (except for this
@@ -244,7 +245,7 @@ actor class Serve() = Self {
       };
       case (null) {
         // The NFT for the Media hasn't been minted yet. Mint it.
-        let metadata: [Nft.MetadataPart] = [
+        let metadata: [NftDb.MetadataPart] = [
           {
             purpose = #Rendered;
             key_val_data = [
@@ -268,8 +269,8 @@ actor class Serve() = Self {
             data = Text.encodeUtf8("https://rss.videate.org/" # feedKey # "&episodeGuid=" # media.uri); // For now, assume the media uri is the guid
           }
         ];
-        let mintReceipt : MintReceipt = Nft.mintDip721(
-          nft, 
+        let mintReceipt : MintReceipt = NftDb.mintDip721(
+          nftDb, 
           Principal.fromActor(Self), // Caller
           msg.caller,                // Owner of newly minted NFT
           metadata);
@@ -337,12 +338,12 @@ actor class Serve() = Self {
     credits.getSampleFeed();
   };
 
-  func getFeedXml(key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, uriTransformers: [UriTransformer]) : Text {
+  func getFeedXml(key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nftDb: NftDb.NftDb, uriTransformers: [UriTransformer]) : Text {
     let feed: ?Feed = credits.getFeed(key);
     switch(feed) {
       case null Xml.stringifyError("Unrecognized feed: " # key);
       case (?feed) {
-        let doc: Document = Rss.format(feed, key, episodeGuid, requestorPrincipal, frontendUri, contributors, nft, uriTransformers);
+        let doc: Document = Rss.format(feed, key, episodeGuid, requestorPrincipal, frontendUri, contributors, nftDb, uriTransformers);
         Xml.stringifyDocument(doc);
       };
     };
@@ -372,72 +373,72 @@ actor class Serve() = Self {
   /* nft interface */
   
   public query func balanceOfDip721(user: Principal) : async Nat64 {
-    Nft.balanceOfDip721(nft, user);
+    NftDb.balanceOfDip721(nftDb, user);
   };
 
-  public query func ownerOfDip721(token_id: Nft.TokenId) : async Nft.OwnerResult {
-    Nft.ownerOfDip721(nft, token_id);
+  public query func ownerOfDip721(token_id: NftDb.TokenId) : async NftDb.OwnerResult {
+    NftDb.ownerOfDip721(nftDb, token_id);
   };
 
-  public shared({ caller }) func safeTransferFromDip721(from: Principal, to: Principal, token_id: Nft.TokenId) : async Nft.TxReceipt {  
-    Nft.safeTransferFromDip721(nft, caller, from, to, token_id);
+  public shared({ caller }) func safeTransferFromDip721(from: Principal, to: Principal, token_id: NftDb.TokenId) : async NftDb.TxReceipt {  
+    NftDb.safeTransferFromDip721(nftDb, caller, from, to, token_id);
   };
 
-  public shared({ caller }) func transferFromDip721(from: Principal, to: Principal, token_id: Nft.TokenId) : async Nft.TxReceipt {
-    Nft.transferFromDip721(nft, caller, from, to, token_id);
+  public shared({ caller }) func transferFromDip721(from: Principal, to: Principal, token_id: NftDb.TokenId) : async NftDb.TxReceipt {
+    NftDb.transferFromDip721(nftDb, caller, from, to, token_id);
   };
 
-  public query func supportedInterfacesDip721() : async [Nft.InterfaceId] {
-    Nft.supportedInterfacesDip721();
+  public query func supportedInterfacesDip721() : async [NftDb.InterfaceId] {
+    NftDb.supportedInterfacesDip721();
   };
 
-  public query func logoDip721() : async Nft.LogoResult {
-    Nft.logoDip721(nft);
+  public query func logoDip721() : async NftDb.LogoResult {
+    NftDb.logoDip721(nftDb);
   };
 
   public query func nameDip721() : async Text {
-    Nft.nameDip721(nft);
+    NftDb.nameDip721(nftDb);
   };
 
   public query func symbolDip721() : async Text {
-    Nft.symbolDip721(nft);
+    NftDb.symbolDip721(nftDb);
   };
 
   public query func totalSupplyDip721() : async Nat64 {
-    Nft.totalSupplyDip721(nft);
+    NftDb.totalSupplyDip721(nftDb);
   };
 
-  public query func getMetadataDip721(token_id: Nft.TokenId) : async Nft.MetadataResult {
-    Nft.getMetadataDip721(nft, token_id);
+  public query func getMetadataDip721(token_id: NftDb.TokenId) : async NftDb.MetadataResult {
+    NftDb.getMetadataDip721(nftDb, token_id);
   };
 
   public query func getMaxLimitDip721() : async Nat16 {
-    Nft.getMaxLimitDip721(nft);
+    NftDb.getMaxLimitDip721(nftDb);
   };
 
-  public func getMetadataForUserDip721(user: Principal) : async Nft.ExtendedMetadataResult {
-    Nft.getMetadataForUserDip721(nft, user);
+  public func getMetadataForUserDip721(user: Principal) : async NftDb.ExtendedMetadataResult {
+    NftDb.getMetadataForUserDip721(nftDb, user);
   };
 
-  public query func getTokenIdsForUserDip721(user: Principal) : async [Nft.TokenId] {
-    Nft.getTokenIdsForUserDip721(nft, user);
+  public query func getTokenIdsForUserDip721(user: Principal) : async [NftDb.TokenId] {
+    NftDb.getTokenIdsForUserDip721(nftDb, user);
   };
 
-  public shared({ caller }) func mintDip721(to: Principal, metadata: Nft.MetadataDesc) : async MintReceipt {
-    Nft.mintDip721(nft, caller, to, metadata);
+  public shared({ caller }) func mintDip721(to: Principal, metadata: NftDb.MetadataDesc) : async MintReceipt {
+    NftDb.mintDip721(nftDb, caller, to, metadata);
   };
 
-  public shared({ caller }) func addNftCustodian(newCustodian: Principal) : async Nft.Result<(), ApiError> {
-    Nft.addCustodian(nft, caller, newCustodian);
+  public shared({ caller }) func addNftCustodian(newCustodian: Principal) : async NftDb.Result<(), ApiError> {
+    NftDb.addCustodian(nftDb, caller, newCustodian);
   };
   
-  public shared({ caller }) func initializeNft() : async Nft.Result<(), ApiError> {
+  public shared({ caller }) func initializeNftDb() : async NftDb.Result<(), ApiError> {
     // Add the caller as the first custodian. This gives all rights to the
     // person who deployed this canister, as long as they make the first
-    // initializeNft call. Note that this call will fail if the canister
+    // initializeNftDb call. Note that this call will fail if the canister
     // already has a custodian; this method can only be called on an
-    // uninitialized nft object.
-    let result = Nft.addCustodian(nft, caller, caller);
+    // uninitialized nftDb object.
+    let result = NftDb.addCustodian(nftDb, caller, caller);
     switch(result) {
       case (#Ok()) {
         // continue
@@ -449,6 +450,6 @@ actor class Serve() = Self {
 
     // Also add this canister as a custodian, without which this canister
     // wouldn't be able to mint or transfer NFTs
-    Nft.addCustodian(nft, caller, Principal.fromActor(Self));
+    NftDb.addCustodian(nftDb, caller, Principal.fromActor(Self));
   };
 };

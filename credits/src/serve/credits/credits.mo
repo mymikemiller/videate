@@ -15,7 +15,7 @@ import Option "mo:base/Option";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Types "types";
-import Nft "../nft/nft";
+import Nft "../nft_db/nft_db";
 
 module {
     public type Platform = Types.Platform;

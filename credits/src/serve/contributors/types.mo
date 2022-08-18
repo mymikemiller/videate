@@ -1,5 +1,5 @@
 import Buffer "mo:base/Buffer";
-import NftTypes "../nft/types";
+import NftTypes "../nft_db/types";
 import CreditsTypes "../credits/types";
 
 module {

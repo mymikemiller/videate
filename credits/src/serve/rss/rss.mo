@@ -1,6 +1,6 @@
 import Xml "xml";
 import Credits "../credits/credits";
-import Nft "../nft/nft";
+import NftDb "../nft_db/nft_db";
 import Contributors "../contributors/contributors";
 import Types "../types";
 import Array "mo:base/Array";
@@ -24,7 +24,7 @@ module {
   //
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
-	public func format(feed: Feed, key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, mediaUriTransformers: [UriTransformer]) : Document {
+	public func format(feed: Feed, key: Text, episodeGuid: ?Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nftDb: NftDb.NftDb, mediaUriTransformers: [UriTransformer]) : Document {
     // let Dip721NFT = actor("rno2w-sqaaa-aaaaa-aaacq-cai"): actor { ownerOfDip721: (token_id: Dip721NFTTypes.TokenId) -> async Dip721NFTTypes.OwnerResult };
 
     var mediaArray: [Media] = [];
@@ -163,7 +163,7 @@ module {
                 children = [];
               }]),
               List.map<Media, Element>(mediaListNewestToOldest, func(media: Media) : Element {
-                getMediaElement(media, key, requestorPrincipal, frontendUri, contributors, nft, mediaUriTransformers);
+                getMediaElement(media, key, requestorPrincipal, frontendUri, contributors, nftDb, mediaUriTransformers);
               })
             ));
 					},
@@ -172,7 +172,7 @@ module {
 		};
 	};
 
-  func getMediaElement(media: Media, feedKey: Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nft: Nft.Nft, mediaUriTransformers: [UriTransformer]) : Element {
+  func getMediaElement(media: Media, feedKey: Text, requestorPrincipal: ?Text, frontendUri: Text, contributors: Contributors.Contributors, nftDb: NftDb.NftDb, mediaUriTransformers: [UriTransformer]) : Element {
     let videateSettingsUri = frontendUri # "?feedKey=" # feedKey;
     let nftPurchaseUri = frontendUri # "/nft?feedKey=" # feedKey # "&episodeGuid=" # media.uri;
 
@@ -183,7 +183,7 @@ module {
         "The NFT for this episode is currently unclaimed! Click here to by the NFT: ";
       };
       case (? nftTokenId) {
-        switch(Nft.ownerOfDip721(nft, nftTokenId)) {
+        switch(NftDb.ownerOfDip721(nftDb, nftTokenId)) {
           case (#Err(e)) {
             "Error retrieving NFT owner. See NFT details here: ";
           };

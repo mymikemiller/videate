@@ -1,5 +1,5 @@
 import { Actor, ActorSubclass } from "@dfinity/agent";
-import React, { useEffect, useState } from "react"; // import * as React from 'react'
+import React, { useCallback, useEffect, useRef, useState } from "react"; // import * as React from 'react'
 import {
   Feed,
   _SERVICE as _SERVE_SERVICE,
@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const urlTemplate = isDevelopment ?
-  '{origin}/{feedKey}?canisterId={serveCanisterId}&contributorAssetsCid={contributorAssetsCid}&principal={principal}'
+  '{origin}/{feedKey}?contributorAssetsCid={contributorAssetsCid}&principal={principal}'
   : 'https://{serveCanisterId}.raw.ic0.app/{feedKey}?contributorAssetsCid={contributorAssetsCid}&principal={principal}';
 
 interface CopyableLinkProps {
@@ -24,10 +24,69 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
   const [exists, setExists] = useState(true);
   const [feed, setFeed] = useState<Feed | undefined>(undefined);
   const [customizedFeedUrl, setCustomizedFeedUrl] = useState<string>("");
+  const mountedRef = useRef(true);
 
+
+  const setup = useCallback(async () => {
+    try {
+      if (!authClient) {
+        return;
+      };
+
+      if (!serveActor) {
+        return;
+      };
+
+      const feeds: [Feed] | [] = await serveActor.getFeed(feedKey);
+      var feed: Feed | undefined = undefined;
+
+      // Note that we cannot use optional chaining here (feeds?.at(0)) as it is
+      // not supported in Apple Podcast's internal browser
+      if (feeds?.length == 1) feed = feeds[0];
+
+      // Don't allow the setState calls below if this component is unmounted
+      if (!mountedRef.current) return null;
+
+      if (!feed) {
+        console.error(`Feed ${feedKey} does not exist.`);
+        setExists(false);
+        return;
+      }
+
+      setFeedInfo(feed);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [mountedRef]);
+
+  const setFeedInfo = (feed: Feed) => {
+    const serveCanisterId = Actor.canisterIdOf(serveActor).toText();
+
+    // The url needs to point to the serve canister, but we want to keep the
+    // other details of the host in tact (i.e. let the latter half of the host
+    // stay as either .localhost or .ic0.app). So we want
+    // window.location.origin, but we switch out the cid to point to serve.
+    const origin = window.location.origin.replace(assetsCanisterId!, serveCanisterId)
+    const url = urlTemplate
+      .replace('{origin}', origin)
+      .replace('{feedKey}', feedKey)
+      .replace('{serveCanisterId}', serveCanisterId)
+      .replace('{contributorAssetsCid}', assetsCanisterId!)
+      .replace('{principal}', authClient!.getIdentity().getPrincipal().toText());
+
+    setExists(true);
+    setFeed(feed);
+    setCustomizedFeedUrl(url);
+  };
+
+  // This pattern is from https://stackoverflow.com/a/63371024/1160216 and
+  // avoids leaving unfinished async calls around resulting in React warnings.
   useEffect(() => {
-    setFeedInfo(feedKey);
-  }, []);
+    setup();
+    return () => {
+      mountedRef.current = false; // clean up
+    };
+  }, [setup]);
 
   function copy() {
     navigator.clipboard.writeText(customizedFeedUrl)
@@ -37,39 +96,6 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
       .catch(err => {
         toast.error('Error copying URL. Try selecting the text and copying manually.');
       })
-  };
-
-  const setFeedInfo = async (feedKey: string) => {
-    if (!authClient) {
-      return;
-    }
-
-    if (!serveActor) {
-      return;
-    }
-
-    const feeds: [Feed] | [] = await serveActor.getFeed(feedKey);
-    var feed: Feed | undefined = undefined;
-    // Note that we cannot use optional chaining here (feeds?.at(0)) as it is
-    // not supported in Apple Podcast's internal browser
-    if (feeds?.length == 1) feed = feeds[0];
-
-    if (!feed) {
-      console.error(`Feed ${feedKey} does not exist.`);
-      setExists(false);
-      return;
-    } else {
-      const url = urlTemplate
-        .replace('{origin}', window.location.origin)
-        .replace('{feedKey}', feedKey)
-        .replace('{serveCanisterId}', Actor.canisterIdOf(serveActor).toText())
-        .replace('{contributorAssetsCid}', assetsCanisterId!)
-        .replace('{principal}', authClient.getIdentity().getPrincipal().toText());
-
-      setExists(true);
-      setFeed(feed);
-      setCustomizedFeedUrl(url);
-    };
   };
 
   if (!exists) {

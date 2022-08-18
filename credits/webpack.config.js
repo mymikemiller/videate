@@ -36,7 +36,10 @@ function initCanisterIds() {
 initCanisterIds();
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-const asset_entry = path.join("src", "contributor_assets", "src", "index.html");
+
+const assetsDirectory = "contributor_assets";
+
+const asset_entry = path.join("src", assetsDirectory, "src", "index.html");
 
 module.exports = {
   target: "web",
@@ -103,7 +106,7 @@ module.exports = {
       CONTRIBUTOR_ASSETS_CANISTER_ID: canisters["contributor_assets"],
       SERVE_CANISTER_ID: canisters["serve"],
       II_URL: isDevelopment
-        ? "{origin}?canisterId=renrk-eyaaa-aaaaa-aaada-cai#authorize"
+        ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000/"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({
@@ -123,6 +126,8 @@ module.exports = {
       },
     },
     hot: true,
+    watchFiles: [path.resolve(__dirname, "src", assetsDirectory)],
+    liveReload: true,
     port: 3000,
     historyApiFallback: true,
     static: {

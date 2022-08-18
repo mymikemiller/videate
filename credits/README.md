@@ -10,20 +10,32 @@ cd credits
 ```
 In one terminal:
 ```
-dfx start --background
+dfx start
 ```
-In another:
+In another, do one of the following:
+
+1. Create, build and install all canisters
 ```
 dfx canister create --all
 dfx build
 dfx canister install --all
 ```
-An alternative to the above commands:
+2. Or do the above in a single call
 ```
 dfx deploy
 ```
+3. If this is the first deploy to a replica (e.g. after using `dfx start --clean`), also initialize the NFT module:
+```
+dfx canister call serve initializeNft
+```
+4. Run the frontend on port 3000 with hot reload capability in Chromium browsers
+```
+npm start
+```
 
-Note the canister IDs printed out for `credits` and `credits_assets`, or located in .dfx/local/canister_ids.
+Remember to use port 3000 when loading the site you're testing.
+
+Note the canister IDs printed out for `serve` and `contributor_assets`, or located in .dfx/local/canister_ids.
 
 ## Running Internet Identity Locally
 
@@ -121,10 +133,6 @@ https://8d0116fb626db2.lhrtunnel.link/example_feed_key?canisterId=r7inp-6aaaa-aa
 Make sure to specify the current cid for contributor_assets from
 .dfx/local/canister_ids.json so the generated videate settings links will work
 properly, e.g.:
-
-## Using Hot Reload for frontend development
-
-After starting dfx, deploy with `npm start` then launch the proper URL using port 3000 instead of 8000.
 
 # Deploy to the Internet Computer:
 ```

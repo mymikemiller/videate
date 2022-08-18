@@ -106,7 +106,7 @@ module {
         ) {
           return #Err(#Unauthorized);
         } else if (Principal.notEqual(from, token.owner)) {
-          return #Err(#Other);
+          return #Err(#Other("Attempt to transfer NFT from someone other than the owner."));
         } else {
           nft.nfts := List.map(nft.nfts, func (item : Types.Nft) : Types.Nft {
             if (item.id == token.id) {
@@ -169,7 +169,7 @@ module {
     let item = List.find(nft.nfts, func(token: Types.Nft) : Bool { token.owner == user });
     switch (item) {
       case null {
-        return #Err(#Other);
+        return #Err(#Other("No NFTs found for specified user"));
       };
       case (?token) {
         return #Ok({
@@ -188,7 +188,7 @@ module {
 
   public func mintDip721(nft: Nft, caller: Principal, to: Principal, metadata: Types.MetadataDesc) : Types.MintReceipt {
     if (not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
-      return #Err(#Unauthorized);
+      return #Err(#Other("Nft module is uninitialized"));
     };
 
     let newId = Nat64.fromNat(List.size(nft.nfts));
@@ -208,17 +208,19 @@ module {
     });
   };
 
-  public func addCustodian(nft: Nft, caller: Principal, newCustodian: Principal) : Result<(), ApiError> {
-    // We allow anyone (usually the deployer since this should be done
-    // immediately after deploying or else there won't be a custodian and none
-    // of the functions in this class will work) to specify the first
-    // custodian, usually the identity for their dfx so they can manage this
-    // class via the console.
-    let isInitialized = nft.transactionId > 0 or List.size(nft.nfts) > 0 or List.size(nft.custodians) > 0;
+  public func isInitialized(nft: Nft): Bool {    
+    return nft.transactionId > 0 or List.size(nft.nfts) > 0 or List.size(nft.custodians) > 0
+  };
 
+  public func addCustodian(nft: Nft, caller: Principal, newCustodian: Principal) : Result<(), ApiError> {
     // Once we've been initialized, only current custodians can add a new
-    // custodian
-    if (isInitialized and not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
+    // custodian. Note that we allow anyone (usually the deployer since the
+    // initalize call should be done immediately after deploying or else there
+    // won't be a custodian and none of the functions in this class will work)
+    // to specify the first custodian, usually the identity for their dfx (the
+    // caller of serveActor.initialize()) so they can manage this class via the
+    // console.
+    if (isInitialized(nft) and not List.some(nft.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
       return #Err(#Unauthorized);
     };
 

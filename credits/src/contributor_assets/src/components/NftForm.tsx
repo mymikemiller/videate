@@ -164,6 +164,7 @@ const NftForm = () => {
       toast.success("NFT successfully purchased!");
       setCurrentOwner(userPrincipal);
     } else {
+      console.error(result);
       toast.error("Error purchasing NFT.");
     };
   };

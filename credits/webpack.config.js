@@ -1,5 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ReactRefreshTypeScript = require('react-refresh-typescript');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
@@ -76,7 +78,22 @@ module.exports = {
   // tutorial, uncomment the following lines:
   module: {
     rules: [
-      { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
+      {
+        test: /\.(ts|tsx|jsx)$/,
+        // loader: "ts-loader" 
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              getCustomTransformers: () => ({
+                before: [isDevelopment && ReactRefreshTypeScript()].filter(Boolean),
+              }),
+              transpileOnly: isDevelopment,
+            },
+          },
+        ],
+      },
       { test: /\.css$/, use: ["style-loader", "css-loader"] },
       {
         test: /\.svg$/,
@@ -113,12 +130,13 @@ module.exports = {
       Buffer: [require.resolve("buffer/"), "Buffer"],
       process: require.resolve("process/browser"),
     }),
-  ],
+    isDevelopment && new ReactRefreshWebpackPlugin(),
+  ].filter(Boolean),
   // proxy /api to port 8000 during development
   devServer: {
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: "http://127.0.0.1:8000",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api",
@@ -126,9 +144,12 @@ module.exports = {
       },
     },
     hot: true,
-    watchFiles: [path.resolve(__dirname, "src", assetsDirectory)],
     liveReload: true,
     port: 3000,
+    allowedHosts: [
+      '.localhost',
+      '127.0.0.1'
+    ],
     historyApiFallback: true,
     static: {
       directory: path.resolve(__dirname, "static"),

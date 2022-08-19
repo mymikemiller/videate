@@ -114,7 +114,13 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    console.log("either profile or actor was set");
+    console.log("profile:");
+    console.dir(profile);
+    console.log("actor:");
+    console.dir(actor);
     if (profile && actor) {
+      console.log("profile and actor are both set")
       if (compareProfiles(profile, emptyProfile)) {
         // Authenticated but no profile
         navigate('/create');

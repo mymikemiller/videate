@@ -19,6 +19,20 @@ module {
         document.prolog # stringifyElement(document.root, 0);
     };
 
+    public func stringifyError(msg: Text): Text {
+        stringifyDocument(createErrorDocument(msg));
+    };
+
+    func createErrorDocument(msg: Text): Document = {
+        prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+        root = {
+            name = "Error";
+            attributes = [];
+            text = msg;
+            children = [];
+        };
+    };
+
     public func stringifyElement(element: Element, indentationLevel: Nat): Text {
         // Remove characters not supported in xml
         func sanitize(str: Text) : Text { Text.replace(str, #text("&"), "&amp;") };

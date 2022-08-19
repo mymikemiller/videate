@@ -14,7 +14,7 @@ git clone git@github.com:dfinity/examples.git
 
 ## Navigate to DIP721 Project root
 ```
-cd credits/src/nft
+cd credits/src/nft_db
 ```
 
 ## Run Local Internet Computer

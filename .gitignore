@@ -22,3 +22,5 @@ doc/api/
 
 # Misc
 credits/canister_ids.json
+credits/internet_identity.wasm
+credits/internet_identity.did

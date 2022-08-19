@@ -22,6 +22,10 @@ module {
         return generateResponse(200, [("content-type", "text/xml")], xml);
     };
 
+    public func generateErrorResponse(msg: Text) : HttpResponse {
+        return generateResponse(400, [("content-type", "text")], msg);
+    };
+
     public func generateResponse(status: Nat, headers: [(Text, Text)], body: Text): HttpResponse {
         // Translate the inputs to the expected types
         var statusNat16 = Nat16.fromNat(status);

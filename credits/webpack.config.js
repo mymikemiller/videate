@@ -1,5 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ReactRefreshTypeScript = require('react-refresh-typescript');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
@@ -36,7 +38,10 @@ function initCanisterIds() {
 initCanisterIds();
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-const asset_entry = path.join("src", "contributor_assets", "src", "index.html");
+
+const assetsDirectory = "frontend";
+
+const asset_entry = path.join("src", assetsDirectory, "src", "index.html");
 
 module.exports = {
   target: "web",
@@ -63,7 +68,7 @@ module.exports = {
   },
   output: {
     filename: "index.js",
-    path: path.join(__dirname, "dist", "contributor_assets"),
+    path: path.join(__dirname, "dist", "frontend"),
   },
 
   // Depending in the language or framework you are using for
@@ -73,7 +78,22 @@ module.exports = {
   // tutorial, uncomment the following lines:
   module: {
     rules: [
-      { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
+      {
+        test: /\.(ts|tsx|jsx)$/,
+        // loader: "ts-loader" 
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              getCustomTransformers: () => ({
+                before: [isDevelopment && ReactRefreshTypeScript()].filter(Boolean),
+              }),
+              transpileOnly: isDevelopment,
+            },
+          },
+        ],
+      },
       { test: /\.css$/, use: ["style-loader", "css-loader"] },
       {
         test: /\.svg$/,
@@ -93,29 +113,30 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "src", "contributor_assets", "assets"),
-          to: path.join(__dirname, "dist", "contributor_assets"),
+          from: path.join(__dirname, "src", "frontend", "assets"),
+          to: path.join(__dirname, "dist", "frontend"),
         },
       ],
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: "development",
-      CONTRIBUTOR_ASSETS_CANISTER_ID: canisters["contributor_assets"],
+      FRONTEND_CANISTER_ID: canisters["frontend"],
       SERVE_CANISTER_ID: canisters["serve"],
       II_URL: isDevelopment
-        ? "{origin}?canisterId=q4eej-kyaaa-aaaaa-aaaha-cai#authorize"
+        ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000/"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
       process: require.resolve("process/browser"),
     }),
-  ],
+    isDevelopment && new ReactRefreshWebpackPlugin(),
+  ].filter(Boolean),
   // proxy /api to port 8000 during development
   devServer: {
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: "http://127.0.0.1:8000",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api",
@@ -123,7 +144,12 @@ module.exports = {
       },
     },
     hot: true,
+    liveReload: true,
     port: 3000,
+    allowedHosts: [
+      '.localhost',
+      '127.0.0.1'
+    ],
     historyApiFallback: true,
     static: {
       directory: path.resolve(__dirname, "static"),
@@ -131,7 +157,7 @@ module.exports = {
       // Don't be confused with `devMiddleware.publicPath`, it is `publicPath` for static directory
       // Can be:
       // publicPath: ['/static-public-path-one/', '/static-public-path-two/'],
-      publicPath: "./src/contributor_assets",
+      publicPath: "./src/frontend",
       // Can be:
       // serveIndex: {} (options for the `serveIndex` option you can find https://github.com/expressjs/serve-index)
       serveIndex: true,

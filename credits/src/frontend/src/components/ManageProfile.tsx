@@ -24,7 +24,7 @@ import { emptyProfile } from "../hooks";
 import { pushProfileUpdate } from "../utils";
 import CopyableLink from "./CopyableLink";
 import ProfileForm from "./ProfileForm";
-import { canisterId as serveCanisterId, createActor as createServeActor } from "../../../declarations/serve";
+import { canisterId as serveCid, createActor as createServeActor } from "../../../declarations/serve";
 import { _SERVICE as _SERVE_SERVICE } from "../../../declarations/serve/serve.did";
 
 const DetailsList = styled.dl`
@@ -40,7 +40,7 @@ function ManageProfile() {
   const navigate = useNavigate();
 
   const initServeActor = () => {
-    const sActor = createServeActor(serveCanisterId as string);
+    const sActor = createServeActor(serveCid as string);
     setServeActor(sActor);
   };
 

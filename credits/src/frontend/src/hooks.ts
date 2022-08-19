@@ -13,7 +13,7 @@ export function useAuthClient(props?: UseAuthClientProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const ii_url = process.env.II_URL?.replace("{origin}", window.location.origin);
+  const ii_url = process.env.II_URL;
 
   const login = () => {
     authClient?.login({

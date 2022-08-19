@@ -11,7 +11,7 @@ import Array "mo:base/Array";
 import Debug "mo:base/Debug";
 import Option "mo:base/Option";
 import Types "types";
-import NftTypes "../nft/types";
+import NftTypes "../nft_db/types";
 import CreditsTypes "../credits/types";
 import ServeTypes "../types";
 

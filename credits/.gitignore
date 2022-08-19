@@ -10,6 +10,9 @@
 # dfx temporary files
 .dfx/
 
-# frontend code
+# Generated files
+src/declarations
+
+# Frontend code
 node_modules/
 dist/

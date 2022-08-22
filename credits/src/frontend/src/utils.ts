@@ -1,6 +1,6 @@
 import { ActorSubclass } from "@dfinity/agent";
 import toast from "react-hot-toast";
-import { Profile, ProfileUpdate, _SERVICE } from "../../declarations/serve/serve.did";
+import { Feed, Profile, ProfileUpdate, AddFeedResult, _SERVICE, Media } from "../../declarations/serve/serve.did";
 
 export function compareProfiles(p1: any | null, p2: any) {
   if (!p1) return false;
@@ -30,4 +30,32 @@ export async function pushProfileUpdate(actor: ActorSubclass<_SERVICE>, profileU
     toast.error("Failed to save update to IC");
     return;
   }
+};
+
+export async function pushNewFeed(actor: ActorSubclass<_SERVICE>, feed: Feed, feedKey: string): Promise<AddFeedResult> {
+  return actor!.addFeed(feedKey, feed);
+};
+
+// Stores the specified search param value in local storage if it was, indeed,
+// in the search params list. If not, removes the existing value in local
+// storage if there is one.
+const storeOrRemoveSearchParam = (searchParams: URLSearchParams, paramName: string) => {
+  const value = searchParams.get(paramName);
+  if (value) {
+    localStorage.setItem(paramName, value);
+  } else {
+    localStorage.removeItem(paramName);
+  }
+};
+
+
+export async function getMedia(actor: ActorSubclass<_SERVICE>, feedKey: string, episodeGuid: string): Promise<{ feed: Feed | undefined; media: Media | undefined; }> {
+  const feedResult: [Feed] | [] = await actor.getFeed(feedKey);
+  const feed: Feed = feedResult[0]!;
+  if (feed == undefined) {
+    return { feed: undefined, media: undefined };
+  };
+  // For now, assume the episodeGuid will always match the media's uri
+  const media: Media | undefined = feed.mediaList.find((media) => media.uri == episodeGuid);
+  return { feed, media };
 };

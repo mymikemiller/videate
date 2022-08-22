@@ -18,6 +18,7 @@ import ServeTypes "../types";
 module {
   public type Bio = Types.Bio;
   public type Profile = Types.Profile;
+  public type ProfileResult = Types.ProfileResult;
   public type ProfileUpdate = Types.ProfileUpdate;
   public type Error = Types.Error;
   public type BuyNftResult = Types.BuyNftResult;
@@ -105,7 +106,7 @@ module {
 
     // Add a feed key to the beginning of the list, or move it to the beginning
     // if it is already in the array
-    public func addRequestedFeedKey(caller: Principal, feedKey: Text) : Result.Result<Profile, Error> {
+    public func addRequestedFeedKey(caller: Principal, feedKey: Text) : ProfileResult {
       // Reject the AnonymousIdentity
       if(Principal.toText(caller) == "2vxsx-fae") {
         return #err(#NotAuthorized);
@@ -176,7 +177,7 @@ module {
     };
 
     // Read profile
-    public func read(caller: Principal) : Result.Result<Profile, Error> {
+    public func read(caller: Principal) : ProfileResult {
       // Reject the AnonymousIdentity
       if(Principal.toText(caller) == "2vxsx-fae") {
         return #err(#NotAuthorized);

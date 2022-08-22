@@ -27,6 +27,7 @@ actor class Serve() = Self {
   type HttpResponse = Types.HttpResponse;
   type StableCredits = Credits.StableCredits;
   type MediaSearchResult = Credits.MediaSearchResult;
+  type AddFeedResult = Credits.AddFeedResult;
   type StableContributors = Contributors.StableContributors;
   type ContributorsError = Contributors.Error;
   type Contributors = Contributors.Error;
@@ -36,6 +37,7 @@ actor class Serve() = Self {
   type Media = Credits.Media;
   type OwnerResult = NftDb.OwnerResult;
   type Profile = Contributors.Profile;
+  type ProfileResult = Contributors.ProfileResult;
   type ProfileUpdate = Contributors.ProfileUpdate;
   type BuyNftResult = Contributors.BuyNftResult;
   type ApiError = NftDb.ApiError;
@@ -207,18 +209,18 @@ actor class Serve() = Self {
   public shared(msg) func buyNft(feedKey: Text, media: Media) : async BuyNftResult {
     if (not NftDb.isInitialized(nftDb)) {
       Debug.print("NftDb module is uninitialized. Please execute `dfx canister call serve initializeNftDb` after initial deploy.");
-      return #Err(#ApiError(#Other("NftDb module has not been initialized. See dfx output for details.")));
+      return #err(#ApiError(#Other("NftDb module has not been initialized. See dfx output for details.")));
     };
 
     switch(media.nftTokenId) {
       case (? tokenId) {
         // The NFT's been minted already, do a transfer
         let currentOwner = switch(NftDb.ownerOfDip721(nftDb, tokenId)) {
-          case (#Ok(currentOwnerPrincipal: Principal)) {
+          case (#ok(currentOwnerPrincipal: Principal)) {
             currentOwnerPrincipal;
           };
-          case (#Err(e: ApiError)) {
-            return #Err(#ApiError(e));
+          case (#err(e: ApiError)) {
+            return #err(#ApiError(e));
           };
         };
       
@@ -235,11 +237,11 @@ actor class Serve() = Self {
           tokenId);
 
         switch(txReceipt) {
-          case (#Ok(transactionId : Nat)) {
-            return #Ok(#TransferTransactionId(transactionId));
+          case (#ok(transactionId : Nat)) {
+            return #ok(#TransferTransactionId(transactionId));
           };
-          case (#Err(e: ApiError)) {
-            return #Err(#ApiError(e));
+          case (#err(e: ApiError)) {
+            return #err(#ApiError(e));
           }
         };
       };
@@ -276,20 +278,20 @@ actor class Serve() = Self {
           metadata);
 
         switch(mintReceipt) {
-          case (#Ok(mintReceiptPart: MintReceiptPart)) {
+          case (#ok(mintReceiptPart: MintReceiptPart)) {
             // Associate the Media with the new tokenId
             let setNftTokenIdResult : MediaSearchResult = credits.setNftTokenId(feedKey, media.uri, mintReceiptPart.token_id); // For now, assume the media uri is the guid
             switch(setNftTokenIdResult) {
-              case (#Ok(_: Credits.Media)) {
-                return #Ok(#MintReceiptPart(mintReceiptPart));
+              case (#ok(_: Credits.Media)) {
+                return #ok(#MintReceiptPart(mintReceiptPart));
               };
-              case (#Err(e: SearchError)) {
-                return #Err(#SearchError(e));
+              case (#err(e: SearchError)) {
+                return #err(#SearchError(e));
               };
             };
           };
-          case (#Err(e : ApiError)) {
-            return #Err(#ApiError(e));
+          case (#err(e : ApiError)) {
+            return #err(#ApiError(e));
           };
         };
       };
@@ -298,7 +300,7 @@ actor class Serve() = Self {
 
   /* Credits interface */
 
-  public func addFeed(key: Text, feed : Feed) : async Nat {
+  public func addFeed(key: Text, feed : Feed) : async AddFeedResult {
     credits.addFeed(key, feed);
   };
 
@@ -428,11 +430,11 @@ actor class Serve() = Self {
     NftDb.mintDip721(nftDb, caller, to, metadata);
   };
 
-  public shared({ caller }) func addNftCustodian(newCustodian: Principal) : async NftDb.Result<(), ApiError> {
+  public shared({ caller }) func addNftCustodian(newCustodian: Principal) : async Result.Result<(), ApiError> {
     NftDb.addCustodian(nftDb, caller, newCustodian);
   };
   
-  public shared({ caller }) func initializeNftDb() : async NftDb.Result<(), ApiError> {
+  public shared({ caller }) func initializeNftDb() : async Result.Result<(), ApiError> {
     // Add the caller as the first custodian. This gives all rights to the
     // person who deployed this canister, as long as they make the first
     // initializeNftDb call. Note that this call will fail if the canister
@@ -440,10 +442,10 @@ actor class Serve() = Self {
     // uninitialized nftDb object.
     let result = NftDb.addCustodian(nftDb, caller, caller);
     switch(result) {
-      case (#Ok()) {
+      case (#ok()) {
         // continue
       };
-      case (#Err(e)) {
+      case (#err(e)) {
         return result;
       };
     };

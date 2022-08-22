@@ -1,4 +1,5 @@
 import Buffer "mo:base/Buffer";
+import Result "mo:base/Result";
 import NftTypes "../nft_db/types";
 import CreditsTypes "../credits/types";
 
@@ -31,14 +32,13 @@ module {
     #NotAuthorized;
   };
 
-  public type BuyNftResult = {
-    #Ok : {
+  public type ProfileResult = Result.Result<Profile, Error>;
+
+  public type BuyNftResult = Result.Result<{
       #MintReceiptPart : NftTypes.MintReceiptPart;
       #TransferTransactionId : Nat;
-    };
-    #Err : {
+    }, {
       #ApiError : NftTypes.ApiError;
       #SearchError : CreditsTypes.SearchError;
-    };
-  };
+    }>;
 };

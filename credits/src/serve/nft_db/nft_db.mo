@@ -20,13 +20,13 @@ import Bool "mo:base/Bool";
 import Debug "mo:base/Debug";
 import Principal "mo:base/Principal";
 import Types "types";
+import Result "mo:base/Result";
 
 module {
   public type Dip721NonFungibleToken = Types.Dip721NonFungibleToken;
   public type ApiError = Types.ApiError;
-  public type Result<S, E> = Types.Result<S, E>;
   public type OwnerResult = Types.OwnerResult;
-  public type TxReceipt =  Types.Result<Nat, ApiError>;
+  public type TxReceipt =  Types.TxReceipt;
   public type TransactionId = Types.TransactionId;
   public type TokenId = Types.TokenId;
   public type InterfaceId = Types.InterfaceId;
@@ -73,17 +73,17 @@ module {
     let item = List.get(nftDb.nfts, Nat64.toNat(token_id));
     switch (item) {
       case (null) {
-        return #Err(#InvalidTokenId);
+        return #err(#InvalidTokenId);
       };
       case (?token) {
-        return #Ok(token.owner);
+        return #ok(token.owner);
       };
     };
   };
 
   public func safeTransferFromDip721(nftDb: NftDb, caller: Principal, from: Principal, to: Principal, token_id: Types.TokenId) : Types.TxReceipt {  
     if (to == nftDb.null_address) {
-      return #Err(#ZeroAddress);
+      return #err(#ZeroAddress);
     } else {
       return transferFrom(nftDb, caller, from, to, token_id);
     };
@@ -97,16 +97,16 @@ module {
     let item = List.get(nftDb.nfts, Nat64.toNat(token_id));
     switch (item) {
       case null {
-        return #Err(#InvalidTokenId);
+        return #err(#InvalidTokenId);
       };
       case (?token) {
         if (
           caller != token.owner and
           not List.some(nftDb.custodians, func (custodian : Principal) : Bool { custodian == caller })
         ) {
-          return #Err(#Unauthorized);
+          return #err(#Unauthorized);
         } else if (Principal.notEqual(from, token.owner)) {
-          return #Err(#Other("Attempt to transfer NFT from someone other than the owner."));
+          return #err(#Other("Attempt to transfer NFT from someone other than the owner."));
         } else {
           nftDb.nfts := List.map(nftDb.nfts, func (item : Types.Nft) : Types.Nft {
             if (item.id == token.id) {
@@ -121,7 +121,7 @@ module {
             };
           });
           nftDb.transactionId += 1;
-          return #Ok(nftDb.transactionId);   
+          return #ok(nftDb.transactionId);   
         };
       };
     };
@@ -153,10 +153,10 @@ module {
     let item = List.get(nftDb.nfts, Nat64.toNat(token_id));
     switch (item) {
       case null {
-        return #Err(#InvalidTokenId);
+        return #err(#InvalidTokenId);
       };
       case (?token) {
-        return #Ok(token.metadata);
+        return #ok(token.metadata);
       }
     };
   };
@@ -169,10 +169,10 @@ module {
     let item = List.find(nftDb.nfts, func(token: Types.Nft) : Bool { token.owner == user });
     switch (item) {
       case null {
-        return #Err(#Other("No NFTs found for specified user"));
+        return #err(#Other("No NFTs found for specified user"));
       };
       case (?token) {
-        return #Ok({
+        return #ok({
           metadata_desc = token.metadata;
           token_id = token.id;
         });
@@ -188,7 +188,7 @@ module {
 
   public func mintDip721(nftDb: NftDb, caller: Principal, to: Principal, metadata: Types.MetadataDesc) : Types.MintReceipt {
     if (not List.some(nftDb.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
-      return #Err(#Other("Nft module is uninitialized"));
+      return #err(#Other("Nft module is uninitialized"));
     };
 
     let newId = Nat64.fromNat(List.size(nftDb.nfts));
@@ -202,7 +202,7 @@ module {
 
     nftDb.transactionId += 1;
 
-    return #Ok({
+    return #ok({
       token_id = newId;
       id = nftDb.transactionId;
     });
@@ -212,7 +212,7 @@ module {
     return nftDb.transactionId > 0 or List.size(nftDb.nfts) > 0 or List.size(nftDb.custodians) > 0
   };
 
-  public func addCustodian(nftDb: NftDb, caller: Principal, newCustodian: Principal) : Result<(), ApiError> {
+  public func addCustodian(nftDb: NftDb, caller: Principal, newCustodian: Principal) : Result.Result<(), ApiError> {
     // Once we've been initialized, only current custodians can add a new
     // custodian. Note that we allow anyone (usually the deployer since the
     // initalize call should be done immediately after deploying or else there
@@ -221,7 +221,7 @@ module {
     // caller of serveActor.initialize()) so they can manage this class via the
     // console.
     if (isInitialized(nftDb) and not List.some(nftDb.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
-      return #Err(#Unauthorized);
+      return #err(#Unauthorized);
     };
 
     // Add the new custodian if it's not already in the list
@@ -229,6 +229,6 @@ module {
       nftDb.custodians := List.push(newCustodian, nftDb.custodians);
     };
 
-    return #Ok();
+    return #ok();
   };
 };

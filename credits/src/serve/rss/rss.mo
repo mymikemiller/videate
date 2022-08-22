@@ -184,10 +184,10 @@ module {
       };
       case (? nftTokenId) {
         switch(NftDb.ownerOfDip721(nftDb, nftTokenId)) {
-          case (#Err(e)) {
+          case (#err(e)) {
             "Error retrieving NFT owner. See NFT details here: ";
           };
-          case (#Ok(nftOwnerPrincipal: Principal)) {
+          case (#ok(nftOwnerPrincipal: Principal)) {
             let msg = if (Option.get(requestorPrincipal, "null") == Principal.toText(nftOwnerPrincipal)) {
               "You own the NFT for this episode! See details here: ";
             } else {

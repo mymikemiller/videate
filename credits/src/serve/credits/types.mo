@@ -1,10 +1,4 @@
-// import Nat "mo:base/Nat";
-// import Nat8 "mo:base/Nat8";
-// import Nat16 "mo:base/Nat16";
-// import Nat32 "mo:base/Nat32";
-// import Nat64 "mo:base/Nat64";
-// import Blob "mo:base/Blob";
-// import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 
 module {
   // Used to store the contents of the Credits canister in stable types
@@ -81,12 +75,15 @@ module {
     #MediaNotFound;
   };
 
-  public type SearchResult<T> = {
-    #Ok : T;
-    #Err : SearchError;
+  public type SearchResult<T> = Result.Result<T, SearchError>;
+
+  public type MediaSearchResult = SearchResult<Media>;
+
+  public type AddFeedError = {
+    #KeyExists;
   };
 
-  public type MediaSearchResult = SearchResult<Media>
+  public type AddFeedResult = Result.Result<(), AddFeedError>;
   
   // Contributor: a causal factor in the existence or occurrence of something
   // All users (creators, consumers and supporters) are contributors

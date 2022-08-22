@@ -5,6 +5,7 @@ import Nat32 "mo:base/Nat32";
 import Nat64 "mo:base/Nat64";
 import Blob "mo:base/Blob";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 
 module {
   public type Dip721NonFungibleToken = {
@@ -21,13 +22,8 @@ module {
     #Other : Text;
   };
 
-  public type Result<S, E> = {
-    #Ok : S;
-    #Err : E;
-  };
-
-  public type OwnerResult = Result<Principal, ApiError>;
-  public type TxReceipt = Result<Nat, ApiError>;
+  public type OwnerResult = Result.Result<Principal, ApiError>;
+  public type TxReceipt = Result.Result<Nat, ApiError>;
   
   public type TransactionId = Nat;
   public type TokenId = Nat64;
@@ -51,12 +47,12 @@ module {
     metadata: MetadataDesc;
   };
 
-  public type ExtendedMetadataResult = Result<{
+  public type ExtendedMetadataResult = Result.Result<{
     metadata_desc: MetadataDesc;
     token_id: TokenId;
   }, ApiError>;
 
-  public type MetadataResult = Result<MetadataDesc, ApiError>;
+  public type MetadataResult = Result.Result<MetadataDesc, ApiError>;
 
   public type MetadataDesc = [MetadataPart];
 
@@ -86,7 +82,7 @@ module {
     #Nat64Content: Nat64;
   };
 
-  public type MintReceipt = Result<MintReceiptPart, ApiError>;
+  public type MintReceipt = Result.Result<MintReceiptPart, ApiError>;
 
   public type MintReceiptPart = {
     token_id: TokenId;

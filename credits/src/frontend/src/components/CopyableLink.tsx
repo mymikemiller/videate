@@ -68,7 +68,6 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
     // stay as either .localhost or .ic0.app). So we want
     // window.location.origin, but we switch out the cid to point to serve.
     const frontendCid = window.location.origin.split('//')[1].split('.')[0];
-    console.log("got frontend Cid: ", frontendCid);
     const origin = window.location.origin.replace(frontendCid, serveCid)
     const url = urlTemplate
       .replace('{origin}', origin)

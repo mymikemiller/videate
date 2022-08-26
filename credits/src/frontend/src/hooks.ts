@@ -15,14 +15,20 @@ export function useAuthClient(props?: UseAuthClientProps) {
 
   const ii_url = process.env.II_URL;
 
-  const login = () => {
-    authClient?.login({
-      identityProvider: ii_url,
-      onSuccess: () => {
-        setIsAuthenticated(true);
-        navigate('/loading');
-      },
-    });
+  const login = async () => {
+    const alreadyAuthenticated = await authClient?.isAuthenticated();
+    if (alreadyAuthenticated) {
+      setIsAuthenticated(true);
+      navigate('/loading');
+    } else {
+      authClient?.login({
+        identityProvider: ii_url,
+        onSuccess: () => {
+          setIsAuthenticated(true);
+          navigate('/loading');
+        },
+      });
+    }
   };
 
   const initActor = () => {
@@ -41,12 +47,23 @@ export function useAuthClient(props?: UseAuthClientProps) {
   };
 
   useEffect(() => {
-    AuthClient.create().then(async (client) => {
-      // Call client.isAuthenticated for side effect purposes
-      await client.isAuthenticated();
-      setAuthClient(client);
-    });
+    if (authClient == null) {
+      AuthClient.create().then(async (client) => {
+        setAuthClient(client);
+      });
+    }
   }, []);
+
+  useEffect(() => {
+    if (authClient != null) {
+      (async () => {
+        const authenticated = await authClient?.isAuthenticated();
+        if (authenticated) {
+          setIsAuthenticated(true);
+        }
+      })();
+    }
+  }, [authClient]);
 
   useEffect(() => {
     if (isAuthenticated) initActor();

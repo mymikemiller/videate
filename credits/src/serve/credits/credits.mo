@@ -24,6 +24,7 @@ module {
   public type Media = Types.Media;
   public type Feed = Types.Feed;
   public type AddFeedResult = Types.AddFeedResult;
+  public type PutMediaResult = Types.PutMediaResult;
   public type StableCredits = Types.StableCredits;
   public type MediaSearchResult = Types.MediaSearchResult;
   public type SearchError = Types.SearchError;
@@ -85,11 +86,47 @@ module {
       };
     };
 
-    func updateMedia(feedKey: Text, episodeGuid: Text, newMedia: Media) : ?Media {
+    public func addMedia(feedKey : Text, media: Media) : PutMediaResult {
+      return putMedia(feedKey, null, media);
+    };
+
+    public func updateMedia(feedKey: Text, episodeGuid: Text, media: Media) : PutMediaResult {
+      return putMedia(feedKey, Option.make(episodeGuid), media);
+    };
+
+    // If episodeGuid is provided, modifies the existing Media, otherwise add a new Media
+    func putMedia(feedKey: Text, episodeGuid: ?Text, newMedia: Media) : PutMediaResult {
+      //todo: check msg caller for feed ownership
       let feed = getFeed(feedKey);
       switch (feed) {
-        case (null) return null;
+        case (null) return #err(#FeedNotFound);
         case (? feed) {
+          // Temporarily convert to a Buffer to perform the modification/addition
+          let newMediaListBuffer = Buffer.Buffer<Media>(feed.mediaList.size());
+          var didReplace = false;
+          Iter.iterate(Iter.fromArray(feed.mediaList), func(m: Media, _index: Nat) {
+            switch(episodeGuid) {
+              case (null) {
+                newMediaListBuffer.add(m);
+              };
+              case (?episodeGuid) {
+                if (episodeGuid == m.uri) { // Assume episodeGuid is media.uri
+                  newMediaListBuffer.add(newMedia);
+                  didReplace := true;
+                } else {
+                  newMediaListBuffer.add(m);
+                }
+              }
+            }
+          });
+          if (not didReplace) {
+            if (episodeGuid != null) {
+              // If an episodeGuid was specified, error if no media to replace
+              return #err(#MediaNotFound);
+            };
+            newMediaListBuffer.add(newMedia);
+          };
+
           let newFeed: Feed = {
             title = feed.title;
             subtitle = feed.subtitle;
@@ -98,19 +135,20 @@ module {
             author = feed.author;
             email = feed.email;
             imageUrl = feed.imageUrl;
-            mediaList = Array.map<Media, Media>(feed.mediaList, func (media) {
-              if (media.uri == episodeGuid) newMedia else media;
-            });
+            mediaList = newMediaListBuffer.toArray();
           };
           let _ = feeds.replace(feedKey, newFeed);
-          return Option.make(newMedia);
+          return #ok();
         };
       };
     };
     
-    public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: Nft.TokenId) : Types.MediaSearchResult {
+    public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: Nft.TokenId) : Types.PutMediaResult {
       let mediaResult = getMedia(feedKey, episodeGuid);
       switch (mediaResult) {
+        case (#err(err)) {
+          return #err(err);
+        };
         case (#ok(media)) {
           let newMedia: Media = {
             title = media.title;
@@ -124,14 +162,9 @@ module {
             nftTokenId = Option.make(tokenId);
           };
 
-          let _ = updateMedia(feedKey, episodeGuid, newMedia);
-        };
-        case (#err(err)) {
-          // Do nothing, just return the result which includes the
-          // error
+          return putMedia(feedKey, Option.make(episodeGuid), newMedia);
         };
       };
-      return mediaResult;
     };
 
     public func getFeedSummary(key: Text) : (Text, Text) {

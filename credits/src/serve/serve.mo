@@ -28,6 +28,7 @@ actor class Serve() = Self {
   type StableCredits = Credits.StableCredits;
   type MediaSearchResult = Credits.MediaSearchResult;
   type AddFeedResult = Credits.AddFeedResult;
+  type PutMediaResult = Credits.PutMediaResult;
   type StableContributors = Contributors.StableContributors;
   type ContributorsError = Contributors.Error;
   type Contributors = Contributors.Error;
@@ -280,9 +281,9 @@ actor class Serve() = Self {
         switch(mintReceipt) {
           case (#ok(mintReceiptPart: MintReceiptPart)) {
             // Associate the Media with the new tokenId
-            let setNftTokenIdResult : MediaSearchResult = credits.setNftTokenId(feedKey, media.uri, mintReceiptPart.token_id); // For now, assume the media uri is the guid
+            let setNftTokenIdResult : PutMediaResult = credits.setNftTokenId(feedKey, media.uri, mintReceiptPart.token_id); // For now, assume the media uri is the guid
             switch(setNftTokenIdResult) {
-              case (#ok(_: Credits.Media)) {
+              case (#ok()) {
                 return #ok(#MintReceiptPart(mintReceiptPart));
               };
               case (#err(e: SearchError)) {
@@ -334,6 +335,10 @@ actor class Serve() = Self {
 
   public func getAllFeedMediaDetails() : async [(Text, [(Text, Text)])] {
     await credits.getAllFeedMediaDetails();
+  };
+
+  public func addMedia(feedKey : Text, media: Media) : async PutMediaResult {
+    credits.addMedia(feedKey, media);
   };
 
   public query func getSampleFeed() : async Feed {

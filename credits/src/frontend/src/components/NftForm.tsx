@@ -107,6 +107,8 @@ const NftForm = (): JSX.Element => {
           if (currentOwnerName == undefined) {
             setCurrentOwnershipText(`Fetching NFT owner name...`);
           } else {
+            // todo: set the price at $1 higher than the current owner
+            // purchased it for
             setCurrentOwnershipText(`Owned by ${currentOwnerName}`);
           }
         }
@@ -193,6 +195,7 @@ const NftForm = (): JSX.Element => {
         <div style={{ height: '5em', width: '22.5em' }} />
         This NFT is for the "{feed.title}" episode titled "{media.title}"
       </DarkCard>
+      {/* todo: display a list of all the previous owners and how much they bought it for */}
       <div style={{ marginTop: '1em', fontWeight: 'bold', textAlign: 'center' }}>{currentOwnershipText}</div>
       {getPurchaseSection()}
     </NftFormContainer >

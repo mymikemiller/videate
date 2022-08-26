@@ -84,6 +84,8 @@ module {
   };
 
   public type AddFeedResult = Result.Result<(), AddFeedError>;
+
+  public type PutMediaResult = Result.Result<(), SearchError>;
   
   // Contributor: a causal factor in the existence or occurrence of something
   // All users (creators, consumers and supporters) are contributors

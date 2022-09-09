@@ -18,12 +18,14 @@ module {
     id: Principal;
 
     bio: Bio;
-    feedKeys: [Text];
+    feedKeys: [Text]; // The feeds this user has indicated that they subscribe to
+    ownedFeedKeys: [Text]; // The feeds this user created (owns) and manages
   };
 
   public type ProfileUpdate = {
     bio: Bio;
     feedKeys: [Text];
+    ownedFeedKeys: [Text];
   };
 
   public type Error = {

@@ -9,6 +9,7 @@ import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Error "mo:base/Error";
 import Map "mo:base/HashMap";
+import Principal "mo:base/Principal";
 import Iter "mo:base/Iter";
 import List "mo:base/List";
 import Option "mo:base/Option";
@@ -28,6 +29,7 @@ module {
   public type StableCredits = Types.StableCredits;
   public type MediaSearchResult = Types.MediaSearchResult;
   public type SearchError = Types.SearchError;
+  public type AddFeedError = Types.AddFeedError;
 
   public class Credits(init: StableCredits) {
     let feeds: Map.HashMap<Text, Feed> = Map.fromIter<Text, Feed>(init.feedEntries.vals(), 1, Text.equal, Text.hash);
@@ -135,6 +137,7 @@ module {
             author = feed.author;
             email = feed.email;
             imageUrl = feed.imageUrl;
+            owner = feed.owner;
             mediaList = newMediaListBuffer.toArray();
           };
           let _ = feeds.replace(feedKey, newFeed);
@@ -236,6 +239,7 @@ module {
         author = "Mike Miller";
         email = "mike@videate.org";
         imageUrl = "https://www.learningcontainer.com/wp-content/uploads/2019/10/Learning-container.png";
+        owner = Principal.fromText("7ox2k-63z7o-qnmk7-btjy4-ntcgm-g4vkx-3v2jy-xh2sh-bo3pb-i46mj-kqe");
         mediaList = [
           {
             uri = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4";

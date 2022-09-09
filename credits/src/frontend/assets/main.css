@@ -18,6 +18,11 @@ main {
     padding: 2rem 0;
 }
 
+#menu li {
+    display: inline;
+    padding: 0px 4px;
+}
+
 img {
     display: block;
     margin: auto;

@@ -67,6 +67,7 @@ module {
     author: Text;
     email: Text;
     imageUrl: Text;
+    owner: Principal;
     mediaList: [Media];
   };
 
@@ -81,6 +82,8 @@ module {
 
   public type AddFeedError = {
     #KeyExists;
+    #InvalidOwner;
+    #ProfileUpdateError;
   };
 
   public type AddFeedResult = Result.Result<(), AddFeedError>;

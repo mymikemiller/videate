@@ -31,7 +31,6 @@ actor class Serve() = Self {
   type PutMediaResult = Credits.PutMediaResult;
   type StableContributors = Contributors.StableContributors;
   type ContributorsError = Contributors.Error;
-  type Contributors = Contributors.Error;
   type Feed = Credits.Feed;
   type Document = Xml.Document;
   type UriTransformer = Types.UriTransformer;
@@ -43,6 +42,7 @@ actor class Serve() = Self {
   type BuyNftResult = Contributors.BuyNftResult;
   type ApiError = NftDb.ApiError;
   type SearchError = Credits.SearchError;
+  type AddFeedError = Credits.AddFeedError;
   type MintReceiptPart = NftDb.MintReceiptPart;
   type MintReceipt = NftDb.MintReceipt;
 
@@ -301,8 +301,30 @@ actor class Serve() = Self {
 
   /* Credits interface */
 
-  public func addFeed(key: Text, feed : Feed) : async AddFeedResult {
-    credits.addFeed(key, feed);
+  public shared(msg) func addFeed(key: Text, feed : Feed) : async AddFeedResult {
+    if (msg.caller != feed.owner) {
+      // Only the owner specified in the feed can add that feed
+      return #err(#InvalidOwner);
+    };
+    let addFeedResult = credits.addFeed(key, feed);
+
+    switch(addFeedResult) {
+      case (#ok()) {
+        // Update the profile so they can find the feed they created
+        let addOwnedFeedKeyResult = contributors.addOwnedFeedKey(msg.caller, key);
+        switch(addOwnedFeedKeyResult) {
+          case (#ok(profile: Profile)) {
+            return #ok();
+          };
+          case (#err(e: ContributorsError)) {
+            return #err(#ProfileUpdateError);
+          }
+        }
+      };
+      case (#err(e: AddFeedError)) {
+        return #err(e);
+      };
+    };
   };
 
   public func deleteFeed(key: Text){

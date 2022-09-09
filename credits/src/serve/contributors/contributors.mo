@@ -83,6 +83,7 @@ module {
         id = principal;
         bio = profileUpdate.bio;
         feedKeys = profileUpdate.feedKeys;
+        ownedFeedKeys = profileUpdate.ownedFeedKeys;
       };
 
       switch (getProfile(principal)) {
@@ -120,9 +121,9 @@ module {
           // Update the profile with the new feedKeys since we can't make
           // feedKeys mutable (it needs to be transfered via candid)
           let feedKeysBuffer = Buffer.Buffer<Text>(existingProfile.feedKeys.size());
-          feedKeysBuffer.add(feedKey); // Add the new url to the top of the list
+          feedKeysBuffer.add(feedKey); // Add the new feedKey to the top of the list
           Iter.iterate(existingProfile.feedKeys.vals(), func(f: Text, _index: Nat) {
-            if (f != feedKey) { // Skip the new url so we don't store it twice
+            if (f != feedKey) { // Skip the new feedKey so we don't store it twice
               feedKeysBuffer.add(f);
             }
           });
@@ -131,6 +132,42 @@ module {
           let profileUpdate: ProfileUpdate = {
             bio = existingProfile.bio;
             feedKeys = newFeedKeys;
+            ownedFeedKeys = existingProfile.ownedFeedKeys;
+          };
+
+          let updatedProfile: ?Profile = updateProfile(caller, profileUpdate);
+          return Result.fromOption(updatedProfile, #NotFound);
+        };
+      };
+    };
+
+    // Add a feed key to the list of feeds this user owns
+    public func addOwnedFeedKey(caller: Principal, feedKey: Text) : ProfileResult {
+      // Reject the AnonymousIdentity
+      if(Principal.toText(caller) == "2vxsx-fae") {
+        return #err(#NotAuthorized);
+      };
+
+      switch (getProfile(caller)) {
+        case null {
+          #err(#NotFound);
+        };
+        case (? existingProfile) {
+          // Update the profile with the new ownedFeedKeys since we can't make
+          // ownedFeedKeys mutable (it needs to be transfered via candid)
+          let ownedFeedKeysBuffer = Buffer.Buffer<Text>(existingProfile.ownedFeedKeys.size());
+          ownedFeedKeysBuffer.add(feedKey); // Add the new feed key to the top of the list
+          Iter.iterate(existingProfile.ownedFeedKeys.vals(), func(f: Text, _index: Nat) {
+            if (f != feedKey) { // Skip the new feedKey so we don't store it twice
+              ownedFeedKeysBuffer.add(f);
+            }
+          });
+          let newOwnedFeedKeys = ownedFeedKeysBuffer.toArray();
+
+          let profileUpdate: ProfileUpdate = {
+            bio = existingProfile.bio;
+            feedKeys = existingProfile.feedKeys;
+            ownedFeedKeys = newOwnedFeedKeys;
           };
 
           let updatedProfile: ?Profile = updateProfile(caller, profileUpdate);
@@ -153,6 +190,7 @@ module {
         id = caller;
         bio = profile.bio;
         feedKeys = profile.feedKeys;
+        ownedFeedKeys = profile.ownedFeedKeys;
       };
 
       let (newProfiles, existing) = Trie.put(

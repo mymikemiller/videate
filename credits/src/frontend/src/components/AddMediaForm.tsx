@@ -121,7 +121,7 @@ const AddMediaForm = ({ feed: incomingFeed }: AddMediaFormProps): JSX.Element =>
     <FormContainer>
       <div style={{ display: 'flex' }}>
         <div style={{ flex: '1', paddingRight: '15px' }}>
-          <div style={{ float: "right" }}>
+          <div style={{ float: "left" }}>
             <Title>Add media to your "{feedKey}" Feed</Title>
           </div>
         </div>

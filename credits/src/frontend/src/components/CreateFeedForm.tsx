@@ -53,6 +53,7 @@ const CreateFeedForm = (): JSX.Element => {
       link: "test.com", //todo: generate correct link using the key and the user's principal
       mediaList: [],
       subtitle: "test subtitle",
+      owner: authClient.getIdentity().getPrincipal(), // Feeds are always owned by the user who created them.
     };
 
     // Handle update async

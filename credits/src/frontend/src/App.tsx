@@ -233,7 +233,7 @@ const App = () => {
                     <Route path="/manage" element={<ManageProfile />} />
                     <Route path="/create" element={<CreateProfile />} />
                     <Route path="/createFeed" element={<CreateFeedForm />} />
-                    <Route path="/addMedia" element={<AddMediaForm feedKey={"nsp"} />} />
+                    <Route path="/addMedia" element={<AddMediaForm />} />
                     <Route path="/nft" element={<NftForm />} />
                   </Routes>
                 )}

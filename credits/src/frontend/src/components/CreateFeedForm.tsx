@@ -1,5 +1,8 @@
 import React, { useContext } from "react";
 import {
+  useNavigate,
+} from "react-router-dom";
+import {
   Feed,
   AddFeedResult,
   _SERVICE,
@@ -10,18 +13,24 @@ import { pushNewFeed } from "../utils";
 import { AppContext } from "../App";
 import toast from "react-hot-toast";
 import { Button, Icon } from "@adobe/react-spectrum";
-import styled from "styled-components";
+import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton, LargeBorder, LargeBorderWrap, ValidationError } from "./styles/styles";
 
-const Section = styled.section`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
+// Specify defaultValues to pre-fill the form with actual values (not just
+// placeholders)
+const defaultValues = {
+  // key: "test",
+  // title: "Test Feed Title",
+  // description: "Test Feed Description",
+  // imageUrl: "imageurl.com",
+  // author: "Test Test",
+  // email: "test@example.com",
+};
 
 const CreateFeedForm = (): JSX.Element => {
-  type AddFeedInfo = Feed & { key: string };
   const { actor, authClient, login } = useContext(AppContext);
+  const navigate = useNavigate();
+  type AddFeedInfo = Feed & { key: string };
+  const { register, handleSubmit, formState: { errors } } = useForm<AddFeedInfo>({ defaultValues });
 
   // todo: break this out into a reusable component
   if (authClient == null || actor == null) {
@@ -38,16 +47,6 @@ const CreateFeedForm = (): JSX.Element => {
     );
   };
 
-  const defaultValues = {
-    key: "test",
-    title: "Test Feed Title",
-    description: "Test Feed Description",
-    imageUrl: "imageurl.com",
-    author: "Test Test",
-    email: "test@example.com",
-  };
-
-  const { register, handleSubmit, formState: { errors } } = useForm<AddFeedInfo>({ defaultValues });
   const onSubmit = (data: AddFeedInfo): void => {
     const feed: Feed = {
       ...data,
@@ -60,7 +59,7 @@ const CreateFeedForm = (): JSX.Element => {
     pushNewFeed(actor!, feed, data.key).then(async (result: AddFeedResult) => {
       if ("ok" in result) {
         toast.success("New feed created!");
-        // todo: navigate to the add media page: navigate('/addMedia');
+        navigate('/addMedia?feedKey=' + data.key);
         return result.ok;
       } else {
         if ("KeyExists" in result.err) {
@@ -75,57 +74,83 @@ const CreateFeedForm = (): JSX.Element => {
   };
 
   return (
-    <div className="App">
+    <FormContainer>
+      <Title>Create new Podcast</Title>
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <label>
+        <Label>
           Key:
-          <input {...register("key", { required: "Feed Key is required" })} />
-          <p>{errors.key?.message}</p>
-        </label>
+          <Input
+            {...register("key", {
+              required: "Feed Key is required",
+              pattern: { value: /^[a-zA-Z0-9_-]*$/, message: "Feed Key must contain only letters, numbers, underscores (_) and dashes (-)" }
+            })}
+            placeholder="Unique Feed Key" />
+          <ValidationError>{errors.key?.message}</ValidationError>
+        </Label>
 
-        <label>
+        <Label>
           Title:
-          <input {...register("title", { required: "Title is required" })} />
-          <p>{errors.title?.message}</p>
-        </label>
+          <Input
+            {...register("title", { required: "Title is required" })}
+            placeholder="Feed Title" />
+          <ValidationError>{errors.title?.message}</ValidationError>
+        </Label>
 
-        <label>
-          Summary:
-          <input {...register("description", { required: "Description is required" })} />
-          <p>{errors.description?.message}</p>
-        </label>
+        <Label>
+          Description:
+          <br />
+          <div className="input-sizer stacked">
+            <GrowableInput
+              {...register("description", {
+                required: "Description is required",
+                onChange: (e) => { e.target.parentNode.dataset.value = e.target.value }
+              })}
+              placeholder="Feed Description" />
+          </div>
+          <ValidationError>{errors.description?.message}</ValidationError>
+        </Label>
 
-        {/* todo: Add Description and Content Encoded so they can be set separately from the Summary */}
+        {/* todo: Add Summary and Content Encoded so they can be set separately from the Description */}
 
-        <label>
+        <Label>
           Image URL:
-          <input {...register("imageUrl", { required: "Image URL is required" })} />
-          <p>{errors.imageUrl?.message}</p>
-        </label>
+          <Input
+            {...register("imageUrl", { required: "Image URL is required" })}
+            placeholder="www.example.com/test.jpg" />
+          <ValidationError>{errors.imageUrl?.message}</ValidationError>
+        </Label>
 
-        {/* todo: Automatically use Owner Name and Owner from uploader profile? */}
+        {/* todo: Automatically use Owner Name and Owner Email from uploader profile? */}
 
-        <label>
+        <Label>
           Owner Name:
-          <input {...register("author", { required: "Owner name is required" })} />
-          <p>{errors.author?.message}</p>
-        </label>
+          <Input
+            {...register("author", { required: "Owner name is required" })}
+            placeholder="John Doe" />
+          <ValidationError>{errors.author?.message}</ValidationError>
+        </Label>
 
-        <label>
+        <Label>
           Owner Email:
-          <input {...register("email", {
-            required: "Email is required",
-            pattern: { value: /.+@.+/, message: "Email should be in xxx@yyy.zzz format" }
-          })} />
-          <p>{errors.email?.message}</p>
-        </label>
+          <Input
+            {...register("email", {
+              required: "Email is required",
+              pattern: { value: /.+@.+/, message: "Email should be in xxx@yyy.zzz format" }
+            })}
+            placeholder="john_doe@example.com" />
+          <ValidationError>{errors.email?.message}</ValidationError>
+        </Label>
 
         {/* todo: add Category dropdowns */}
 
-        <input type="submit" />
+        <LargeBorderWrap>
+          <LargeBorder>
+            <LargeButton type="submit" />
+          </LargeBorder>
+        </LargeBorderWrap>
       </form>
-    </div>
+    </FormContainer>
   );
 };
 

@@ -30,7 +30,6 @@ h1 {
 form {
     display: flex;
     flex-flow: row wrap;
-    max-width: 40vw;
     margin: auto;
     align-items: baseline;
 }
@@ -49,4 +48,55 @@ form {
 
 #greeting:empty {
     display: none;
+}
+
+::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+/* The following input-sizer selectors allow form input boxes to grow
+vertically with the content. See
+https://css-tricks.com/auto-growing-inputs-textareas/#aa-other-ideas */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+.input-sizer {
+    display: inline-grid;
+    vertical-align: top;
+    align-items: center;
+    position: relative;
+}
+
+.input-sizer.stacked {
+    align-items: stretch;
+    width: 100%;
+}
+
+.input-sizer.stacked::after,
+.input-sizer.stacked textarea {
+    grid-area: 2 / 1;
+}
+
+.input-sizer::after,
+.input-sizer input,
+.input-sizer textarea {
+    width: auto;
+    min-width: 1em;
+    grid-area: 1 / 2;
+    font: inherit;
+    padding: 0.75em;
+}
+
+.input-sizer span {
+    padding: 0.75em;
+}
+
+.input-sizer::after {
+    content: attr(data-value) " ";
+    visibility: hidden;
+    white-space: pre-wrap;
 }

@@ -1,3 +1,8 @@
+import NftTypes "nft_db/types";
+import CreditsTypes "credits/types";
+import ContributorsTypes "contributors/types";
+import Result "mo:base/Result";
+
 module {
   /* Serve */
   public type HeaderField = (Text, Text);
@@ -31,4 +36,14 @@ module {
   };
 
   public type UriTransformer = Text -> Text;
+
+  public type ServeError = {
+    #NftError : NftTypes.NftError;
+    #CreditsError : CreditsTypes.CreditsError;
+    #ContributorsError : ContributorsTypes.ContributorsError;
+  };
+
+  // PutFeedFullResult differs from Credits.PutFeedResult in that it might
+  // result in an error when updating the contributor's list of owned feeds.
+  public type PutFeedFullResult = Result.Result<CreditsTypes.PutSuccess, { #CreditsError: CreditsTypes.CreditsError; #ContributorsError: ContributorsTypes.ContributorsError }>;
 }

@@ -28,19 +28,19 @@ module {
     ownedFeedKeys: [Text];
   };
 
-  public type Error = {
+  public type ContributorsError = {
     #NotFound;
     #AlreadyExists;
     #NotAuthorized;
   };
 
-  public type ProfileResult = Result.Result<Profile, Error>;
+  public type ProfileResult = Result.Result<Profile, ContributorsError>;
 
   public type BuyNftResult = Result.Result<{
       #MintReceiptPart : NftTypes.MintReceiptPart;
       #TransferTransactionId : Nat;
     }, {
-      #ApiError : NftTypes.ApiError;
-      #SearchError : CreditsTypes.SearchError;
+      #NftError : NftTypes.NftError;
+      #CreditsError : CreditsTypes.CreditsError;
     }>;
 };

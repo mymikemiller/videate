@@ -8,7 +8,6 @@ import {
 } from "../../../declarations/serve/serve.did";
 import Loop from "../../assets/loop.svg";
 import { useForm } from "react-hook-form";
-import { pushNewMedia } from "../utils";
 import { AppContext } from "../App";
 import toast from "react-hot-toast";
 import { Button, ActionButton, Icon } from "@adobe/react-spectrum";
@@ -17,7 +16,7 @@ import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton
 // We'll use dummy information for now, so we omit the fields we don't ask for
 type MediaSubmission = Omit<Media, "source" | "durationInMicroseconds" | "nftTokenId" | "etag" | "lengthInBytes">;
 
-interface AddMediaFormProps {
+interface PutMediaFormProps {
   feed?: Feed; // If feed is provided, use that feed instead of fetching the feed using the the feedKey query param on load
 };
 
@@ -30,7 +29,7 @@ const defaultValues = {
   // uri: "www.example.com/test.mp4",
 };
 
-const AddMediaForm = ({ feed: incomingFeed }: AddMediaFormProps): JSX.Element => {
+const PutMediaForm = ({ feed: incomingFeed }: PutMediaFormProps): JSX.Element => {
   const { actor, authClient, login } = useContext(AppContext);
   const [searchParams] = useSearchParams();
   const feedKey = searchParams.get('feedKey');
@@ -99,7 +98,7 @@ const AddMediaForm = ({ feed: incomingFeed }: AddMediaFormProps): JSX.Element =>
     };
 
     // Handle update async
-    pushNewMedia(actor!, feedKey!, media).then(async (result: PutMediaResult) => {
+    actor!.putMedia(feedKey!, media).then(async (result: PutMediaResult) => {
       if ("ok" in result) {
         toast.success("Media successfully added!");
       } else {
@@ -175,4 +174,4 @@ const AddMediaForm = ({ feed: incomingFeed }: AddMediaFormProps): JSX.Element =>
   );
 };
 
-export default AddMediaForm;
+export default PutMediaForm;

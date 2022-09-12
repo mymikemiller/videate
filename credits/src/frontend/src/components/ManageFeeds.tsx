@@ -17,11 +17,11 @@ import { _SERVICE as _SERVE_SERVICE } from "../../../declarations/serve/serve.di
 import FeedAdd from "@spectrum-icons/workflow/FeedAdd";
 
 function ManageFeeds() {
-  const { actor, profile, setProfile } = useContext(AppContext);
+  const { profile } = useContext(AppContext);
   const navigate = useNavigate();
 
   const createFeed = async () => {
-    navigate("/createFeed");
+    navigate("/putFeed");
   };
 
   if (!profile) {

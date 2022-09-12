@@ -1,15 +1,16 @@
+// Create a new feed or modify an existing feed (existing feeds must be owned
+// by the current user in order to edit)
 import React, { useContext } from "react";
 import {
   useNavigate,
 } from "react-router-dom";
 import {
   Feed,
-  AddFeedResult,
+  PutFeedResult,
   _SERVICE,
 } from "../../../declarations/serve/serve.did";
 import Loop from "../../assets/loop.svg";
 import { useForm } from "react-hook-form";
-import { pushNewFeed } from "../utils";
 import { AppContext } from "../App";
 import toast from "react-hot-toast";
 import { Button, Icon } from "@adobe/react-spectrum";
@@ -26,11 +27,11 @@ const defaultValues = {
   // email: "test@example.com",
 };
 
-const CreateFeedForm = (): JSX.Element => {
+const PutFeedForm = (): JSX.Element => {
   const { actor, authClient, login } = useContext(AppContext);
   const navigate = useNavigate();
-  type AddFeedInfo = Feed & { key: string };
-  const { register, handleSubmit, formState: { errors } } = useForm<AddFeedInfo>({ defaultValues });
+  type PutFeedInfo = Feed & { key: string };
+  const { register, handleSubmit, formState: { errors } } = useForm<PutFeedInfo>({ defaultValues });
 
   // todo: break this out into a reusable component
   if (authClient == null || actor == null) {
@@ -47,7 +48,7 @@ const CreateFeedForm = (): JSX.Element => {
     );
   };
 
-  const onSubmit = (data: AddFeedInfo): void => {
+  const onSubmit = (data: PutFeedInfo): void => {
     const feed: Feed = {
       ...data,
       link: "test.com", //todo: generate correct link using the key and the user's principal
@@ -57,10 +58,10 @@ const CreateFeedForm = (): JSX.Element => {
     };
 
     // Handle update async
-    pushNewFeed(actor!, feed, data.key).then(async (result: AddFeedResult) => {
+    actor!.putFeed(data.key, feed).then(async (result: PutFeedResult) => {
       if ("ok" in result) {
         toast.success("New feed created!");
-        navigate('/addMedia?feedKey=' + data.key);
+        navigate('/putMedia?feedKey=' + data.key);
         return result.ok;
       } else {
         if ("KeyExists" in result.err) {
@@ -155,4 +156,4 @@ const CreateFeedForm = (): JSX.Element => {
   );
 };
 
-export default CreateFeedForm;
+export default PutFeedForm;

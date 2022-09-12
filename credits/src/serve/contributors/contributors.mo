@@ -20,7 +20,7 @@ module {
   public type Profile = Types.Profile;
   public type ProfileResult = Types.ProfileResult;
   public type ProfileUpdate = Types.ProfileUpdate;
-  public type Error = Types.Error;
+  public type ContributorsError = Types.ContributorsError;
   public type BuyNftResult = Types.BuyNftResult;
   public type StableContributors = Types.StableContributors;
 
@@ -177,7 +177,7 @@ module {
     };
 
     // Create a profile
-    public func create(caller: Principal, profile: ProfileUpdate) : Result.Result<(), Error> {
+    public func create(caller: Principal, profile: ProfileUpdate) : Result.Result<(), ContributorsError> {
       // Reject the AnonymousIdentity, which always has the value of "2vxsx-fae".
       // The AnonymousIdentity is one that any not-logged-in browser is, so it's
       // useless to have a user with that value.
@@ -226,7 +226,7 @@ module {
     };
 
     // Update profile
-    public func update(caller: Principal, profile : ProfileUpdate) : Result.Result<(), Error> {
+    public func update(caller: Principal, profile : ProfileUpdate) : Result.Result<(), ContributorsError> {
       // Reject the AnonymousIdentity
       if(Principal.toText(caller) == "2vxsx-fae") {
         return #err(#NotAuthorized);
@@ -246,7 +246,7 @@ module {
     };
 
     // Delete profile
-    public func delete(caller: Principal) : Result.Result<(), Error> {
+    public func delete(caller: Principal) : Result.Result<(), ContributorsError> {
       // Reject the AnonymousIdentity
       if(Principal.toText(caller) == "2vxsx-fae") {
         return #err(#NotAuthorized);

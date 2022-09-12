@@ -105,8 +105,11 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
       })
   };
 
-  function addMedia() {
-    navigate('/addMedia?feedKey=' + feedKey);
+  function editFeed() {
+    navigate('/editFeed?feedKey=' + feedKey);
+  };
+  function putMedia() {
+    navigate('/putMedia?feedKey=' + feedKey);
   };
 
   if (!exists) {
@@ -134,7 +137,8 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
         }
         {mode == Mode.Edit &&
           <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* Add media button */}
-            <button type="button" style={{ height: '100%' }} onClick={() => addMedia()}>Add Media</button>
+            <button type="button" style={{ height: '100%' }} onClick={() => editFeed()}>Edit Feed</button>
+            <button type="button" style={{ height: '100%' }} onClick={() => putMedia()}>Add Media</button>
           </div>
         }
       </div>

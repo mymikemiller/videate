@@ -5,6 +5,7 @@ module {
   // between upgrades
   public type StableCredits = {
     feedEntries: [(Text, Feed)];
+    custodianEntries: [Principal];
   };
 
   // Represents the platform where the media was originally released, e.g. youtube
@@ -71,24 +72,28 @@ module {
     mediaList: [Media];
   };
 
-  public type SearchError = {
+  public type CreditsError = {
+    #Unauthorized;
     #FeedNotFound;
     #MediaNotFound;
+    #KeyExists;
+    #InvalidOwner;
+    #Uninitialized : Text;
+    #Other : Text;
   };
 
-  public type SearchResult<T> = Result.Result<T, SearchError>;
+  public type SearchResult<T> = Result.Result<T, CreditsError>;
 
   public type MediaSearchResult = SearchResult<Media>;
 
-  public type AddFeedError = {
-    #KeyExists;
-    #InvalidOwner;
-    #ProfileUpdateError;
+  public type PutSuccess = {
+    #Created;
+    #Updated;
   };
 
-  public type AddFeedResult = Result.Result<(), AddFeedError>;
+  public type PutFeedResult = Result.Result<PutSuccess, CreditsError>;
 
-  public type PutMediaResult = Result.Result<(), SearchError>;
+  public type PutMediaResult = Result.Result<PutSuccess, CreditsError>;
   
   // Contributor: a causal factor in the existence or occurrence of something
   // All users (creators, consumers and supporters) are contributors

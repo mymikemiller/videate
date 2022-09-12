@@ -15,15 +15,16 @@ module {
     maxLimit : Nat16;
   };
 
-  public type ApiError = {
+  public type NftError = {
     #Unauthorized;
     #InvalidTokenId;
     #ZeroAddress;
+    #Uninitialized : Text;
     #Other : Text;
   };
 
-  public type OwnerResult = Result.Result<Principal, ApiError>;
-  public type TxReceipt = Result.Result<Nat, ApiError>;
+  public type OwnerResult = Result.Result<Principal, NftError>;
+  public type TxReceipt = Result.Result<Nat, NftError>;
   
   public type TransactionId = Nat;
   public type TokenId = Nat64;
@@ -50,9 +51,9 @@ module {
   public type ExtendedMetadataResult = Result.Result<{
     metadata_desc: MetadataDesc;
     token_id: TokenId;
-  }, ApiError>;
+  }, NftError>;
 
-  public type MetadataResult = Result.Result<MetadataDesc, ApiError>;
+  public type MetadataResult = Result.Result<MetadataDesc, NftError>;
 
   public type MetadataDesc = [MetadataPart];
 
@@ -82,7 +83,7 @@ module {
     #Nat64Content: Nat64;
   };
 
-  public type MintReceipt = Result.Result<MintReceiptPart, ApiError>;
+  public type MintReceipt = Result.Result<MintReceiptPart, NftError>;
 
   public type MintReceiptPart = {
     token_id: TokenId;

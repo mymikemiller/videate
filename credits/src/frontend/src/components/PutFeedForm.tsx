@@ -7,6 +7,7 @@ import {
 import { useSearchParams, useLocation } from 'react-router-dom';
 import {
   Feed,
+  Media,
   PutFeedFullResult,
   _SERVICE,
 } from "../../../declarations/serve/serve.did";
@@ -45,6 +46,7 @@ const PutFeedForm = (): JSX.Element => {
   const navigate = useNavigate();
   type PutFeedInfo = Feed & { key: string };
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<PutFeedInfo>();//{ defaultValues });
+  const [mediaList, setMediaList] = useState<Media[]>();
 
   const populate = (init: PutFeedFormProps): void => {
     if (init.key) {
@@ -56,6 +58,11 @@ const PutFeedForm = (): JSX.Element => {
       setValue('imageUrl', init.feed.imageUrl, { shouldValidate: true });
       setValue('author', init.feed.author, { shouldValidate: true });
       setValue('email', init.feed.email, { shouldValidate: true });
+
+      // Store the mediaList separately from the form since we don't edit the
+      // media list here. We store it in state so we can restore it before
+      // submitting the feed so it doesn't get blown away.
+      setMediaList(init.feed.mediaList);
     }
   };
 
@@ -84,7 +91,7 @@ const PutFeedForm = (): JSX.Element => {
     const feed: Feed = {
       ...data,
       link: "test.com", //todo: generate correct link using the key and the user's principal
-      mediaList: [],
+      mediaList: mediaList ?? [],
       subtitle: "test subtitle",
       owner: authClient.getIdentity().getPrincipal(), // Feeds are always owned by the user who created them.
     };

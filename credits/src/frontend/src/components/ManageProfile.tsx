@@ -1,15 +1,13 @@
-import { ActorSubclass } from "@dfinity/agent";
 import {
   ActionButton,
   ButtonGroup,
-  Grid,
   Heading,
   Text,
 } from "@adobe/react-spectrum";
 import Cancel from "@spectrum-icons/workflow/Cancel";
 import Delete from "@spectrum-icons/workflow/Delete";
 import Edit from "@spectrum-icons/workflow/Edit";
-import React, { useEffect, useState } from "react"; // import * as React from 'react'
+import React, { useState } from "react";
 import { useContext } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -22,31 +20,14 @@ import {
 import { AppContext } from "../App";
 import { emptyProfile } from "../hooks";
 import { pushProfileUpdate } from "../utils";
-import CopyableLink from "./CopyableLink";
+import FeedLink, { Mode as FeedLinkMode } from "./FeedLink";
 import ProfileForm from "./ProfileForm";
-import { canisterId as serveCid, createActor as createServeActor } from "../../../declarations/serve";
 import { _SERVICE as _SERVE_SERVICE } from "../../../declarations/serve/serve.did";
-
-const DetailsList = styled.dl`
-  dd {
-    margin-left: 0;
-  }
-`;
 
 function ManageProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [serveActor, setServeActor] = useState<ActorSubclass<_SERVE_SERVICE>>();
   const { actor, profile, setProfile } = useContext(AppContext);
   const navigate = useNavigate();
-
-  const initServeActor = () => {
-    const sActor = createServeActor(serveCid as string);
-    setServeActor(sActor);
-  };
-
-  useEffect(() => {
-    initServeActor();
-  }, []);
 
   const deleteProfile = async () => {
     if (
@@ -68,7 +49,7 @@ function ManageProfile() {
       if (profile) {
         toast.success("Contributor profile updated!");
         setProfile(profile);
-        navigate('/manage');
+        navigate('/');
       }
     });
   };
@@ -90,7 +71,7 @@ function ManageProfile() {
   let fallbackDisplayName = name;
   if (name[0]) fallbackDisplayName = name;
 
-  if (serveActor == undefined) {
+  if (actor == undefined) {
     return null;
   }
 
@@ -111,15 +92,15 @@ function ManageProfile() {
       ) : (
         <section key={String(isEditing)}>
           <Heading level={2}>
-            Welcome back
-            {fallbackDisplayName[0] ? `, ${fallbackDisplayName[0]}` : ""}!
+            Hello
+            {fallbackDisplayName[0] ? `, ${fallbackDisplayName[0]}` : ""}. Here are the feeds you subscribe to:
           </Heading>
           {feedKeys.length == 0 && <Text>No feed keys found. Please click the Videate link in the shownotes to populate.</Text>}
           <ul style={{ padding: 0 }} >
             {feedKeys.map((feedKey, index) => {
               return (
                 <li key={feedKey} style={{ listStyleType: 'none', marginBottom: '1em' }} >
-                  <CopyableLink serveActor={serveActor!} feedKey={feedKey} />
+                  <FeedLink mode={FeedLinkMode.Copy} feedKey={feedKey} />
                 </li>
               )
             })}

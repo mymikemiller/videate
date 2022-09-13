@@ -7,14 +7,15 @@
 
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
-import Error "mo:base/Error";
 import Map "mo:base/HashMap";
+import Principal "mo:base/Principal";
 import Iter "mo:base/Iter";
 import List "mo:base/List";
 import Option "mo:base/Option";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Debug "mo:base/Debug";
+import Result "mo:base/Result";
 import Types "types";
 import Nft "../nft_db/nft_db";
 
@@ -23,30 +24,53 @@ module {
   public type Source = Types.Source;
   public type Media = Types.Media;
   public type Feed = Types.Feed;
-  public type AddFeedResult = Types.AddFeedResult;
+  public type PutFeedResult = Types.PutFeedResult;
   public type PutMediaResult = Types.PutMediaResult;
   public type StableCredits = Types.StableCredits;
   public type MediaSearchResult = Types.MediaSearchResult;
-  public type SearchError = Types.SearchError;
+  public type CreditsError = Types.CreditsError;
 
+  // After creating an instance of this class, call addCustodian on it to add
+  // the identity that can manage the entire class. Usually this should be the
+  // results of `dfx identity get-principal` so the class can be managed from
+  // the command line.
   public class Credits(init: StableCredits) {
     let feeds: Map.HashMap<Text, Feed> = Map.fromIter<Text, Feed>(init.feedEntries.vals(), 1, Text.equal, Text.hash);
+    var custodians = List.fromArray<Principal>(init.custodianEntries);
 
     public func asStable() : StableCredits = {
       feedEntries = Iter.toArray(feeds.entries());
+      custodianEntries = List.toArray(custodians);
     };
 
     // Feeds
-    public func addFeed(key: Text, feed : Feed) : AddFeedResult {
+    public func putFeed(caller: Principal, key: Text, feed : Feed) : PutFeedResult {
+      let isCustodian = List.some(custodians, func (custodian : Principal) : Bool { custodian == caller });
       switch(feeds.get(key)) {
-        case (?feed) {
-          return #err(#KeyExists);
+        case (? existingFeed) {
+          if (existingFeed.owner != caller) {
+            // The feed already exists and is owned by a user other than the
+            // caller. The only time we allow modifications to such feeds is
+            // when the caller is the custodian, as long as they're not trying
+            // to change the owner of the feed. This is necessary so the cloner
+            // can modify feeds (e.g. to add media).
+            if (not isCustodian or feed.owner != existingFeed.owner) {
+              return #err(#KeyExists);
+            };
+          };
+          feeds.put(key, feed);
+          return #ok(#Updated);
         };
         case (null) {
-          Debug.print("Adding " # key # " feed:");
-          Debug.print(debug_show(feed));
+          if (feed.owner != caller and not isCustodian) {
+            // New feeds must be owned by the caller, unless the owner is a
+            // custodian, who is allowed to create feeds owned by anyone (this
+            // is so that the cloner works, which needs to be able to create
+            // feeds for any user)
+            return #err(#Unauthorized);
+          };
           feeds.put(key, feed);
-          return #ok;
+          return #ok(#Created);
         };
       };
     };
@@ -86,16 +110,14 @@ module {
       };
     };
 
-    public func addMedia(feedKey : Text, media: Media) : PutMediaResult {
-      return putMedia(feedKey, null, media);
-    };
-
-    public func updateMedia(feedKey: Text, episodeGuid: Text, media: Media) : PutMediaResult {
-      return putMedia(feedKey, Option.make(episodeGuid), media);
-    };
-
-    // If episodeGuid is provided, modifies the existing Media, otherwise add a new Media
-    func putMedia(feedKey: Text, episodeGuid: ?Text, newMedia: Media) : PutMediaResult {
+    // Adds new Media to the specified feed. If media's episodeGuid (assumed to
+    // be media.uri) matches that of a Media already in the feed, replaces that
+    // Media instead of adding a new Media. This will fail silently (will
+    // unintentially overwrite the previous Media) if trying to add two Media
+    // with the same uri to the feed, for example for a re-release of an old
+    // episode. 
+    // todo: generate a unique episodeGuid for each episode.
+    public func putMedia(feedKey: Text, media: Media) : PutMediaResult {
       //todo: check msg caller for feed ownership
       let feed = getFeed(feedKey);
       switch (feed) {
@@ -105,26 +127,24 @@ module {
           let newMediaListBuffer = Buffer.Buffer<Media>(feed.mediaList.size());
           var didReplace = false;
           Iter.iterate(Iter.fromArray(feed.mediaList), func(m: Media, _index: Nat) {
-            switch(episodeGuid) {
-              case (null) {
-                newMediaListBuffer.add(m);
-              };
-              case (?episodeGuid) {
-                if (episodeGuid == m.uri) { // Assume episodeGuid is media.uri
-                  newMediaListBuffer.add(newMedia);
-                  didReplace := true;
-                } else {
-                  newMediaListBuffer.add(m);
-                }
-              }
+            // switch(episodeGuid) { case (null) { newMediaListBuffer.add(m);
+            //   };
+            //   case (?episodeGuid) {
+            if (media.uri == m.uri) { // Assume episodeGuid is media.uri. 
+              newMediaListBuffer.add(media);
+              didReplace := true;
+            } else {
+              newMediaListBuffer.add(m);
             }
+            //   }
+            // }
           });
           if (not didReplace) {
-            if (episodeGuid != null) {
-              // If an episodeGuid was specified, error if no media to replace
-              return #err(#MediaNotFound);
-            };
-            newMediaListBuffer.add(newMedia);
+            // if (episodeGuid != null) {
+            //   // If an episodeGuid was specified, error if no media to replace
+            //   return #err(#MediaNotFound); // No longer an error. This is expected when adding new Media.
+            // };
+            newMediaListBuffer.add(media);
           };
 
           let newFeed: Feed = {
@@ -135,10 +155,11 @@ module {
             author = feed.author;
             email = feed.email;
             imageUrl = feed.imageUrl;
+            owner = feed.owner;
             mediaList = newMediaListBuffer.toArray();
           };
           let _ = feeds.replace(feedKey, newFeed);
-          return #ok();
+          return #ok(if didReplace { #Updated } else { #Created });
         };
       };
     };
@@ -162,7 +183,7 @@ module {
             nftTokenId = Option.make(tokenId);
           };
 
-          return putMedia(feedKey, Option.make(episodeGuid), newMedia);
+          return putMedia(feedKey, newMedia);
         };
       };
     };
@@ -236,6 +257,7 @@ module {
         author = "Mike Miller";
         email = "mike@videate.org";
         imageUrl = "https://www.learningcontainer.com/wp-content/uploads/2019/10/Learning-container.png";
+        owner = Principal.fromText("7ox2k-63z7o-qnmk7-btjy4-ntcgm-g4vkx-3v2jy-xh2sh-bo3pb-i46mj-kqe");
         mediaList = [
           {
             uri = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4";
@@ -258,5 +280,29 @@ module {
         ];
       };
     };
-  }
-}
+
+    public func isInitialized(): Bool {    
+      return List.size(custodians) > 0
+    };
+
+    public func addCustodian(caller: Principal, newCustodian: Principal) : Result.Result<(), CreditsError> {
+      // Once we've been initialized, only current custodians can add a new
+      // custodian. Note that we allow anyone (usually the deployer since the
+      // initalize call should be done immediately after deploying or else there
+      // won't be a custodian and many functions in this class won't work) to
+      // specify the first custodian, usually the identity for their dfx (the
+      // caller of serveActor.initialize()) so they can manage this class via the
+      // console.
+      if (isInitialized() and not List.some(custodians, func (custodian : Principal) : Bool { custodian == caller })) {
+        return #err(#Unauthorized);
+      };
+
+      // Add the new custodian if it's not already in the list
+      if (not List.some(custodians, func (custodian : Principal) : Bool { custodian == newCustodian })) {
+        custodians := List.push(newCustodian, custodians);
+      };
+
+      return #ok();
+    };
+  };
+};

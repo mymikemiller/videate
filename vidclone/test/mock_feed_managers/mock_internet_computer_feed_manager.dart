@@ -17,7 +17,7 @@ class MockInternetComputerFeedManager extends InternetComputerFeedManager {
       get processRunner => (String executable, List<String> arguments,
               {String workingDirectory}) {
             final getFeedIndex = arguments.indexOf('getFeed');
-            final addFeedIndex = arguments.indexOf('addFeed');
+            final putFeedIndex = arguments.indexOf('putFeed');
 
             // For testing, we simply return whatever candid was last written,
             // regardless of the name specified
@@ -27,13 +27,13 @@ class MockInternetComputerFeedManager extends InternetComputerFeedManager {
               } else {
                 return ProcessResult(0, 0, mostRecentlyWrittenCandid, '');
               }
-            } else if (addFeedIndex > 0) {
-              final addFeedCandid = arguments[addFeedIndex + 1];
+            } else if (putFeedIndex > 0) {
+              final putFeedCandid = arguments[putFeedIndex + 1];
               // The feeds are added in this format:
               // ("feedName", feedCandidString)
               // But we just want feedCandidString, so we extract it
               final regex = RegExp(r'\("\w+", (.*)\)', dotAll: true);
-              final match = regex.firstMatch(addFeedCandid);
+              final match = regex.firstMatch(putFeedCandid);
               mostRecentlyWrittenCandid = match.group(1);
               return ProcessResult(0, 0, '()', '');
             } else {

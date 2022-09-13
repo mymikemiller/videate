@@ -89,6 +89,9 @@ class InternetComputerFeedManager extends FeedManager {
   @override
   String feedName;
 
+  // The owner principal for all feeds created through this FeedManager
+  String owner;
+
   // "local" to access a locally running IC instance
   // "ic" to use canisters on the IC network
   String network;
@@ -104,6 +107,7 @@ class InternetComputerFeedManager extends FeedManager {
   void configure(ClonerTaskArgs feedManagerArgs) {
     feedKey = feedManagerArgs.get('key');
     feedName = feedManagerArgs.get('name');
+    owner = feedManagerArgs.get('owner');
     network = feedManagerArgs.get('network').toLowerCase();
     dfxWorkingDirectory = feedManagerArgs.get('dfxWorkingDirectory');
   }
@@ -141,7 +145,7 @@ class InternetComputerFeedManager extends FeedManager {
 
   @override
   Future<void> write() async {
-    final feedCandidString = toCandidString(feed);
+    final feedCandidString = toCandidString(feed, owner);
 
     final args = [
       'canister',
@@ -149,7 +153,7 @@ class InternetComputerFeedManager extends FeedManager {
       '$network',
       'call',
       'serve',
-      'addFeed',
+      'putFeed',
       '("$feedKey", $feedCandidString)'
     ];
     final output =
@@ -161,6 +165,11 @@ class InternetComputerFeedManager extends FeedManager {
     }
 
     final stdout = output.stdout;
+    if (output.stdout.contains('err')) {
+      // If the candid returned contains an error, throw it. Returned candid
+      // comes back on stdout, not stderr.
+      throw output.stdout;
+    }
 
     if (stdout == '(null)\n)') {
       // No feed found with the given name
@@ -170,7 +179,7 @@ class InternetComputerFeedManager extends FeedManager {
     return true;
   }
 
-  static String toCandidString(Feed feed) {
+  static String toCandidString(Feed feed, String owner) {
     String escape(String str) => str.replaceAll('\"', '\\\"');
 
     final mediaListCandid = feed.mediaList.map((servedMedia) => '''
@@ -199,6 +208,7 @@ record {
   description="${escape(feed.description)}";
   link="${feed.link}";
   author="${escape(feed.author)}";
+  owner=principal \"$owner\";
   email="${feed.email}";
   imageUrl="${feed.imageUrl}";
   mediaList=vec {

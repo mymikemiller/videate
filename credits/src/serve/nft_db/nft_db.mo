@@ -24,7 +24,7 @@ import Result "mo:base/Result";
 
 module {
   public type Dip721NonFungibleToken = Types.Dip721NonFungibleToken;
-  public type ApiError = Types.ApiError;
+  public type NftError = Types.NftError;
   public type OwnerResult = Types.OwnerResult;
   public type TxReceipt =  Types.TxReceipt;
   public type TransactionId = Types.TransactionId;
@@ -188,7 +188,7 @@ module {
 
   public func mintDip721(nftDb: NftDb, caller: Principal, to: Principal, metadata: Types.MetadataDesc) : Types.MintReceipt {
     if (not List.some(nftDb.custodians, func (custodian : Principal) : Bool { custodian == caller })) {
-      return #err(#Other("Nft module is uninitialized"));
+      return #err(#Unauthorized);
     };
 
     let newId = Nat64.fromNat(List.size(nftDb.nfts));
@@ -212,7 +212,7 @@ module {
     return nftDb.transactionId > 0 or List.size(nftDb.nfts) > 0 or List.size(nftDb.custodians) > 0
   };
 
-  public func addCustodian(nftDb: NftDb, caller: Principal, newCustodian: Principal) : Result.Result<(), ApiError> {
+  public func addCustodian(nftDb: NftDb, caller: Principal, newCustodian: Principal) : Result.Result<(), NftError> {
     // Once we've been initialized, only current custodians can add a new
     // custodian. Note that we allow anyone (usually the deployer since the
     // initalize call should be done immediately after deploying or else there

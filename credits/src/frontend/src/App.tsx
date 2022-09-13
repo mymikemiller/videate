@@ -8,7 +8,7 @@ import styled from "styled-components";
 import NotAuthenticated from "./components/NotAuthenticated";
 import Home from "./components/Home";
 import NftForm from "./components/NftForm";
-import CreateFeedForm from "./components/CreateFeedForm";
+import PutFeedForm from "./components/PutFeedForm";
 import toast, { Toaster } from "react-hot-toast";
 import ErrorBoundary from "./components/ErrorBoundary";
 import {
@@ -19,6 +19,8 @@ import {
 } from "react-router-dom";
 import CreateProfile from "./components/CreateProfile";
 import ManageProfile from "./components/ManageProfile";
+import ManageFeeds from "./components/ManageFeeds";
+import ListMedia from "./components/ListMedia";
 import Loading from "./components/Loading";
 import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
@@ -27,7 +29,7 @@ import { useEffect } from "react";
 import { compareProfiles } from "./utils";
 import { _SERVICE, ProfileUpdate } from "../../declarations/serve/serve.did";
 import Logout from '../assets/logout.svg'
-import AddMediaForm from "./components/AddMediaForm";
+import PutMediaForm from "./components/PutMediaForm";
 
 const Header = styled.header`
   position: relative;
@@ -205,13 +207,24 @@ const App = () => {
                     <span />
                   } />
                   <Route path="*" element={
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
-                      <h5>
-                        {authClient.getIdentity().getPrincipal().toString()}
-                      </h5>
-                      <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>
-                        <Logout />
-                      </button>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', flexGrow: 1 }}>
+                      <div id="menu">
+                        <ul>
+                          <li><a href="/">Subscribed Feeds</a>
+                          </li>
+                          <li><a href="/manageFeeds">Owned Feeds</a>
+                          </li>
+                        </ul>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
+                        <h5>
+                          {authClient.getIdentity().getPrincipal().toString()}
+                        </h5>
+                        <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>
+                          <Logout />
+                        </button>
+                      </div>
                     </div>
                   }>
                   </Route>
@@ -220,7 +233,7 @@ const App = () => {
             </Header>
             <h2 style={{ textAlign: 'center', margin: 0 }}>Videate</h2>
             <Main>
-              <Flex maxWidth={700} id="main-container">
+              <Flex direction="column" justifyContent="start" maxWidth={700} id="main-container">
                 {!isAuthenticated ? (
                   <Flex direction="column">
                     <Home />
@@ -230,10 +243,12 @@ const App = () => {
                   <Routes>
                     <Route path="/loading" element={<Loading />} />
                     <Route path="/" element={<ManageProfile />} />
-                    <Route path="/manage" element={<ManageProfile />} />
+                    <Route path="/manageProfile" element={<ManageProfile />} />
+                    <Route path="/manageFeeds" element={<ManageFeeds />} />
                     <Route path="/create" element={<CreateProfile />} />
-                    <Route path="/createFeed" element={<CreateFeedForm />} />
-                    <Route path="/addMedia" element={<AddMediaForm feedKey={"nsp"} />} />
+                    <Route path="/putFeed" element={<PutFeedForm />} />
+                    <Route path="/putMedia" element={<PutMediaForm />} />
+                    <Route path="/listMedia" element={<ListMedia />} />
                     <Route path="/nft" element={<NftForm />} />
                   </Routes>
                 )}

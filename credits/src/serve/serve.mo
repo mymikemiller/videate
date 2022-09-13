@@ -27,11 +27,9 @@ actor class Serve() = Self {
   type HttpResponse = Types.HttpResponse;
   type StableCredits = Credits.StableCredits;
   type MediaSearchResult = Credits.MediaSearchResult;
-  type AddFeedResult = Credits.AddFeedResult;
+  type PutFeedFullResult = Types.PutFeedFullResult;
   type PutMediaResult = Credits.PutMediaResult;
   type StableContributors = Contributors.StableContributors;
-  type ContributorsError = Contributors.Error;
-  type Contributors = Contributors.Error;
   type Feed = Credits.Feed;
   type Document = Xml.Document;
   type UriTransformer = Types.UriTransformer;
@@ -41,8 +39,10 @@ actor class Serve() = Self {
   type ProfileResult = Contributors.ProfileResult;
   type ProfileUpdate = Contributors.ProfileUpdate;
   type BuyNftResult = Contributors.BuyNftResult;
-  type ApiError = NftDb.ApiError;
-  type SearchError = Credits.SearchError;
+  type NftError = NftDb.NftError;
+  type ServeError = Types.ServeError;
+  type CreditsError = Credits.CreditsError;
+  type ContributorsError = Contributors.ContributorsError;
   type MintReceiptPart = NftDb.MintReceiptPart;
   type MintReceipt = NftDb.MintReceipt;
 
@@ -51,7 +51,7 @@ actor class Serve() = Self {
   // This pattern uses `preupgrade` and `postupgrade` to allow `feeds` to be
   // stable even though HashMap is not. See
   // https://sdk.dfinity.org/docs/language-guide/upgrades.html#_preupgrade_and_postupgrade_system_methods
-  stable var stableCredits: StableCredits = { feedEntries = []; };
+  stable var stableCredits: StableCredits = { feedEntries = []; custodianEntries = []; };
   var credits : Credits.Credits = Credits.Credits(stableCredits);
   stable var stableContributors: StableContributors = { profileEntries = []; };
   var contributors : Contributors.Contributors = Contributors.Contributors(stableContributors);
@@ -66,7 +66,7 @@ actor class Serve() = Self {
   };
 
   system func postupgrade() {
-    stableCredits := { feedEntries=[]; };
+    stableCredits := { feedEntries=[]; custodianEntries = []; };
     stableContributors := { profileEntries=[]; };
   };
 
@@ -209,8 +209,8 @@ actor class Serve() = Self {
   // (msg.caller)'s name
   public shared(msg) func buyNft(feedKey: Text, media: Media) : async BuyNftResult {
     if (not NftDb.isInitialized(nftDb)) {
-      Debug.print("NftDb module is uninitialized. Please execute `dfx canister call serve initializeNftDb` after initial deploy.");
-      return #err(#ApiError(#Other("NftDb module has not been initialized. See dfx output for details.")));
+      Debug.print("Serve canister is uninitialized. Please execute `dfx canister call serve initialize` after initial deploy.");
+      return #err(#NftError(#Uninitialized("Nft module has not been initialized. See dfx output for details.")));
     };
 
     switch(media.nftTokenId) {
@@ -220,8 +220,8 @@ actor class Serve() = Self {
           case (#ok(currentOwnerPrincipal: Principal)) {
             currentOwnerPrincipal;
           };
-          case (#err(e: ApiError)) {
-            return #err(#ApiError(e));
+          case (#err(e: NftError)) {
+            return #err(#NftError(e));
           };
         };
       
@@ -241,8 +241,8 @@ actor class Serve() = Self {
           case (#ok(transactionId : Nat)) {
             return #ok(#TransferTransactionId(transactionId));
           };
-          case (#err(e: ApiError)) {
-            return #err(#ApiError(e));
+          case (#err(e: NftError)) {
+            return #err(#NftError(e));
           }
         };
       };
@@ -283,16 +283,16 @@ actor class Serve() = Self {
             // Associate the Media with the new tokenId
             let setNftTokenIdResult : PutMediaResult = credits.setNftTokenId(feedKey, media.uri, mintReceiptPart.token_id); // For now, assume the media uri is the guid
             switch(setNftTokenIdResult) {
-              case (#ok()) {
+              case (#ok(actionPerformed)) {
                 return #ok(#MintReceiptPart(mintReceiptPart));
               };
-              case (#err(e: SearchError)) {
-                return #err(#SearchError(e));
+              case (#err(e: CreditsError)) {
+                return #err(#CreditsError(e));
               };
             };
           };
-          case (#err(e : ApiError)) {
-            return #err(#ApiError(e));
+          case (#err(e : NftError)) {
+            return #err(#NftError(e));
           };
         };
       };
@@ -301,12 +301,57 @@ actor class Serve() = Self {
 
   /* Credits interface */
 
-  public func addFeed(key: Text, feed : Feed) : async AddFeedResult {
-    credits.addFeed(key, feed);
+  public shared(msg) func putFeed(key: Text, feed : Feed) : async PutFeedFullResult {
+    if (not credits.isInitialized()) {
+      Debug.print("Credits module is uninitialized. Please execute `dfx canister call serve initialize` after initial deploy.");
+      return #err(#CreditsError(#Uninitialized("Credits module has not been initialized. See dfx output for details.")));
+    };
+    let putFeedResult = credits.putFeed(msg.caller, key, feed);
+
+    switch(putFeedResult) {
+      case (#ok(actionPerformed)) {
+        // Update the profile so they can find the feed they created (if they
+        // already own this feed [i.e. this was an update], this will move the
+        // feed to the top of their list) 
+        //
+        // Note that, for now, we use the owner specified in the feed, not the
+        // caller. The two should always match, except in the case of the
+        // cloner for which the caller is dfx which is why we go with the
+        // feed's owner here.
+        //
+        // todo: Use the caller as the owner, not the owner specified in the
+        // feed. Make sure this works with the cloner.
+        let addOwnedFeedKeyResult = contributors.addOwnedFeedKey(feed.owner, key); //(msg.caller, key);
+        switch(addOwnedFeedKeyResult) {
+          case (#ok(profile: Profile)) {
+            return #ok(actionPerformed);
+          };
+          case (#err(e: ContributorsError)) {
+            return #err(#ContributorsError(e));
+          };
+        }
+      };
+      case (#err(e: CreditsError)) {
+        return #err(#CreditsError(e));
+      };
+    };
   };
 
   public func deleteFeed(key: Text){
-    credits.deleteFeed(key);
+    let feed: ?Feed = credits.getFeed(key);
+
+    switch (feed) {
+      case (null){/* do nothing */};
+      case (?feed) {
+        let owner: Principal = feed.owner;
+
+        // First delete the owned feedKey from the Contributor who owns it, if any
+        let _ = contributors.removeOwnedFeedKey(owner, key);
+
+        // Now delete the feed itself
+        credits.deleteFeed(key);
+      };
+    };
   };
 
   public query func getAllFeedKeys() : async [Text] {
@@ -337,8 +382,8 @@ actor class Serve() = Self {
     await credits.getAllFeedMediaDetails();
   };
 
-  public func addMedia(feedKey : Text, media: Media) : async PutMediaResult {
-    credits.addMedia(feedKey, media);
+  public func putMedia(feedKey : Text, media: Media) : async PutMediaResult {
+    credits.putMedia(feedKey, media);
   };
 
   public query func getSampleFeed() : async Feed {
@@ -361,19 +406,26 @@ actor class Serve() = Self {
   public func getContributorName(principal: Principal) : async ?Text {
     contributors.getName(principal);
   };
-  public shared(msg) func addRequestedFeedKey(feedKey: Text) : async Result.Result<Profile, Contributors.Error> {
+  public shared(msg) func addRequestedFeedKey(feedKey: Text) : async ProfileResult {
     contributors.addRequestedFeedKey(msg.caller, feedKey);
   };
-  public shared(msg) func createContributor(profile: Contributors.ProfileUpdate) : async Result.Result<(), Contributors.Error> {
+  public shared(msg) func getOwnedFeedKeys(principal: Principal) : async [Text] {
+    contributors.getOwnedFeedKeys(principal);
+  };
+  public shared(msg) func removeAllOwnedFeedKeys(principal: Principal) : async ProfileResult {
+    contributors.removeAllOwnedFeedKeys(principal);
+  };
+
+  public shared(msg) func createContributor(profile: Contributors.ProfileUpdate) : async Result.Result<(), ContributorsError> {
     contributors.create(msg.caller, profile);
   };
-  public shared(msg) func readContributor() : async Result.Result<Profile, Contributors.Error> {
+  public shared(msg) func readContributor() : async Result.Result<Profile, ContributorsError> {
     contributors.read(msg.caller);
   };
-  public shared(msg) func updateContributor(profile : ProfileUpdate) : async Result.Result<(), Contributors.Error> {
+  public shared(msg) func updateContributor(profile : ProfileUpdate) : async Result.Result<(), ContributorsError> {
     contributors.update(msg.caller, profile);
   };
-  public shared(msg) func deleteContributor() : async Result.Result<(), Contributors.Error> {
+  public shared(msg) func deleteContributor() : async Result.Result<(), ContributorsError> {
     contributors.delete(msg.caller);
   };
 
@@ -434,29 +486,45 @@ actor class Serve() = Self {
   public shared({ caller }) func mintDip721(to: Principal, metadata: NftDb.MetadataDesc) : async MintReceipt {
     NftDb.mintDip721(nftDb, caller, to, metadata);
   };
-
-  public shared({ caller }) func addNftCustodian(newCustodian: Principal) : async Result.Result<(), ApiError> {
-    NftDb.addCustodian(nftDb, caller, newCustodian);
-  };
   
-  public shared({ caller }) func initializeNftDb() : async Result.Result<(), ApiError> {
+  public shared({ caller }) func initialize() : async Result.Result<(), ServeError> {
     // Add the caller as the first custodian. This gives all rights to the
     // person who deployed this canister, as long as they make the first
-    // initializeNftDb call. Note that this call will fail if the canister
-    // already has a custodian; this method can only be called on an
-    // uninitialized nftDb object.
-    let result = NftDb.addCustodian(nftDb, caller, caller);
-    switch(result) {
+    // initialize call. Note that this call will fail if the class already has
+    // a custodian; this method can only be called on an uninitialized nftDb
+    // object.
+    switch(NftDb.addCustodian(nftDb, caller, caller)) {
       case (#ok()) {
         // continue
       };
       case (#err(e)) {
-        return result;
+        return #err(#NftError(e));
       };
     };
 
     // Also add this canister as a custodian, without which this canister
     // wouldn't be able to mint or transfer NFTs
-    NftDb.addCustodian(nftDb, caller, Principal.fromActor(Self));
+    switch(NftDb.addCustodian(nftDb, caller, Principal.fromActor(Self))) {
+      case (#ok()) {
+        // continue
+      };
+      case (#err(e)) {
+        return #err(#NftError(e));
+      };
+    };
+
+    // Also add this canister as a custodian for the credits database, which
+    // will allow the caller (usually the dfx instance) to perform certain
+    // operations like uploading feeds for users other than itself (this is
+    // necessary so that cloning works since that requires dfx to be able to
+    // manage anyone's feed).
+    switch(credits.addCustodian(caller, caller)) {
+      case (#ok()) {
+        return #ok();
+      };
+      case (#err(e)) {
+        return #err(#CreditsError(e));
+      };
+    };
   };
 };

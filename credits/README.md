@@ -24,9 +24,9 @@ dfx canister install --all
 ```
 dfx deploy
 ```
-3. If this is the first deploy to a replica (e.g. after using `dfx start --clean`), also initialize the NFT module:
+3. If this is the first deploy to a replica (e.g. after using `dfx start --clean`), also initialize canister:
 ```
-dfx canister call serve initializeNft
+dfx canister call serve initialize
 ```
 4. Run the frontend on port 3000 with hot reload capability in Chromium browsers
 ```

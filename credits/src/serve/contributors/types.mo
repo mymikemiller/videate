@@ -18,27 +18,29 @@ module {
     id: Principal;
 
     bio: Bio;
-    feedKeys: [Text];
+    feedKeys: [Text]; // The feeds this user has indicated that they subscribe to
+    ownedFeedKeys: [Text]; // The feeds this user created (owns) and manages
   };
 
   public type ProfileUpdate = {
     bio: Bio;
     feedKeys: [Text];
+    ownedFeedKeys: [Text];
   };
 
-  public type Error = {
+  public type ContributorsError = {
     #NotFound;
     #AlreadyExists;
     #NotAuthorized;
   };
 
-  public type ProfileResult = Result.Result<Profile, Error>;
+  public type ProfileResult = Result.Result<Profile, ContributorsError>;
 
   public type BuyNftResult = Result.Result<{
       #MintReceiptPart : NftTypes.MintReceiptPart;
       #TransferTransactionId : Nat;
     }, {
-      #ApiError : NftTypes.ApiError;
-      #SearchError : CreditsTypes.SearchError;
+      #NftError : NftTypes.NftError;
+      #CreditsError : CreditsTypes.CreditsError;
     }>;
 };

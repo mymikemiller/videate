@@ -1,6 +1,6 @@
 import { ActorSubclass } from "@dfinity/agent";
 import toast from "react-hot-toast";
-import { Feed, Profile, ProfileUpdate, AddFeedResult, PutMediaResult, _SERVICE, Media } from "../../declarations/serve/serve.did";
+import { Feed, Profile, ProfileUpdate, _SERVICE, Media } from "../../declarations/serve/serve.did";
 
 export function compareProfiles(p1: any | null, p2: any) {
   if (!p1) return false;
@@ -30,14 +30,6 @@ export async function pushProfileUpdate(actor: ActorSubclass<_SERVICE>, profileU
     toast.error("Failed to save update to IC");
     return;
   }
-};
-
-export async function pushNewFeed(actor: ActorSubclass<_SERVICE>, feed: Feed, feedKey: string): Promise<AddFeedResult> {
-  return actor.addFeed(feedKey, feed);
-};
-
-export async function pushNewMedia(actor: ActorSubclass<_SERVICE>, feedKey: string, media: Media): Promise<PutMediaResult> {
-  return actor.addMedia(feedKey, media);
 };
 
 // Stores the specified search param value in local storage if it was, indeed,

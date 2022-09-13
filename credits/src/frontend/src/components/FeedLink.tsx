@@ -1,32 +1,37 @@
-import { Actor, ActorSubclass } from "@dfinity/agent";
+import { Actor } from "@dfinity/agent";
 import React, { useCallback, useEffect, useRef, useState } from "react"; // import * as React from 'react'
 import {
   Feed,
   _SERVICE as _SERVE_SERVICE,
 } from "../../../declarations/serve/serve.did";
-// import { canisterId as frontendCid } from "../../../declarations/frontend";
 import { useContext } from "react";
 import { AppContext } from "../App";
 import toast from "react-hot-toast";
 import { frontend } from "../../../declarations/frontend";
+import { useNavigate } from "react-router-dom";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const urlTemplate = isDevelopment ?
   '{origin}/{feedKey}?frontendCid={frontendCid}&principal={principal}'
   : 'https://{serveCid}.raw.ic0.app/{feedKey}?frontendCid={frontendCid}&principal={principal}';
 
-interface CopyableLinkProps {
-  serveActor: ActorSubclass<_SERVE_SERVICE>;
-  feedKey: string;
+export enum Mode {
+  Copy, // Provides UI to copy the Feed URL for feeds the user subscribes to
+  Edit, // Provides UI to edit the contents of a feed (e.g. add media)
 };
 
-const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
-  const { authClient } = useContext(AppContext);
+interface FeedLinkProps {
+  feedKey: string;
+  mode: Mode;
+};
+
+const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
+  const { actor, authClient } = useContext(AppContext);
   const [exists, setExists] = useState(true);
   const [feed, setFeed] = useState<Feed | undefined>(undefined);
   const [customizedFeedUrl, setCustomizedFeedUrl] = useState<string>("");
   const mountedRef = useRef(true);
-
+  const navigate = useNavigate();
 
   const setup = useCallback(async () => {
     try {
@@ -34,11 +39,11 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
         return;
       };
 
-      if (!serveActor) {
+      if (!actor) {
         return;
       };
 
-      const feeds: [Feed] | [] = await serveActor.getFeed(feedKey);
+      const feeds: [Feed] | [] = await actor.getFeed(feedKey);
       var feed: Feed | undefined = undefined;
 
       // Note that we cannot use optional chaining here (feeds?.at(0)) as it is
@@ -61,7 +66,7 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
   }, [mountedRef]);
 
   const setFeedInfo = (feed: Feed) => {
-    const serveCid = Actor.canisterIdOf(serveActor).toText();
+    const serveCid = Actor.canisterIdOf(actor!).toText();
 
     // The url needs to point to the serve canister, but we want to keep the
     // other details of the host in tact (i.e. let the latter half of the host
@@ -81,8 +86,9 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
     setCustomizedFeedUrl(url);
   };
 
-  // This pattern is from https://stackoverflow.com/a/63371024/1160216 and
-  // avoids leaving unfinished async calls around resulting in React warnings.
+  // This mountedRef pattern is from
+  // https://stackoverflow.com/a/63371024/1160216 and avoids leaving unfinished
+  // async calls around resulting in React warnings.
   useEffect(() => {
     setup();
     return () => {
@@ -100,9 +106,19 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
       })
   };
 
+  function editFeed() {
+    navigate('/putFeed?feedKey=' + feedKey, { state: { key: feedKey, feed } });
+  };
+  function listMedia() {
+    navigate('/listMedia?feedKey=' + feedKey, { state: { key: feedKey, feed } });
+  };
+  function putMedia() {
+    navigate('/putMedia?feedKey=' + feedKey, { state: { feedKey, feed } });
+  };
+
   if (!exists) {
     return null;
-  }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row', width: '100%', backgroundColor: '#1a1a1a' }}>
@@ -117,13 +133,22 @@ const CopyableLink = ({ serveActor, feedKey }: CopyableLinkProps) => {
         }}>
           {feed?.title}
         </h5>
-        <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* url and copy button */}
-          <input type="text" readOnly value={customizedFeedUrl} style={{ height: '100%', padding: 0, border: 0, paddingLeft: '1em', flexGrow: 1 }}></input>
-          <button type="button" style={{ height: '100%' }} onClick={() => copy()}>Copy</button>
-        </div>
+        {mode == Mode.Copy &&
+          <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* url and copy button */}
+            <input type="text" readOnly value={customizedFeedUrl} style={{ height: '100%', padding: 0, border: 0, paddingLeft: '1em', flexGrow: 1 }}></input>
+            <button type="button" style={{ height: '100%' }} onClick={() => copy()}>Copy</button>
+          </div>
+        }
+        {mode == Mode.Edit &&
+          <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* Add media button */}
+            <button type="button" style={{ height: '100%' }} onClick={() => editFeed()}>Edit Feed</button>
+            <button type="button" style={{ height: '100%' }} onClick={() => listMedia()}>Edit Media</button>
+            <button type="button" style={{ height: '100%' }} onClick={() => putMedia()}>Add Media</button>
+          </div>
+        }
       </div>
     </div>
   );
 }
 
-export default CopyableLink;
+export default FeedLink;

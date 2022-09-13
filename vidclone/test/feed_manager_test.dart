@@ -19,19 +19,19 @@ final memoryFileSystem = MemoryFileSystem();
 class FeedManagerTest {
   FeedManager _feedManager;
   FeedManager get feedManager => _feedManager;
-  final FeedManager Function() createFeedManager;
+  final FeedManager Function() putFeedManager;
   final Function(FeedManager feedManager, Feed feed) mockValidSourceFeed;
   final Function(FeedManager feedManager) mockInvalidSourceFeed;
 
   FeedManagerTest(
-      {@required this.createFeedManager,
+      {@required this.putFeedManager,
       @required this.mockValidSourceFeed,
       @required this.mockInvalidSourceFeed}) {
     resetFeedManager();
   }
 
   void resetFeedManager() {
-    _feedManager = createFeedManager();
+    _feedManager = putFeedManager();
   }
 }
 
@@ -70,7 +70,7 @@ void main() async {
 
   List<FeedManagerTest> generateFeedManagerTests() => [
         FeedManagerTest(
-            createFeedManager: () => MockInternetComputerFeedManager()
+            putFeedManager: () => MockInternetComputerFeedManager()
               ..configure(ClonerTaskArgs((a) => a
                 ..id = 'internet_computer'
                 ..args = [
@@ -78,6 +78,8 @@ void main() async {
                   'test',
                   'key',
                   'test',
+                  'owner',
+                  '7ox2k-63z7o-qnmk7-btjy4-ntcgm-g4vkx-3v2jy-xh2sh-bo3pb-i46mj-kqe',
                   'network',
                   'local',
                   'dfxWorkingDirectory',
@@ -86,12 +88,13 @@ void main() async {
             mockValidSourceFeed: (feedManager, feed) =>
                 (feedManager as MockInternetComputerFeedManager)
                         .mostRecentlyWrittenCandid =
-                    InternetComputerFeedManager.toCandidString(feed),
+                    InternetComputerFeedManager.toCandidString(
+                        feed, 'dummyFeedOwnerPrincipal'),
             mockInvalidSourceFeed: (feedManager) =>
                 (feedManager as MockInternetComputerFeedManager)
                     .mostRecentlyWrittenCandid = null),
         FeedManagerTest(
-            createFeedManager: () => JsonFileFeedManager()
+            putFeedManager: () => JsonFileFeedManager()
               ..fileSystem = memoryFileSystem
               ..configure(ClonerTaskArgs((a) => a
                 ..id = 'json_file'
@@ -101,7 +104,7 @@ void main() async {
             mockInvalidSourceFeed: (feedManager) =>
                 deleteSourceFeed(memoryFileSystem)),
         FeedManagerTest(
-            createFeedManager: () => MockRsyncFeedManager()
+            putFeedManager: () => MockRsyncFeedManager()
               ..configure(ClonerTaskArgs((a) => a
                 ..id = 'rsync'
                 ..args = ['path', feedPath].toBuiltList().toBuilder())),

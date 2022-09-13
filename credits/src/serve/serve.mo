@@ -338,7 +338,20 @@ actor class Serve() = Self {
   };
 
   public func deleteFeed(key: Text){
-    credits.deleteFeed(key);
+    let feed: ?Feed = credits.getFeed(key);
+
+    switch (feed) {
+      case (null){/* do nothing */};
+      case (?feed) {
+        let owner: Principal = feed.owner;
+
+        // First delete the owned feedKey from the Contributor who owns it, if any
+        let _ = contributors.removeOwnedFeedKey(owner, key);
+
+        // Now delete the feed itself
+        credits.deleteFeed(key);
+      };
+    };
   };
 
   public query func getAllFeedKeys() : async [Text] {
@@ -393,9 +406,16 @@ actor class Serve() = Self {
   public func getContributorName(principal: Principal) : async ?Text {
     contributors.getName(principal);
   };
-  public shared(msg) func addRequestedFeedKey(feedKey: Text) : async Result.Result<Profile, ContributorsError> {
+  public shared(msg) func addRequestedFeedKey(feedKey: Text) : async ProfileResult {
     contributors.addRequestedFeedKey(msg.caller, feedKey);
   };
+  public shared(msg) func getOwnedFeedKeys(principal: Principal) : async [Text] {
+    contributors.getOwnedFeedKeys(principal);
+  };
+  public shared(msg) func removeAllOwnedFeedKeys(principal: Principal) : async ProfileResult {
+    contributors.removeAllOwnedFeedKeys(principal);
+  };
+
   public shared(msg) func createContributor(profile: Contributors.ProfileUpdate) : async Result.Result<(), ContributorsError> {
     contributors.create(msg.caller, profile);
   };

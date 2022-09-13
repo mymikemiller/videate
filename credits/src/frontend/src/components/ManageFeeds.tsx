@@ -5,7 +5,7 @@ import {
   Heading,
   Text,
 } from "@adobe/react-spectrum";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,7 +16,7 @@ import FeedLink, { Mode as FeedLinkMode } from "./FeedLink";
 import { _SERVICE as _SERVE_SERVICE } from "../../../declarations/serve/serve.did";
 import FeedAdd from "@spectrum-icons/workflow/FeedAdd";
 
-function ManageFeeds() {
+const ManageFeeds = (): JSX.Element => {
   const { profile } = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ function ManageFeeds() {
   };
 
   if (!profile) {
-    return null;
+    return (<></>);
   }
 
   return (
@@ -34,7 +34,7 @@ function ManageFeeds() {
       {profile.ownedFeedKeys.length > 0 && <>
         <Heading level={2}>
           Here are the feeds you manage:
-        </Heading><br /><br />
+        </Heading>
         <ul style={{ padding: 0 }} >
           {profile.ownedFeedKeys.map((feedKey, index) => {
             return (

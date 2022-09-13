@@ -20,6 +20,7 @@ import {
 import CreateProfile from "./components/CreateProfile";
 import ManageProfile from "./components/ManageProfile";
 import ManageFeeds from "./components/ManageFeeds";
+import ListMedia from "./components/ListMedia";
 import Loading from "./components/Loading";
 import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
@@ -247,6 +248,7 @@ const App = () => {
                     <Route path="/create" element={<CreateProfile />} />
                     <Route path="/putFeed" element={<PutFeedForm />} />
                     <Route path="/putMedia" element={<PutMediaForm />} />
+                    <Route path="/listMedia" element={<ListMedia />} />
                     <Route path="/nft" element={<NftForm />} />
                   </Routes>
                 )}

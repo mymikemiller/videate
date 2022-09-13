@@ -176,6 +176,79 @@ module {
       };
     };
 
+    // Return the list of feeds this user owns
+    public func getOwnedFeedKeys(caller: Principal) : [Text] {
+      switch (getProfile(caller)) {
+        case null {
+          return [];
+        };
+        case (? existingProfile) {
+          return existingProfile.ownedFeedKeys;
+        };
+      };
+    };
+
+    // Remove the feed key from the list of feeds this user owns
+    public func removeOwnedFeedKey(caller: Principal, feedKey: Text) : ProfileResult {
+      // Reject the AnonymousIdentity
+      if(Principal.toText(caller) == "2vxsx-fae") {
+        return #err(#NotAuthorized);
+      };
+
+      switch (getProfile(caller)) {
+        case null {
+          #err(#NotFound);
+        };
+        case (? existingProfile) {
+          // Update the profile with feedKey removed from ownedFeedKeys (we
+          // can't make ownedFeedKeys mutable since it needs to be transfered
+          // via candid). When creating the buffer, use the full size of the
+          // existing profile's owned feedKeys since it's possible we won't
+          // remove anything (if we don't own feedKey)
+          let ownedFeedKeysBuffer = Buffer.Buffer<Text>(existingProfile.ownedFeedKeys.size());
+          Iter.iterate(existingProfile.ownedFeedKeys.vals(), func(f: Text, _index: Nat) {
+            if (f != feedKey) { // Skip adding the feedKey to accomplish removing it
+              ownedFeedKeysBuffer.add(f);
+            }
+          });
+          let newOwnedFeedKeys = ownedFeedKeysBuffer.toArray();
+
+          let profileUpdate: ProfileUpdate = {
+            bio = existingProfile.bio;
+            feedKeys = existingProfile.feedKeys;
+            ownedFeedKeys = newOwnedFeedKeys;
+          };
+
+          let updatedProfile: ?Profile = updateProfile(caller, profileUpdate);
+          return Result.fromOption(updatedProfile, #NotFound);
+        };
+      };
+    };
+
+    // Remove all owned feed keys from the given Contributor
+    public func removeAllOwnedFeedKeys(caller: Principal) : ProfileResult {
+      // Reject the AnonymousIdentity
+      if(Principal.toText(caller) == "2vxsx-fae") {
+        return #err(#NotAuthorized);
+      };
+
+      switch (getProfile(caller)) {
+        case null {
+          #err(#NotFound);
+        };
+        case (? existingProfile) {
+          let profileUpdate: ProfileUpdate = {
+            bio = existingProfile.bio;
+            feedKeys = existingProfile.feedKeys;
+            ownedFeedKeys = [];
+          };
+
+          let updatedProfile: ?Profile = updateProfile(caller, profileUpdate);
+          return Result.fromOption(updatedProfile, #NotFound);
+        };
+      };
+    };
+
     // Create a profile
     public func create(caller: Principal, profile: ProfileUpdate) : Result.Result<(), ContributorsError> {
       // Reject the AnonymousIdentity, which always has the value of "2vxsx-fae".

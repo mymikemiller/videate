@@ -92,8 +92,8 @@ function ManageProfile() {
       ) : (
         <section key={String(isEditing)}>
           <Heading level={2}>
-            Welcome back
-            {fallbackDisplayName[0] ? `, ${fallbackDisplayName[0]}` : ""}!
+            Hello
+            {fallbackDisplayName[0] ? `, ${fallbackDisplayName[0]}` : ""}. Here are the feeds you subscribe to:
           </Heading>
           {feedKeys.length == 0 && <Text>No feed keys found. Please click the Videate link in the shownotes to populate.</Text>}
           <ul style={{ padding: 0 }} >

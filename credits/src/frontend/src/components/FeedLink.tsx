@@ -86,8 +86,9 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
     setCustomizedFeedUrl(url);
   };
 
-  // This pattern is from https://stackoverflow.com/a/63371024/1160216 and
-  // avoids leaving unfinished async calls around resulting in React warnings.
+  // This mountedRef pattern is from
+  // https://stackoverflow.com/a/63371024/1160216 and avoids leaving unfinished
+  // async calls around resulting in React warnings.
   useEffect(() => {
     setup();
     return () => {
@@ -106,10 +107,13 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
   };
 
   function editFeed() {
-    navigate('/editFeed?feedKey=' + feedKey);
+    navigate('/putFeed?feedKey=' + feedKey, { state: { key: feedKey, feed } });
+  };
+  function listMedia() {
+    navigate('/listMedia?feedKey=' + feedKey, { state: { key: feedKey, feed } });
   };
   function putMedia() {
-    navigate('/putMedia?feedKey=' + feedKey);
+    navigate('/putMedia?feedKey=' + feedKey, { state: { feedKey, feed } });
   };
 
   if (!exists) {
@@ -138,6 +142,7 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
         {mode == Mode.Edit &&
           <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* Add media button */}
             <button type="button" style={{ height: '100%' }} onClick={() => editFeed()}>Edit Feed</button>
+            <button type="button" style={{ height: '100%' }} onClick={() => listMedia()}>Edit Media</button>
             <button type="button" style={{ height: '100%' }} onClick={() => putMedia()}>Add Media</button>
           </div>
         }

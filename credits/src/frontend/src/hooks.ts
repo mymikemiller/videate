@@ -43,7 +43,7 @@ export function useAuthClient(props?: UseAuthClientProps) {
   const logout = () => {
     setIsAuthenticated(false);
     setActor(undefined);
-    navigate('/');
+    authClient?.logout({ returnTo: "/" });
   };
 
   useEffect(() => {

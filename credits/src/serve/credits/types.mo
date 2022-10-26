@@ -4,78 +4,107 @@ module {
   // Used to store the contents of the Credits canister in stable types
   // between upgrades
   public type StableCredits = {
-    feedEntries: [(Text, Feed)];
-    custodianEntries: [Principal];
+    feedEntries : [(Text, Feed)];
+    custodianEntries : [Principal];
   };
 
-  // Represents the platform where the media was originally released, e.g. youtube
+  // Represents the platform where the source media was originally released,
+  // e.g. youtube
   public type Platform = {
     // The Uri to the platform's main page, e.g. 'http://www.youtube.com'
-    uri: Text;
+    uri : Text;
 
     // An id unique among all platforms, e.g. 'youtube'
-    id: Text;
+    id : Text;
   };
 
   // Represents the original source of media, e.g. a video's page on YouTube
   public type Source = {
     // The source platform, e.g. youtube
-    platform: Platform;
+    platform : Platform;
 
     // The Uri where the media can be accessed on the source platform
-    uri: Text;
+    uri : Text;
 
     // An id unique among all media on the source platform, likely part of
     // the uri
-    id: Text;
+    id : Text;
 
     // The date the media was released on the source platform. Example:
     // 1970-01-01T00:00:00.000Z
-    releaseDate: Text;
+    releaseDate : Text;
   };
 
   public type Media = {
-    title: Text;
-    description: Text;
-
     // The source of the media, which contains information about how to
     // access the media on the platform on which it was originally released
-    source: Source;
+    source : Source;
 
     // Everyone who participated in the media's creation or consumption
     // contributors: [Contributor];
 
     // The duration of the media in microseconds
-    durationInMicroseconds: Nat;
+    durationInMicroseconds : Nat;
 
-    // The token_id that was provided when an NFT for this Media was minted.
-    // This corresponds to an NFT stored in the "nft" module. "Null" implies
-    // that no NFT for this Media has yet been minted.
-    nftTokenId: ?Nat64;
+    // All Episodes this Media is used in. The first item in this list is the
+    // Episode this Media was originally created for.
+    episodes : [Episode];
 
-    // From ServedMedia when cloning, but all media on the InternetComputer
-    // is served, so these values are just stored on Media directly
-    uri: Text;
-    etag: Text;
-    lengthInBytes: Nat;
+    uri : Text;
+    etag : Text;
+    lengthInBytes : Nat;
   };
 
+  public type EpisodeData = {
+    title : Text;
+    description : Text;
+    media : Media;
+  };
+
+  // A full-fledged Episode is created once the EpisodeData has been inserted
+  // into a Feed and is given a Number
+  public type Episode = EpisodeData and {
+    // The Feed in which this Episode is found. An Episode is only ever in one
+    // Feed. To copy Episodes from other Feeds, or to re-release an episode in
+    // the same Feed, a separate Episode is created. note: this creates a
+    // circular refernce
+    feed : Feed;
+
+    // The serial 1-based number of the episode. This Episode exists at index
+    // {number-1} into this Episode's Feed's array of Episodes. This does not
+    // necessarily match the index into the list of Episodes returned when
+    // requesting a Feed as rss, since some Episodes may be excluded from that
+    // list after being removed from the Feed, though the rest of the Episodes
+    // retain their index.
+    number : Nat;
+
+    // The token_id that was provided when an NFT for this Episode was minted.
+    // This corresponds to an NFT stored in the "nft" module. "Null" implies
+    // that no NFT for this Episode has yet been minted.
+    nftTokenId : ?Nat64;
+  };
+
+  public type FeedKey = Text;
+
   public type Feed = {
-    title: Text;
-    subtitle: Text;
-    description: Text;
-    link: Text;
-    author: Text;
-    email: Text;
-    imageUrl: Text;
-    owner: Principal;
-    mediaList: [Media];
+    // A string that uniquely identifies this Feed among all Videate Feeds
+    key : Text;
+
+    title : Text;
+    subtitle : Text;
+    description : Text;
+    link : Text;
+    author : Text;
+    email : Text;
+    imageUrl : Text;
+    owner : Principal;
+    episodes : [Episode];
   };
 
   public type CreditsError = {
     #Unauthorized;
     #FeedNotFound;
-    #MediaNotFound;
+    #EpisodeNotFound;
     #KeyExists;
     #InvalidOwner;
     #Uninitialized : Text;
@@ -84,20 +113,25 @@ module {
 
   public type SearchResult<T> = Result.Result<T, CreditsError>;
 
-  public type MediaSearchResult = SearchResult<Media>;
+  public type EpisodeSearchResult = SearchResult<Episode>;
 
   public type PutSuccess = {
-    #Created;
+    #Added;
     #Updated;
   };
 
-  public type PutFeedResult = Result.Result<PutSuccess, CreditsError>;
+  public type PutResult = Result.Result<PutSuccess, CreditsError>;
 
-  public type PutMediaResult = Result.Result<PutSuccess, CreditsError>;
-  
+  public type PutEpisodeSuccess = {
+    #Added : { episode : Episode };
+    #Updated;
+  };
+
+  public type PutEpisodeResult = Result.Result<PutEpisodeSuccess, CreditsError>;
+
   // Contributor: a causal factor in the existence or occurrence of something
   // All users (creators, consumers and supporters) are contributors
   // public type Contributor = {
-  //     uploads: [Media];
+  //     uploads: [Episode];
   // }
-}
+};

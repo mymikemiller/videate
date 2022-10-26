@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import {
-  PutMediaResult,
+  PutEpisodeResult,
   _SERVICE,
-  Media,
+  Episode,
   Feed,
 } from "../../../declarations/serve/serve.did";
 import Loop from "../../assets/loop.svg";
@@ -14,16 +14,16 @@ import { Button, ActionButton, Icon } from "@adobe/react-spectrum";
 import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton, LargeBorder, LargeBorderWrap, ValidationError } from "./styles/styles";
 
 // We'll use dummy information for now, so we omit the fields we don't ask for
-type MediaSubmission = Omit<Media, "source" | "durationInMicroseconds" | "nftTokenId" | "etag" | "lengthInBytes">;
+type EpisodeSubmission = Omit<Episode, "source" | "durationInMicroseconds" | "nftTokenId" | "etag" | "lengthInBytes">;
 
-interface PutMediaFormProps {
+interface PutEpisodeFormProps {
   // If feed is specified, we'll be able to copy over values from the most
-  // recent media
+  // recent Episode
   feed?: Feed;
-  // If media is specified, we're editing that Media. The form will be
-  // pre-popuated with that Media's information, and that episode will be
+  // If episode is specified, we're editing that Episode. The form will be
+  // pre-popuated with that Episode's information, and that Episode will be
   // updated when submitting
-  media?: Media;
+  episode?: Episode;
 };
 
 // Specify defaultValues to pre-fill the form with actual values (not just
@@ -35,15 +35,15 @@ const defaultValues = {
   // uri: "www.example.com/test.mp4",
 };
 
-const PutMediaForm = (): JSX.Element => {
+const PutEpisodeForm = (): JSX.Element => {
   const { actor, authClient, login, profile } = useContext(AppContext);
   const { state } = useLocation();
   const [searchParams] = useSearchParams();
   const [feedKey, setFeedKey] = useState(searchParams.get('feedKey'));
-  const { feed: incomingFeed, media } = state as PutMediaFormProps || {};
+  const { feed: incomingFeed, episode } = state as PutEpisodeFormProps || {};
   const [feed, setFeed] = useState(incomingFeed);
   const navigate = useNavigate();
-  const { register, getValues, setValue, handleSubmit, formState: { errors } } = useForm<MediaSubmission>();//{ defaultValues });
+  const { register, getValues, setValue, handleSubmit, formState: { errors } } = useForm<EpisodeSubmission>();//{ defaultValues });
 
   const allFieldsAreEmpty = () => {
     const values = getValues();
@@ -58,15 +58,15 @@ const PutMediaForm = (): JSX.Element => {
     return true;
   }
 
-  const populate = (media: Media): void => {
-    setValue('title', media.title, { shouldValidate: true });
-    setValue('description', media.description, { shouldValidate: true });
-    setValue('uri', media.uri, { shouldValidate: true });
+  const populate = (episode: Episode): void => {
+    setValue('title', episode.title, { shouldValidate: true });
+    setValue('description', episode.description, { shouldValidate: true });
+    setValue('uri', episode.uri, { shouldValidate: true });
   };
 
   useEffect(() => {
-    if (media) {
-      populate(media);
+    if (episode) {
+      populate(episode);
     };
   }, []);
 
@@ -91,7 +91,7 @@ const PutMediaForm = (): JSX.Element => {
   if (authClient == null || actor == null) {
     return (
       <Section>
-        <h3>Please authenticate before adding media</h3>
+        <h3>Please authenticate before adding episodes</h3>
         <Button variant="cta" onPress={login}>
           Login with&nbsp;
           <Icon>
@@ -102,23 +102,20 @@ const PutMediaForm = (): JSX.Element => {
     );
   };
 
-
-  const copyOverMostRecentMediaValues = (): void => {
-    const mostRecentMedia = feed?.mediaList.at(feed?.mediaList.length - 1);
-    if (mostRecentMedia) populate(mostRecentMedia);
+  const confirmAndCopyOverMostRecentEpisodeValues = (): void => {
+    const mostRecentEpisode = feed?.episodes.at(feed?.episodes.length - 1);
+    if (!mostRecentEpisode) {
+      window.prompt("No previous episode found to copy values from");
+    } else {
+      if (allFieldsAreEmpty() || window.confirm("Are you sure you want to replace all form values with values from episode titled \"" + mostRecentEpisode.title + "\"?")) {
+        populate(mostRecentEpisode);
+      };
+    }
   };
 
-  const confirmAndCopyOverMostRecentMediaValues = (): void => {
-    const mostRecentMedia = feed?.mediaList.at(feed?.mediaList.length - 1);
-    const mostRecentMediaTitle = mostRecentMedia ? mostRecentMedia.title : "the most recent episode";
-    if (allFieldsAreEmpty() || window.confirm("Are you sure you want to replace all form values with values from episode titled \"" + mostRecentMediaTitle + "\"?")) {
-      copyOverMostRecentMediaValues()
-    };
-  };
-
-  const onSubmit = (data: MediaSubmission): void => {
+  const onSubmit = (data: EpisodeSubmission): void => {
     // Add in dummy information for now
-    const media: Media = {
+    const episode: Episode = {
       ...data,
       source: {
         id: "roF5zFCgAhc",
@@ -136,15 +133,15 @@ const PutMediaForm = (): JSX.Element => {
     };
 
     // Handle update async
-    actor!.putMedia(feedKey!, media).then(async (result: PutMediaResult) => {
+    actor!.putEpisode(feedKey!, episode).then(async (result: PutEpisodeResult) => {
       if ("ok" in result) {
-        toast.success("Media successfully added!");
-        navigate('/listMedia?feedKey=' + feedKey, { state: { feedInfo: { key: feedKey, feed } } });
+        toast.success("Episode successfully added!");
+        navigate('/listEpisodes?feedKey=' + feedKey, { state: { feedInfo: { key: feedKey, feed } } });
       } else {
         if ("FeedNotFound" in result.err) {
           toast.error("Feed not found: " + feedKey);
         } else {
-          toast.error("Error adding media.");
+          toast.error("Error adding episode.");
         }
         console.error(result.err);
       }
@@ -152,7 +149,7 @@ const PutMediaForm = (): JSX.Element => {
   };
 
   if (!feedKey) {
-    return <h1>feedKey must be specified as a search param so we know which feed to add media to.</h1>
+    return <h1>feedKey must be specified as a search param so we know which feed to add the episode to.</h1>
   };
 
   if (!profile) {
@@ -160,7 +157,7 @@ const PutMediaForm = (): JSX.Element => {
   };
 
   if (!profile.ownedFeedKeys.includes(feedKey)) {
-    return <h1>You do not own the "{feedKey}" feed. You can only edit media for feeds you own.</h1>
+    return <h1>You do not own the "{feedKey}" feed. You can only edit episodes for feeds you own.</h1>
   };
 
   return (
@@ -168,13 +165,13 @@ const PutMediaForm = (): JSX.Element => {
       <div style={{ display: 'flex' }}>
         <div style={{ flex: '1', paddingRight: '15px' }}>
           <div style={{ float: "left" }}>
-            <Title>{media ? "Edit media" : "Add media to your \"" + feedKey + "\" feed"}</Title>
+            <Title>{episode ? "Edit episode" : "Add episode to your \"" + feedKey + "\" feed"}</Title>
           </div>
         </div>
         {
-          feed && feed.mediaList.length > 0 ?
+          feed && feed.episodes.length > 0 ?
             <div style={{ flex: "1", paddingLeft: "15px" }}>
-              <ActionButton onPress={confirmAndCopyOverMostRecentMediaValues}>Copy previous episode's values</ActionButton>
+              <ActionButton onPress={confirmAndCopyOverMostRecentEpisodeValues}>Copy previous episode's values</ActionButton>
             </div> : null
         }
       </div>
@@ -221,4 +218,4 @@ const PutMediaForm = (): JSX.Element => {
   );
 };
 
-export default PutMediaForm;
+export default PutEpisodeForm;

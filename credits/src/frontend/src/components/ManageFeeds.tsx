@@ -1,4 +1,4 @@
-// Manage the feeds owned by the current user (e.g. create new feeds or upload media)
+// Manage the feeds owned by the current user (e.g. create new feeds or add episodes)
 import {
   ActionButton,
   ButtonGroup,

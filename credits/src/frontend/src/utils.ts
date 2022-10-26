@@ -1,6 +1,6 @@
 import { ActorSubclass } from "@dfinity/agent";
 import toast from "react-hot-toast";
-import { Feed, Profile, ProfileUpdate, _SERVICE, Media } from "../../declarations/serve/serve.did";
+import { Feed, Profile, ProfileUpdate, _SERVICE, Media, Episode } from "../../declarations/serve/serve.did";
 
 export function compareProfiles(p1: any | null, p2: any) {
   if (!p1) return false;
@@ -45,13 +45,15 @@ const storeOrRemoveSearchParam = (searchParams: URLSearchParams, paramName: stri
 };
 
 
-export async function getMedia(actor: ActorSubclass<_SERVICE>, feedKey: string, episodeGuid: string): Promise<{ feed: Feed | undefined; media: Media | undefined; }> {
+export async function getEpisode(actor: ActorSubclass<_SERVICE>, feedKey: string, number: number): Promise<Episode | undefined> {
   const feedResult: [Feed] | [] = await actor.getFeed(feedKey);
   const feed: Feed = feedResult[0]!;
   if (feed == undefined) {
-    return { feed: undefined, media: undefined };
+    return undefined;
   };
-  // For now, assume the episodeGuid will always match the media's uri
-  const media: Media | undefined = feed.mediaList.find((media) => media.uri == episodeGuid);
-  return { feed, media };
+  if (feed.episodes.length < number) {
+    return undefined;
+  }
+
+  return feed.episodes[number - 1];
 };

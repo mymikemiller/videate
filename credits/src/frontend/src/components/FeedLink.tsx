@@ -17,7 +17,7 @@ const urlTemplate = isDevelopment ?
 
 export enum Mode {
   Copy, // Provides UI to copy the Feed URL for feeds the user subscribes to
-  Edit, // Provides UI to edit the contents of a feed (e.g. add media)
+  Edit, // Provides UI to edit the contents of a feed (e.g. add Episodes)
 };
 
 interface FeedLinkProps {
@@ -109,11 +109,11 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
   function editFeed() {
     navigate('/putFeed?feedKey=' + feedKey, { state: { key: feedKey, feed } });
   };
-  function listMedia() {
-    navigate('/listMedia?feedKey=' + feedKey, { state: { key: feedKey, feed } });
+  function listEpisodes() {
+    navigate('/listEpisodes?feedKey=' + feedKey, { state: { key: feedKey, feed } });
   };
-  function putMedia() {
-    navigate('/putMedia?feedKey=' + feedKey, { state: { feedKey, feed } });
+  function putEpisode() {
+    navigate('/putEpisode?feedKey=' + feedKey, { state: { feedKey, feed } });
   };
 
   if (!exists) {
@@ -140,10 +140,10 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
           </div>
         }
         {mode == Mode.Edit &&
-          <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* Add media button */}
+          <div style={{ display: 'flex', flexDirection: 'row', height: '30px', flexGrow: 1 }}> {/* Edit buttons */}
             <button type="button" style={{ height: '100%' }} onClick={() => editFeed()}>Edit Feed</button>
-            <button type="button" style={{ height: '100%' }} onClick={() => listMedia()}>Edit Media</button>
-            <button type="button" style={{ height: '100%' }} onClick={() => putMedia()}>Add Media</button>
+            <button type="button" style={{ height: '100%' }} onClick={() => listEpisodes()}>Edit Episodes</button>
+            <button type="button" style={{ height: '100%' }} onClick={() => putEpisode()}>Add Episode</button>
           </div>
         }
       </div>

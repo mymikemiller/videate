@@ -7,7 +7,7 @@ import {
 import { useSearchParams, useLocation } from 'react-router-dom';
 import {
   Feed,
-  Media,
+  Episode,
   PutFeedFullResult,
   _SERVICE,
 } from "../../../declarations/serve/serve.did";
@@ -46,7 +46,7 @@ const PutFeedForm = (): JSX.Element => {
   const navigate = useNavigate();
   type PutFeedInfo = Feed & { key: string };
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<PutFeedInfo>();//{ defaultValues });
-  const [mediaList, setMediaList] = useState<Media[]>();
+  const [episodes, setEpisodes] = useState<Episode[]>();
 
   const populate = (init: PutFeedFormProps): void => {
     if (init.key) {
@@ -59,10 +59,10 @@ const PutFeedForm = (): JSX.Element => {
       setValue('author', init.feed.author, { shouldValidate: true });
       setValue('email', init.feed.email, { shouldValidate: true });
 
-      // Store the mediaList separately from the form since we don't edit the
-      // media list here. We store it in state so we can restore it before
+      // Store the Episodes separately from the form since we don't edit the
+      // episode list here. We store it in state so we can restore it before
       // submitting the feed so it doesn't get blown away.
-      setMediaList(init.feed.mediaList);
+      setEpisodes(init.feed.episodes);
     }
   };
 
@@ -91,13 +91,13 @@ const PutFeedForm = (): JSX.Element => {
     const feed: Feed = {
       ...data,
       link: "test.com", //todo: generate correct link using the key and the user's principal
-      mediaList: mediaList ?? [],
+      episodes: episodes ?? [],
       subtitle: "test subtitle",
       owner: authClient.getIdentity().getPrincipal(), // Feeds are always owned by the user who created them.
     };
 
     // Handle update async
-    actor!.putFeed(data.key, feed).then(async (result: PutFeedFullResult) => {
+    actor!.putFeed(feed).then(async (result: PutFeedFullResult) => {
       if ("ok" in result) {
         if ("Created" in result.ok) {
           toast.success("New feed created!");
@@ -106,7 +106,7 @@ const PutFeedForm = (): JSX.Element => {
           } else {
             console.error("Profile does not exist at the time of adding feed, so the UI won't know we own the new feed.")
           }
-          navigate('/putMedia?feedKey=' + data.key, { state: { feedKey: data.key, feed } })
+          navigate('/putEpisode?feedKey=' + data.key, { state: { feedKey: data.key, feed } })
         } else if ("Updated" in result.ok) {
           toast.success("Feed updated!");
           navigate('/manageFeeds');

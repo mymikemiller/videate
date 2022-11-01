@@ -110,20 +110,12 @@ module.exports = {
       template: path.join(__dirname, asset_entry),
       cache: false,
     }),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: path.join(__dirname, "src", "frontend", "assets"),
-          to: path.join(__dirname, "dist", "frontend"),
-        },
-      ],
-    }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: "development",
       FRONTEND_CANISTER_ID: canisters["frontend"],
       SERVE_CANISTER_ID: canisters["serve"],
       II_URL: isDevelopment
-        ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000/"
+        ? "http://r7inp-6aaaa-aaaaa-aaabq-cai.localhost:8000/"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({

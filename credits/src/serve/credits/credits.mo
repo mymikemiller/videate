@@ -6,8 +6,8 @@
 // https://forum.dfinity.org/t/cant-call-an-imported-actors-query-functions
 
 import Array "mo:base/Array";
-import Buffer "mo:base/Buffer";
 import Map "mo:base/HashMap";
+import Buffer "mo:base/Buffer";
 import Principal "mo:base/Principal";
 import Iter "mo:base/Iter";
 import List "mo:base/List";
@@ -23,19 +23,27 @@ module {
   public type Platform = Types.Platform;
   public type Source = Types.Source;
   public type Media = Types.Media;
+  public type Episode = Types.Episode;
+  public type EpisodeData = Types.EpisodeData;
+  public type FeedKey = Types.FeedKey;
   public type Feed = Types.Feed;
-  public type PutFeedResult = Types.PutFeedResult;
-  public type PutMediaResult = Types.PutMediaResult;
+  public type PutResult = Types.PutResult;
+  public type PutEpisodeResult = Types.PutEpisodeResult;
   public type StableCredits = Types.StableCredits;
-  public type MediaSearchResult = Types.MediaSearchResult;
+  public type EpisodeSearchResult = Types.EpisodeSearchResult;
   public type CreditsError = Types.CreditsError;
 
   // After creating an instance of this class, call addCustodian on it to add
   // the identity that can manage the entire class. Usually this should be the
   // results of `dfx identity get-principal` so the class can be managed from
   // the command line.
-  public class Credits(init: StableCredits) {
-    let feeds: Map.HashMap<Text, Feed> = Map.fromIter<Text, Feed>(init.feedEntries.vals(), 1, Text.equal, Text.hash);
+  public class Credits(init : StableCredits) {
+    let feeds : Map.HashMap<Text, Feed> = Map.fromIter<Text, Feed>(
+      init.feedEntries.vals(),
+      1,
+      Text.equal,
+      Text.hash,
+    );
     var custodians = List.fromArray<Principal>(init.custodianEntries);
 
     public func asStable() : StableCredits = {
@@ -44,21 +52,24 @@ module {
     };
 
     // Feeds
-    public func putFeed(caller: Principal, key: Text, feed : Feed) : PutFeedResult {
-      let isCustodian = List.some(custodians, func (custodian : Principal) : Bool { custodian == caller });
-      switch(feeds.get(key)) {
-        case (? existingFeed) {
+    public func putFeed(caller : Principal, feed : Feed) : PutResult {
+      let isCustodian = List.some(
+        custodians,
+        func(custodian : Principal) : Bool { custodian == caller },
+      );
+      switch (feeds.get(feed.key)) {
+        case (?existingFeed) {
           if (existingFeed.owner != caller) {
             // The feed already exists and is owned by a user other than the
             // caller. The only time we allow modifications to such feeds is
             // when the caller is the custodian, as long as they're not trying
             // to change the owner of the feed. This is necessary so the cloner
-            // can modify feeds (e.g. to add media).
+            // can modify feeds (e.g. to add episodes).
             if (not isCustodian or feed.owner != existingFeed.owner) {
               return #err(#KeyExists);
             };
           };
-          feeds.put(key, feed);
+          feeds.put(feed.key, feed);
           return #ok(#Updated);
         };
         case (null) {
@@ -69,13 +80,13 @@ module {
             // feeds for any user)
             return #err(#Unauthorized);
           };
-          feeds.put(key, feed);
-          return #ok(#Created);
+          feeds.put(feed.key, feed);
+          return #ok(#Added);
         };
       };
     };
 
-    public func deleteFeed(key: Text){
+    public func deleteFeed(key : Text) {
       feeds.delete(key);
     };
 
@@ -84,126 +95,170 @@ module {
     };
 
     public func getAllFeedKeys() : [Text] {
-      Array.map(getAllFeeds(), func((key: Text, feed: Feed)) : Text { 
-        key
-      });
+      Array.map(
+        getAllFeeds(),
+        func((key : Text, feed : Feed)) : Text {
+          key;
+        },
+      );
     };
 
-    public func getFeed(key: Text) : ?Feed {
+    public func getFeed(key : FeedKey) : ?Feed {
       feeds.get(key);
     };
 
-    public func getMedia(feedKey: Text, episodeGuid: Text) : Types.MediaSearchResult {
-      let feed = getFeed(feedKey);
+    public func getEpisode(key : FeedKey, number : Nat) : Types.EpisodeSearchResult {
+      let feed = getFeed(key);
 
       switch (feed) {
         case (null) #err(#FeedNotFound);
         case (?feed) {
-          let media = Array.find(feed.mediaList, func (media: Media) : Bool { media.uri == episodeGuid }); // Assume or now that the media uri is the guid
-          switch (media) {
-            case (null) #err(#MediaNotFound);
-            case (?media) {
-              return #ok(media);
-            }
-          }
+          if (number > feed.episodes.size()) {
+            return #err(#EpisodeNotFound);
+          };
+          // number is 1-based
+          let episode = feed.episodes[number - 1];
+          return #ok(episode);
         };
       };
     };
 
-    // Adds new Media to the specified feed. If media's episodeGuid (assumed to
-    // be media.uri) matches that of a Media already in the feed, replaces that
-    // Media instead of adding a new Media. This will fail silently (will
-    // unintentially overwrite the previous Media) if trying to add two Media
-    // with the same uri to the feed, for example for a re-release of an old
-    // episode. 
-    // todo: generate a unique episodeGuid for each episode.
-    public func putMedia(feedKey: Text, media: Media) : PutMediaResult {
+    public func addEpisode(feed : Feed, episodeData : EpisodeData) : PutEpisodeResult {
+      putEpisode(#Add { feed; episodeData });
+    };
+
+    public func updateEpisode(episode : Episode) : PutEpisodeResult {
+      putEpisode(#Update { episode });
+    };
+
+    // Adds a new Episode with the given data to the given feed and returns the
+    // newly created Episode, or updates an existing Episode
+    func putEpisode(
+      instructions : {
+        #Add : { feed : Feed; episodeData : EpisodeData };
+        #Update : { episode : Episode };
+      },
+    ) : PutEpisodeResult {
       //todo: check msg caller for feed ownership
-      let feed = getFeed(feedKey);
-      switch (feed) {
-        case (null) return #err(#FeedNotFound);
-        case (? feed) {
-          // Temporarily convert to a Buffer to perform the modification/addition
-          let newMediaListBuffer = Buffer.Buffer<Media>(feed.mediaList.size());
-          var didReplace = false;
-          Iter.iterate(Iter.fromArray(feed.mediaList), func(m: Media, _index: Nat) {
-            // switch(episodeGuid) { case (null) { newMediaListBuffer.add(m);
-            //   };
-            //   case (?episodeGuid) {
-            if (media.uri == m.uri) { // Assume episodeGuid is media.uri. 
-              newMediaListBuffer.add(media);
-              didReplace := true;
-            } else {
-              newMediaListBuffer.add(m);
-            }
-            //   }
-            // }
-          });
-          if (not didReplace) {
-            // if (episodeGuid != null) {
-            //   // If an episodeGuid was specified, error if no media to replace
-            //   return #err(#MediaNotFound); // No longer an error. This is expected when adding new Media.
-            // };
-            newMediaListBuffer.add(media);
+      var updating = true;
+      let episode : Episode = switch instructions {
+        case (#Update(data : { episode : Episode })) {
+          // todo: do we need this check? It fails because episode doesn't exist in data.episode.feed.episodes, which is empty
+          // if (data.episode.number > data.episode.feed.episodes.size()) {
+          //   Debug.print("data.episode.number > data.episode.feed.episodes.size()");
+          //   Debug.print(debug_show (data.episode.number) # " > " # debug_show (data.episode.feed.episodes.size()));
+          //   // No Episode at the specified index (index = number-1) to update
+          //   return #err(#EpisodeNotFound);
+          // };
+          data.episode;
+        };
+        case (#Add(data : { feed : Feed; episodeData : EpisodeData })) {
+          updating := false;
+          let episodeData = data.episodeData;
+          let e : Episode = {
+            title = episodeData.title;
+            description = episodeData.description;
+            media = episodeData.media;
+            feed = data.feed;
+            // episodeData with feed = data.feed; number is 1-based
+            number = data.feed.episodes.size() + 1;
+            nftTokenId = null;
           };
 
-          let newFeed: Feed = {
-            title = feed.title;
-            subtitle = feed.subtitle;
-            description = feed.description;
-            link = feed.link;
-            author = feed.author;
-            email = feed.email;
-            imageUrl = feed.imageUrl;
-            owner = feed.owner;
-            mediaList = newMediaListBuffer.toArray();
-          };
-          let _ = feeds.replace(feedKey, newFeed);
-          return #ok(if didReplace { #Updated } else { #Created });
+          e;
         };
       };
-    };
-    
-    public func setNftTokenId(feedKey: Text, episodeGuid: Text, tokenId: Nft.TokenId) : Types.PutMediaResult {
-      let mediaResult = getMedia(feedKey, episodeGuid);
-      switch (mediaResult) {
-        case (#err(err)) {
-          return #err(err);
-        };
-        case (#ok(media)) {
-          let newMedia: Media = {
-            title = media.title;
-            description = media.description;
-            source = media.source;
-            durationInMicroseconds = media.durationInMicroseconds;
-            uri = media.uri;
-            etag = media.etag;
-            lengthInBytes = media.lengthInBytes;
 
-            nftTokenId = Option.make(tokenId);
+      // Temporarily convert to a Buffer to perform the modification/addition
+      let episodesBuffer = Buffer.Buffer<Episode>(episode.feed.episodes.size() + (if (updating) 0 else 1));
+      for (i in episode.feed.episodes.keys()) {
+        let existingEpisode = episode.feed.episodes[i];
+        if ((episode.number - 1) : Nat == i) {
+          // Update (replace) Episode
+          episodesBuffer.add(episode);
+        } else {
+          // Sanity check for existing episodes
+          if ((existingEpisode.number - 1) : Nat != i) {
+            // This should never happen as long as Episodes are always
+            // added/updated to/in Feeds via this function, and are never
+            // removed from the middle of the list.
+            return #err(#Other("Encountered out-of-order episode number " # debug_show (episode.number) # " at index " # debug_show (i) # " in \"" # episode.feed.key # "\" feed. An Episode's number should always be equal to 1 + the index into Episode's Feed's Episode list."));
           };
-
-          return putMedia(feedKey, newMedia);
+          // Retain existing Episodes
+          episodesBuffer.add(existingEpisode);
         };
       };
+
+      if (not updating) {
+        // We're intending to add a new Episode, so add the it to the end
+        episodesBuffer.add(episode);
+      };
+
+      // The following should work to modify the feed's episode list, but gives "unexpected token 'and'" or "unexpected token 'with'"
+      // let updatedFeed : Feed = {
+      //   episode.feed with episodes = episodesBuffer.toArray();
+      // }
+
+      // Why doesn't this work? See https://internetcomputer.org/docs/current/developer-docs/build/cdks/motoko-dfinity/language-manual#object-combinationextension and https://github.com/dfinity/motoko/pull/3084
+      // let a = { x = 1 };
+      // let b = { y = 2 };
+      // let c = { a and b with x = 3 };
+
+      let updatedFeed : Feed = {
+        key = episode.feed.key;
+        title = episode.feed.title;
+        subtitle = episode.feed.subtitle;
+        description = episode.feed.description;
+        link = episode.feed.link;
+        author = episode.feed.author;
+        email = episode.feed.email;
+        imageUrl = episode.feed.imageUrl;
+        owner = episode.feed.owner;
+        episodes = episodesBuffer.toArray();
+      };
+      let _ = feeds.replace(episode.feed.key, updatedFeed);
+      return #ok(if (updating) { #Updated } else { #Added { episode } });
     };
 
-    public func getFeedSummary(key: Text) : (Text, Text) {
-      let feed: ?Feed = getFeed(key);
+    public func setNftTokenId(
+      episode : Episode,
+      tokenId : Nft.TokenId,
+    ) : PutEpisodeResult {
+
+      // This should work, but gives errors about unexpected 'with' and 'and' tokens
+      // let episodeWithNftTokenId : Episode = {
+      //   episode with nftTokenId = Option.make(tokenId);
+      // };
+
+      let episodeWithNftTokenId : Episode = {
+        title = episode.title;
+        description = episode.description;
+        media = episode.media;
+        feed = episode.feed;
+        number = episode.number;
+
+        nftTokenId = Option.make(tokenId);
+      };
+
+      return updateEpisode(episodeWithNftTokenId);
+    };
+
+    public func getFeedSummary(key : Text) : (Text, Text) {
+      let feed : ?Feed = getFeed(key);
 
       switch (feed) {
         case (?feed) {
-          (feed.title, "items: " # Nat.toText(feed.mediaList.size()));
+          (feed.title, "episodes: " # Nat.toText(feed.episodes.size()));
         };
-        case (null) ("Unrecognized feed: " # key, "");
+        case (null)("Unrecognized feed: " # key, "");
       };
     };
 
     public func getAllFeedSummaries() : async [(Text, Text)] {
-      let keys: [Text] = getAllFeedKeys();
-      var buffer = Buffer.Buffer<(Text, Text)>(keys.size()); 
+      let keys : [Text] = getAllFeedKeys();
+      var buffer = Buffer.Buffer<(Text, Text)>(keys.size());
       for (key in keys.vals()) {
-        let summary = getFeedSummary(key); 
+        let summary = getFeedSummary(key);
         buffer.add(summary);
       };
       buffer.toArray();
@@ -213,32 +268,32 @@ module {
       // });
     };
 
-    public func getFeedMediaDetails(key: Text) : (Text, [(Text, Text)]) {
-      let feed: ?Feed = getFeed(key);
+    public func getFeedEpisodeDetails(key : Text) : (Text, [(Text, Text)]) {
+      let feed : ?Feed = getFeed(key);
 
       switch (feed) {
         case (?feed) {
-          var buffer = Buffer.Buffer<(Text, Text)>(feed.mediaList.size()); 
-          for (media in feed.mediaList.vals()) {
-            let details = (media.source.releaseDate, media.title); 
+          var buffer = Buffer.Buffer<(Text, Text)>(feed.episodes.size());
+          for (episode in feed.episodes.vals()) {
+            let details = (episode.media.source.releaseDate, episode.title);
             buffer.add(details);
           };
-          let mediaDetails = buffer.toArray();
+          let details = buffer.toArray();
           // Not sure why this doesn't work instead of the above:
-          // let mediaDetails = Array.map(feed.mediaList, func(media: Media) : (Text, Text) {
+          // let details = Array.map(feed.mediaList, func(media: Media) : (Text, Text) {
           //     (media.releaseDate, media.title);
           // });
-          (feed.title, mediaDetails);
+          (feed.title, details);
         };
-        case (null) ("Unrecognized feed: " # key, []);
+        case (null)("Unrecognized feed: " # key, []);
       };
     };
 
-    public func getAllFeedMediaDetails() : async [(Text, [(Text, Text)])] {
-      let keys: [Text] = getAllFeedKeys();
-      var buffer = Buffer.Buffer<(Text, [(Text, Text)])>(keys.size()); 
+    public func getAllFeedEpisodeDetails() : async [(Text, [(Text, Text)])] {
+      let keys : [Text] = getAllFeedKeys();
+      var buffer = Buffer.Buffer<(Text, [(Text, Text)])>(keys.size());
       for (key in keys.vals()) {
-        let details = getFeedMediaDetails(key); 
+        let details = getFeedEpisodeDetails(key);
         buffer.add(details);
       };
       buffer.toArray();
@@ -248,6 +303,7 @@ module {
       // });
     };
 
+    /*
     public func getSampleFeed() : Feed {
       {
         title = "Sample Feed";
@@ -258,7 +314,7 @@ module {
         email = "mike@videate.org";
         imageUrl = "https://www.learningcontainer.com/wp-content/uploads/2019/10/Learning-container.png";
         owner = Principal.fromText("7ox2k-63z7o-qnmk7-btjy4-ntcgm-g4vkx-3v2jy-xh2sh-bo3pb-i46mj-kqe");
-        mediaList = [
+        episodes = [
           {
             uri = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4";
             etag = "a1b2c3";
@@ -276,16 +332,17 @@ module {
               id = "test";
               releaseDate = "1970-01-01T00:00:00.000Z";
             };
-          }
+          },
         ];
       };
     };
+    */
 
-    public func isInitialized(): Bool {    
-      return List.size(custodians) > 0
+    public func isInitialized() : Bool {
+      return List.size(custodians) > 0;
     };
 
-    public func addCustodian(caller: Principal, newCustodian: Principal) : Result.Result<(), CreditsError> {
+    public func addCustodian(caller : Principal, newCustodian : Principal) : Result.Result<(), CreditsError> {
       // Once we've been initialized, only current custodians can add a new
       // custodian. Note that we allow anyone (usually the deployer since the
       // initalize call should be done immediately after deploying or else there
@@ -293,12 +350,12 @@ module {
       // specify the first custodian, usually the identity for their dfx (the
       // caller of serveActor.initialize()) so they can manage this class via the
       // console.
-      if (isInitialized() and not List.some(custodians, func (custodian : Principal) : Bool { custodian == caller })) {
+      if (isInitialized() and not List.some(custodians, func(custodian : Principal) : Bool { custodian == caller })) {
         return #err(#Unauthorized);
       };
 
       // Add the new custodian if it's not already in the list
-      if (not List.some(custodians, func (custodian : Principal) : Bool { custodian == newCustodian })) {
+      if (not List.some(custodians, func(custodian : Principal) : Bool { custodian == newCustodian })) {
         custodians := List.push(newCustodian, custodians);
       };
 

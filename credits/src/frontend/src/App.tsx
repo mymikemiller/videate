@@ -134,7 +134,7 @@ const App = () => {
             sanitizedLandingPath = splitLandingPath[1];
           }
           const searchParams = new URLSearchParams(sanitizedLandingPath);
-          const feedKey = searchParams.get('feedKey');
+          const feedKey = searchParams.get('feed');
           if (feedKey) {
             profileResult = await actor.addRequestedFeedKey(feedKey);
           }

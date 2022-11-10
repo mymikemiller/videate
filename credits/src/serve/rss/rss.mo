@@ -1,19 +1,24 @@
+import Buffer "mo:base/Buffer";
 import Xml "xml";
 import Credits "../credits/credits";
 import NftDb "../nft_db/nft_db";
 import Contributors "../contributors/contributors";
 import Types "../types";
+import Utils "../utils";
 import Array "mo:base/Array";
 import List "mo:base/List";
 import Nat "mo:base/Nat";
 import Debug "mo:base/Debug";
 import Option "mo:base/Option";
+import Result "mo:base/Result";
 import Principal "mo:base/Principal";
 
 module {
   type Document = Xml.Document;
   type Element = Xml.Element;
   type Feed = Credits.Feed;
+  type MediaID = Credits.MediaID;
+  type EpisodeID = Credits.EpisodeID;
   type Media = Credits.Media;
   type Episode = Credits.Episode;
   type UriTransformer = Types.UriTransformer;
@@ -27,38 +32,53 @@ module {
   // Validation can be perfomed here:
   // https://validator.w3.org/feed/#validate_by_input
   public func format(
+    credits : Credits.Credits,
     feed : Feed,
-    episodeNumber : ?Nat,
+    episodeId : ?EpisodeID,
     requestorPrincipal : ?Text,
     frontendUri : Text,
     contributors : Contributors.Contributors,
     nftDb : NftDb.NftDb,
     mediaUriTransformers : [UriTransformer],
   ) : Document {
-    var episodes : [Episode] = [];
-    switch (episodeNumber) {
+    let episodeIds : [EpisodeID] = switch (episodeId) {
       case null {
         // Normal case. Caller did not specify an Episode, so use all Episodes
-        episodes := feed.episodes;
+        feed.episodeIds;
       };
-      case (?episodeNumber) {
-        // Check if Episode exists in feed. note: episodeNumber is 1-based
-        if (episodeNumber > feed.episodes.size()) {
-          // No Episode at given index.
-          return {
-            prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-            root = {
-              name = "Error";
-              attributes = [];
-              text = "Episode " # debug_show (episodeNumber) # " not found in " # feed.key # " feed";
-              children = [];
-            };
+      case (?episodeId) {
+        // Use only the single Episode specified by the caller
+        [episodeId];
+      };
+    };
+
+    // Use mapResult to return early with an error when an Episode isn't found
+    let episodesResult = Array.mapResult<EpisodeID, Episode, Text>(
+      episodeIds,
+      func(id : EpisodeID) : Result.Result<Episode, Text> {
+        switch (credits.getEpisode(feed.key, id)) {
+          case (null) #err("Episode with ID " # Nat.toText(id) # " not found in " # feed.key # " feed");
+          case (?episode) #ok(episode);
+        };
+      },
+    );
+
+    let episodes = switch (episodesResult) {
+      case (#ok(episodes)) {
+        // All Episodes were found
+        episodes;
+      };
+      case (#err(msg : Text)) {
+        // There was an Episode not found. Notify the user.
+        return {
+          prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+          root = {
+            name = "Error";
+            attributes = [];
+            text = msg;
+            children = [];
           };
         };
-
-        // We found the specified Episode, so generate a Document containing
-        // only that single Episode
-        episodes := [feed.episodes[episodeNumber - 1]];
       };
     };
 
@@ -188,6 +208,7 @@ module {
                   episodeListNewestToOldest,
                   func(episode : Episode) : Element {
                     getEpisodeElement(
+                      credits,
                       episode,
                       requestorPrincipal,
                       frontendUri,
@@ -206,6 +227,7 @@ module {
   };
 
   func getEpisodeElement(
+    credits : Credits.Credits,
     episode : Episode,
     requestorPrincipal : ?Text,
     frontendUri : Text,
@@ -213,8 +235,8 @@ module {
     nftDb : NftDb.NftDb,
     mediaUriTransformers : [UriTransformer],
   ) : Element {
-    let videateSettingsUri = frontendUri # "?feedKey=" # episode.feed.key;
-    let nftPurchaseUri = frontendUri # "/nft?feedKey=" # episode.feed.key # "&episodeNumber=" # debug_show (episode.number);
+    let videateSettingsUri = frontendUri # "?feed=" # episode.feedKey;
+    let nftPurchaseUri = frontendUri # "/nft?feed=" # episode.feedKey # "&episode=" # debug_show (episode.id);
 
     let videateSettingsMessage : Text = episode.description # "\n\nManage your Videate settings:\n\n" # videateSettingsUri # "\n\n";
 
@@ -250,11 +272,25 @@ module {
 
     let episodeDescription = videateSettingsMessage # nftDescription;
 
-    let uri = transformUri(episode.media.uri, mediaUriTransformers);
+    let media : Media = switch (credits.getMedia(episode.mediaId)) {
+      case (null) {
+        // Media for this Episode was not found. Notify the user.
+        return {
+          name = "Error";
+          attributes = [];
+          text = "Media not found for Episode " # Nat.toText(episode.id) # " in feed " # episode.feedKey # ". Expected to find MediaID " # Nat.toText(episode.mediaId) # ".";
+          children = [];
+        };
+      };
+      case (?media) {
+        media;
+      };
+    };
 
-    // Episode number, since it matches index+1 into the Episode array, is
-    // unique per Episode in the Feed and can be used as the guid
-    let guid = episode.number;
+    let uri = transformUri(media.uri, mediaUriTransformers);
+
+    // Episode ID is unique per Episode in the Feed and can be used as the guid
+    let guid = Nat.toText(episode.id);
 
     {
       name = "item";
@@ -329,7 +365,7 @@ module {
         {
           name = "guid";
           attributes = [];
-          text = Nat.toText(episode.number);
+          text = guid;
           children = [];
         },
       ];

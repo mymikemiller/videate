@@ -28,13 +28,16 @@ actor class Serve() = Self {
   type StableCredits = Credits.StableCredits;
   type EpisodeSearchResult = Credits.EpisodeSearchResult;
   type PutFeedFullResult = Types.PutFeedFullResult;
-  type PutEpisodeResult = Credits.PutEpisodeResult;
   type StableContributors = Contributors.StableContributors;
   type Feed = Credits.Feed;
   type FeedKey = Credits.FeedKey;
   type Document = Xml.Document;
   type UriTransformer = Types.UriTransformer;
+  type Media = Credits.Media;
+  type MediaData = Credits.MediaData;
+  type MediaID = Credits.MediaID;
   type Episode = Credits.Episode;
+  type EpisodeID = Credits.EpisodeID;
   type EpisodeData = Credits.EpisodeData;
   type OwnerResult = NftDb.OwnerResult;
   type Profile = Contributors.Profile;
@@ -51,10 +54,12 @@ actor class Serve() = Self {
   let sampleFeed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" version=\"2.0\"> <channel> <atom:link href=\"http://mikem-18bd0e1e.localhost.run/\" rel=\"self\" type=\"application/rss+xml\"></atom:link> <title>Sample Feed</title> <link>http://example.com</link> <language>en-us</language> <itunes:subtitle>Just a sample</itunes:subtitle> <itunes:author>Mike Miller</itunes:author> <itunes:summary>A sample feed hosted on the Internet Computer</itunes:summary> <description>A sample feed hosted on the Internet Computer</description> <itunes:owner> <itunes:name>Mike Miller</itunes:name> <itunes:email>mike@videate.org</itunes:email> </itunes:owner> <itunes:explicit>no</itunes:explicit> <itunes:image href=\"https://brianchristner.io/content/images/2016/01/Success-loading.jpg\"></itunes:image> <itunes:category text=\"Arts\"></itunes:category> <item> <title>test</title> <itunes:summary>test</itunes:summary> <description>test</description> <link>http://example.com/podcast-1</link> <enclosure url=\"https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4\" type=\"video/mpeg\" length=\"1024\"></enclosure> <pubDate>21 Dec 2016 16:01:07 +0000</pubDate> <itunes:author>Mike Miller</itunes:author> <itunes:duration>00:32:16</itunes:duration> <itunes:explicit>no</itunes:explicit> <guid></guid> </item> </channel> </rss>";
 
   // This pattern uses `preupgrade` and `postupgrade` to allow `feeds` to be
-  // stable even though HashMap is not. See
+  // stable even though HashMap and Buffer are not. See
   // https://sdk.dfinity.org/docs/language-guide/upgrades.html#_preupgrade_and_postupgrade_system_methods
   stable var stableCredits : StableCredits = {
     feedEntries = [];
+    episodeEntries = [];
+    mediaEntries = [];
     custodianEntries = [];
   };
   var credits : Credits.Credits = Credits.Credits(stableCredits);
@@ -71,7 +76,12 @@ actor class Serve() = Self {
   };
 
   system func postupgrade() {
-    stableCredits := { feedEntries = []; custodianEntries = [] };
+    stableCredits := {
+      feedEntries = [];
+      episodeEntries = [];
+      mediaEntries = [];
+      custodianEntries = [];
+    };
     stableContributors := { profileEntries = [] };
   };
 
@@ -322,7 +332,7 @@ actor class Serve() = Self {
                 val = #Nat8Content(4);
               },
             ];
-            data = Text.encodeUtf8("https://rss.videate.org/" # episode.feed.key # "/" # Nat.toText(episode.number));
+            data = Text.encodeUtf8("https://rss.videate.org/" # episode.feedKey # "&episode=" # Nat.toText(episode.id));
           },
         ];
 
@@ -338,12 +348,12 @@ actor class Serve() = Self {
         switch (mintReceipt) {
           case (#ok(mintReceiptPart : MintReceiptPart)) {
             // Associate the Episode with the new tokenId
-            let setNftTokenIdResult : PutEpisodeResult = credits.setNftTokenId(
+            let setNftTokenIdResult = credits.setNftTokenId(
               episode,
               mintReceiptPart.token_id,
             );
             switch (setNftTokenIdResult) {
-              case (#ok(actionPerformed)) {
+              case (#ok()) {
                 return #ok(#MintReceiptPart(mintReceiptPart));
               };
               case (#err(e : CreditsError)) {
@@ -428,8 +438,24 @@ actor class Serve() = Self {
     credits.getAllFeeds();
   };
 
+  public query func getAllEpisodes(feedKey : Text) : async [Episode] {
+    credits.getAllEpisodes(feedKey);
+  };
+
   public query func getFeed(key : Text) : async ?Feed {
     credits.getFeed(key);
+  };
+
+  public func getMedia(id : MediaID) : async ?Media {
+    credits.getMedia(id);
+  };
+
+  public func getEpisode(key : FeedKey, id : EpisodeID) : async ?Episode {
+    credits.getEpisode(key, id);
+  };
+
+  public func getEpisodes(key : FeedKey) : async ?[Episode] {
+    credits.getEpisodes(key);
   };
 
   public func getFeedSummary(key : Text) : async (Text, Text) {
@@ -448,11 +474,19 @@ actor class Serve() = Self {
     await credits.getAllFeedEpisodeDetails();
   };
 
-  public func addEpisode(feed : Feed, episodeData : EpisodeData) : async PutEpisodeResult {
-    credits.addEpisode(feed, episodeData);
+  public func addMedia(mediaData : MediaData) : async Result.Result<Media, CreditsError> {
+    credits.addMedia(mediaData);
   };
 
-  public func updateEpisode(episode : Episode) : async PutEpisodeResult {
+  public func updateMedia(newMedia : Media) : async Result.Result<(), CreditsError> {
+    credits.updateMedia(newMedia);
+  };
+
+  public func addEpisode(episodeData : EpisodeData) : async Result.Result<Episode, CreditsError> {
+    credits.addEpisode(episodeData);
+  };
+
+  public func updateEpisode(episode : Episode) : async Result.Result<(), CreditsError> {
     credits.updateEpisode(episode);
   };
 
@@ -462,7 +496,7 @@ actor class Serve() = Self {
 
   func getFeedXml(
     feed : Feed,
-    episodeNumber : ?Nat,
+    episodeId : ?EpisodeID,
     requestorPrincipal : ?Text,
     frontendUri : Text,
     contributors : Contributors.Contributors,
@@ -470,8 +504,9 @@ actor class Serve() = Self {
     uriTransformers : [UriTransformer],
   ) : Text {
     let doc : Document = Rss.format(
+      credits,
       feed,
-      episodeNumber,
+      episodeId,
       requestorPrincipal,
       frontendUri,
       contributors,

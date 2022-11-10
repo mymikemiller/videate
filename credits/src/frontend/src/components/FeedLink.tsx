@@ -106,13 +106,13 @@ const FeedLink = ({ feedKey, mode }: FeedLinkProps) => {
   };
 
   function editFeed() {
-    navigate('/putFeed?feedKey=' + feedKey, { state: { key: feedKey, feed } });
+    navigate('/putFeed?feed=' + feedKey, { state: { key: feedKey, feed } });
   };
   function listEpisodes() {
-    navigate('/listEpisodes?feedKey=' + feedKey, { state: { key: feedKey, feed } });
+    navigate('/listEpisodes?feed=' + feedKey, { state: { key: feedKey, feed } });
   };
   function putEpisode() {
-    navigate('/putEpisode?feedKey=' + feedKey, { state: { feedKey, feed } });
+    navigate('/putEpisode?feed=' + feedKey, { state: { feedKey, feed } });
   };
 
   if (!exists) {

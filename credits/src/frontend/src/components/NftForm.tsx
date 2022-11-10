@@ -70,10 +70,10 @@ const Section = styled.section`
 const NftForm = (): JSX.Element => {
   const { actor, authClient } = useContext(AppContext);
   const [searchParams] = useSearchParams();
-  const [feedKey, setFeedKey] = useState(searchParams.get('feedKey'));
-  const _episodeNumberString = searchParams.get('episodeNumber');
-  const _episodeNumber = _episodeNumberString ? parseInt(_episodeNumberString) : null;
-  const [episodeNumber, setEpisodeNumber] = useState<number | null>(_episodeNumber);
+  const [feedKey, setFeedKey] = useState(searchParams.get('feed'));
+  const _episodeIdString = searchParams.get('episode');
+  const _episodeId = _episodeIdString ? parseInt(_episodeIdString) : null;
+  const [episodeId, setEpisodeId] = useState<number | null>(_episodeId);
   const [feed, setFeed] = useState<Feed | null | undefined>(null);
   const [episode, setEpisode] = useState<Episode | null | undefined>(null);
   const [currentOwner, setCurrentOwner] = useState<Principal>();
@@ -104,7 +104,7 @@ const NftForm = (): JSX.Element => {
         setCurrentOwnershipText("No one has claimed this NFT yet!");
       } else {
         if (currentOwner.toString() == authClient.getIdentity().getPrincipal().toString()) {
-          setCurrentOwnershipText("You own this NFT!!!!");
+          setCurrentOwnershipText("You own this NFT!");
         } else {
           if (currentOwnerName == undefined) {
             setCurrentOwnershipText(`Fetching NFT owner name...`);
@@ -131,16 +131,22 @@ const NftForm = (): JSX.Element => {
     return (<></>);
   };
 
-  if (feedKey == null || episodeNumber == null) {
+  if (feedKey == null || episodeId == null) {
     return (<h1>URL must specify feedKey and episode query params</h1>);
   };
 
   const fetchEpisode = async () => {
-    const episode = await getEpisode(actor, feedKey, episodeNumber);
     // Note that feed and episode might come back undefined if the feed isn't
     // found
-    setFeed(episode && episode.feed);
-    setEpisode(episode);
+    let feedResult = await actor.getFeed(feedKey);
+    if (feedResult.length == 1) {
+      setFeed(feedResult[0]);
+    };
+
+    let episodeResult = await actor.getEpisode(feedKey, BigInt(episodeId));
+    if (episodeResult.length == 1) {
+      setEpisode(episodeResult[0]);
+    };
   };
 
   if (feed === null || episode === null) {
@@ -150,7 +156,7 @@ const NftForm = (): JSX.Element => {
 
   if (episode == undefined) {
     return (
-      <Heading level={1}><>Episode number {episodeNumber} not found in "{feedKey}" feed. Check the URL query params for a valid episodeNumber.</></Heading>
+      <Heading level={1}><>Episode ID {episodeId} not found in "{feedKey}" feed. Check the URL query params for a valid episode.</></Heading>
     );
   };
 

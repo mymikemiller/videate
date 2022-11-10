@@ -9,6 +9,7 @@ import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 import Option "mo:base/Option";
+import Buffer "mo:base/Buffer";
 import Xml "rss/xml";
 import Types "types";
 
@@ -79,4 +80,16 @@ module {
     return Option.make(n);
   };
 
+  // Buffer.fromArray is documented and should exist, but errors are produced
+  // so the function is duplicated here. See
+  // https://forum.dfinity.org/t/buffer-fromarray-missing-from-motoko-base-lib/13746/7?u=mymikemiller
+  public func bufferFromArray<X>(array : [X]) : Buffer.Buffer<X> {
+    let newBuffer = Buffer.Buffer<X>(array.size());
+
+    for (element in array.vals()) {
+      newBuffer.add(element);
+    };
+
+    newBuffer;
+  };
 };

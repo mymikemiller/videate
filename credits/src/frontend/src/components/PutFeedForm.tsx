@@ -8,6 +8,7 @@ import { useSearchParams, useLocation } from 'react-router-dom';
 import {
   Feed,
   Episode,
+  EpisodeID,
   PutFeedFullResult,
   _SERVICE,
 } from "../../../declarations/serve/serve.did";
@@ -44,25 +45,25 @@ const PutFeedForm = (): JSX.Element => {
   const { state } = useLocation();
   const init = state as PutFeedFormProps;
   const navigate = useNavigate();
-  type PutFeedInfo = Feed & { key: string };
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<PutFeedInfo>();//{ defaultValues });
-  const [episodes, setEpisodes] = useState<Episode[]>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<Feed>();//{ defaultValues });
+  const [episodeIds, setEpisodeIds] = useState<EpisodeID[]>();
 
   const populate = (init: PutFeedFormProps): void => {
     if (init.key) {
       setValue('key', init.key, { shouldValidate: true });
     }
     if (init.feed) {
+      setValue('key', init.feed.key, { shouldValidate: true });
       setValue('title', init.feed.title, { shouldValidate: true });
       setValue('description', init.feed.description, { shouldValidate: true });
       setValue('imageUrl', init.feed.imageUrl, { shouldValidate: true });
       setValue('author', init.feed.author, { shouldValidate: true });
       setValue('email', init.feed.email, { shouldValidate: true });
 
-      // Store the Episodes separately from the form since we don't edit the
+      // Store the EpisodeIDs separately from the form since we don't edit the
       // episode list here. We store it in state so we can restore it before
       // submitting the feed so it doesn't get blown away.
-      setEpisodes(init.feed.episodes);
+      setEpisodeIds(init.feed.episodeIds);
     }
   };
 
@@ -87,14 +88,11 @@ const PutFeedForm = (): JSX.Element => {
     );
   };
 
-  const onSubmit = (data: PutFeedInfo): void => {
-    const feed: Feed = {
-      ...data,
-      link: "test.com", //todo: generate correct link using the key and the user's principal
-      episodes: episodes ?? [],
-      subtitle: "test subtitle",
-      owner: authClient.getIdentity().getPrincipal(), // Feeds are always owned by the user who created them.
-    };
+  const onSubmit = (feed: Feed): void => {
+    feed.link = "test.com"; //todo: generate correct link using the key and the user's principal
+    feed.episodeIds = episodeIds ?? [];
+    feed.subtitle = "test subtitle";
+    feed.owner = authClient.getIdentity().getPrincipal(); // Feeds are always owned by the user who created them.
 
     // Handle update async
     actor!.putFeed(feed).then(async (result: PutFeedFullResult) => {
@@ -102,11 +100,11 @@ const PutFeedForm = (): JSX.Element => {
         if ("Created" in result.ok) {
           toast.success("New feed created!");
           if (profile) {
-            profile.ownedFeedKeys.push(data.key);
+            profile.ownedFeedKeys.push(feed.key);
           } else {
             console.error("Profile does not exist at the time of adding feed, so the UI won't know we own the new feed.")
           }
-          navigate('/putEpisode?feedKey=' + data.key, { state: { feedKey: data.key, feed } })
+          navigate('/putEpisode?feed=' + feed.key, { state: { feed } })
         } else if ("Updated" in result.ok) {
           toast.success("Feed updated!");
           navigate('/manageFeeds');

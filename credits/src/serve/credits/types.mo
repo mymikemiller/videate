@@ -5,6 +5,8 @@ module {
   // Used to store the contents of the Credits canister in stable types
   // between upgrades
   public type StableCredits = {
+    mediaEntries : [Media];
+    episodeEntries : [Episode];
     feedEntries : [(Text, Feed)];
     custodianEntries : [Principal];
   };
@@ -36,7 +38,7 @@ module {
     releaseDate : Text;
   };
 
-  public type Media = {
+  public type MediaData = {
     // The source of the media, which contains information about how to
     // access the media on the platform on which it was originally released
     source : Source;
@@ -50,40 +52,44 @@ module {
     uri : Text;
     etag : Text;
     lengthInBytes : Nat;
+  };
 
-    // not using for now as it creates a circular dependency. See
-    // https://forum.dfinity.org/t/circular-reference-support-in-motoko-an-object-containing-itself-downstream-while-remaining-shared-and-stable/16262
-    // All Episodes this Media is used in. The first item in this list is the
-    // Episode this Media was originally created for. This is mutable (var) so
-    // we can create a new Episode and then add it to its Media's episodes
-    // array by reassigning that array to a new one containing the new Episide.
-    // episodes : [Episode];
+  public type MediaID = Nat;
+
+  // A full-fledged Media is created once the MediaData has been inserted into
+  // the list of all Videate Media and is given an ID
+  public type Media = MediaData and {
+    // A serial, 0-based ID that also corresponds to the index into credits's
+    // array of all Media on the platform.
+    id : MediaID;
   };
 
   public type EpisodeData = {
-    title : Text;
-    description : Text;
-    media : Media;
-  };
-
-  // A full-fledged Episode is created once the EpisodeData has been inserted
-  // into a Feed and is given a Number
-  public type Episode = EpisodeData and {
     // The Feed in which this Episode is found. An Episode is only ever in one
     // Feed. To copy Episodes from other Feeds, or to re-release an episode in
-    // the same Feed, a separate Episode is created. note: this creates a
-    // circular reference, which means Episode and Feed cannot be shared (i.e.
-    // represented in candid)
-    // todo: switch to feedKey here
-    feed : Feed;
+    // the same Feed, a separate Episode is created.
+    feedKey : FeedKey;
 
-    // The serial 1-based number of the episode. This Episode exists at index
-    // {number-1} into this Episode's Feed's array of Episodes. This does not
-    // necessarily match the index into the list of Episodes returned when
+    title : Text;
+    description : Text;
+    mediaId : MediaID;
+  };
+
+  public type EpisodeID = Nat;
+
+  // A full-fledged Episode is created once the EpisodeData has been inserted
+  // into a Feed and is given an Id
+  public type Episode = EpisodeData and {
+    feedKey : FeedKey;
+
+    // The serial 0-based id of the episode (i.e. the first Episode in a feed
+    // is Episode 0, not Episode 1). This Episode exists at this index into
+    // this Episode's Feed's array of EpisodeIDs. This does not necessarily
+    // match the index into the textual list of Episodes returned when
     // requesting a Feed as rss, since some Episodes may be excluded from that
     // list after being removed from the Feed, though the rest of the Episodes
-    // retain their index.
-    number : Nat;
+    // retain their EpisodeId.
+    id : EpisodeID;
 
     // The token_id that was provided when an NFT for this Episode was minted.
     // This corresponds to an NFT stored in the "nft" module. "Null" implies
@@ -94,8 +100,10 @@ module {
   public type FeedKey = Text;
 
   public type Feed = {
-    // A string that uniquely identifies this Feed among all Videate Feeds
-    key : Text;
+    // A string that uniquely identifies this Feed among all Videate Feeds. As
+    // this is part of the URL for the feed, creators get to choose their
+    // FeedKey and it must be unique among all Feeds on Videate.
+    key : FeedKey;
 
     title : Text;
     subtitle : Text;
@@ -105,7 +113,10 @@ module {
     email : Text;
     imageUrl : Text;
     owner : Principal;
-    episodes : [Episode];
+
+    // Usually this will look like [0, 1, 2, 3, ...] but if Episodes are
+    // removed from the feed, numbers will be omitted from this array
+    episodeIds : [EpisodeID];
   };
 
   public type CreditsError = {
@@ -128,13 +139,6 @@ module {
   };
 
   public type PutResult = Result.Result<PutSuccess, CreditsError>;
-
-  public type PutEpisodeSuccess = {
-    #Added : { episode : Episode };
-    #Updated;
-  };
-
-  public type PutEpisodeResult = Result.Result<PutEpisodeSuccess, CreditsError>;
 
   // Contributor: a causal factor in the existence or occurrence of something
   // All users (creators, consumers and supporters) are contributors

@@ -1,12 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import {
-  PutEpisodeResult,
   _SERVICE,
   Episode,
   EpisodeData,
   Feed,
   Media,
+  MediaData,
 } from "../../../declarations/serve/serve.did";
 import Loop from "../../assets/loop.svg";
 import { useForm } from "react-hook-form";
@@ -48,7 +48,7 @@ const PutEpisodeForm = (): JSX.Element => {
   const { actor, authClient, login, profile } = useContext(AppContext);
   const { state } = useLocation();
   const [searchParams] = useSearchParams();
-  const [feedKey, setFeedKey] = useState(searchParams.get('feedKey'));
+  const [feedKey, setFeedKey] = useState(searchParams.get('feed'));
   const { feed: incomingFeed, episode } = state as PutEpisodeFormProps || {};
   const [feed, setFeed] = useState(incomingFeed);
   const navigate = useNavigate();
@@ -67,10 +67,16 @@ const PutEpisodeForm = (): JSX.Element => {
     return true;
   }
 
-  const populate = (episode: Episode): void => {
+  const populate = async (episode: Episode) => {
     setValue('description', episode.description, { shouldValidate: true });
     setValue('title', episode.title, { shouldValidate: true });
-    setValue('uri', episode.media.uri, { shouldValidate: true });
+    if (actor) {
+      let mediaResult = await actor.getMedia(episode.mediaId);
+      if (mediaResult.length == 1) {
+        let media: Media = mediaResult[0];
+        setValue('uri', media.uri, { shouldValidate: true });
+      }
+    };
   };
 
   useEffect(() => {
@@ -111,54 +117,77 @@ const PutEpisodeForm = (): JSX.Element => {
     );
   };
 
-  const confirmAndCopyOverMostRecentEpisodeValues = (): void => {
-    const mostRecentEpisode = feed?.episodes.at(feed?.episodes.length - 1);
-    if (!mostRecentEpisode) {
-      window.prompt("No previous episode found to copy values from");
+  const confirmAndCopyOverMostRecentEpisodeValues = async () => {
+    const mostRecentEpisodeId = feed?.episodeIds.at(feed?.episodeIds.length - 1);
+    if (!mostRecentEpisodeId) {
+      alert("No previous episode found to copy values from");
     } else {
-      if (allFieldsAreEmpty() || window.confirm("Are you sure you want to replace all form values with values from episode titled \"" + mostRecentEpisode.title + "\"?")) {
-        populate(mostRecentEpisode);
-      };
+      let episodeResult = await actor.getEpisode(feed!.key, mostRecentEpisodeId);
+      if (episodeResult.length == 1) {
+        let mostRecentEpisode = episodeResult[0];
+        if (allFieldsAreEmpty() || window.confirm("Are you sure you want to replace all form values with values from episode titled \"" + mostRecentEpisode.title + "\"?")) {
+          populate(mostRecentEpisode);
+        };
+      }
     }
   };
 
-  const onSubmit = (data: Submission): void => {
-    // Add in dummy information for now
-    const episodeData: EpisodeData = {
-      title: data.title,
-      description: data.description,
-      media: {
-        episodes: [],
-        source: {
-          id: "roF5zFCgAhc",
-          uri: "https://www.youtube.com/watch?v=roF5zFCgAhc",
-          platform: {
-            id: "youtube",
-            uri: "www.youtube.com",
-          },
-          releaseDate: "1970-01-01T00:00:00.000Z",
-        },
-        durationInMicroseconds: BigInt(100),
-        uri: data.uri,
-        etag: "example",
-        lengthInBytes: BigInt(100),
-      },
+  const onSubmit = async (data: Submission): Promise<void> => {
+    if (!feed) {
+      toast.error("Please wait for feed to be fetched, or refresh");
+      console.error("Feed is undefined at time of form submission");
+      return;
     };
 
-    // Handle update async
-    actor!.addEpisode(feed!, episodeData).then(async (result: PutEpisodeResult) => {
-      if ("ok" in result) {
-        toast.success("Episode successfully added!");
-        navigate('/listEpisodes?feedKey=' + feedKey, { state: { feedInfo: { key: feedKey, feed } } });
+    // Until we want to reuse Media in multiple Episodes, we add a new Media
+    // for every Episode using mostly dummy information for now
+    const mediaData: MediaData = {
+      source: {
+        id: "roF5zFCgAhc",
+        uri: "https://www.youtube.com/watch?v=roF5zFCgAhc",
+        platform: {
+          id: "youtube",
+          uri: "www.youtube.com",
+        },
+        releaseDate: "1970-01-01T00:00:00.000Z",
+      },
+      durationInMicroseconds: BigInt(100),
+      uri: data.uri,
+      etag: "example",
+      lengthInBytes: BigInt(100),
+    };
+
+    // Submit the Media to receive the MediaID, which we need for the Episode
+    let mediaAddResult = await actor!.addMedia(mediaData);
+    if ("ok" in mediaAddResult) {
+      toast.success("Media successfully added!");
+    } else {
+      toast.error("Error when adding Media");
+      console.error(mediaAddResult.err);
+      return;
+    };
+    let mediaId = mediaAddResult.ok.id;
+
+    // Add the Episode
+    const episodeData: EpisodeData = {
+      feedKey: feed.key,
+      title: data.title,
+      description: data.description,
+      mediaId: mediaId,
+    };
+
+    let addEpisodeResult = await actor!.addEpisode(episodeData);
+    if ("ok" in addEpisodeResult) {
+      toast.success("Episode successfully added!");
+      navigate('/listEpisodes?feed=' + feedKey, { state: { feedInfo: { key: feedKey, feed } } });
+    } else {
+      if ("FeedNotFound" in addEpisodeResult.err) {
+        toast.error("Feed not found: " + feedKey);
       } else {
-        if ("FeedNotFound" in result.err) {
-          toast.error("Feed not found: " + feedKey);
-        } else {
-          toast.error("Error adding episode.");
-        }
-        console.error(result.err);
+        toast.error("Error adding episode.");
       }
-    });
+      console.error(addEpisodeResult.err);
+    }
   };
 
   if (!feedKey) {
@@ -182,7 +211,7 @@ const PutEpisodeForm = (): JSX.Element => {
           </div>
         </div>
         {
-          feed && feed.episodes.length > 0 ?
+          feed && feed.episodeIds.length > 0 ?
             <div style={{ flex: "1", paddingLeft: "15px" }}>
               <ActionButton onPress={confirmAndCopyOverMostRecentEpisodeValues}>Copy previous episode's values</ActionButton>
             </div> : null

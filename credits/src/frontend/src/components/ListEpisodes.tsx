@@ -100,7 +100,7 @@ const ListEpisodes = (): JSX.Element => {
   };
 
   if (!feedKey) {
-    return <h1>feedKey must be specified as a search param so we know which feed's Episode to list.</h1>
+    return <h1>feed must be specified as a search param so we know which feed's Episode to list.</h1>
   };
 
   if (!feed) return <h1>Loading feed...</h1>;

@@ -132,7 +132,7 @@ const NftForm = (): JSX.Element => {
   };
 
   if (feedKey == null || episodeId == null) {
-    return (<h1>URL must specify feedKey and episode query params</h1>);
+    return (<h1>URL must specify feed and episode query params</h1>);
   };
 
   const fetchEpisode = async () => {
@@ -156,13 +156,13 @@ const NftForm = (): JSX.Element => {
 
   if (episode == undefined) {
     return (
-      <Heading level={1}><>Episode ID {episodeId} not found in "{feedKey}" feed. Check the URL query params for a valid episode.</></Heading>
+      <Heading level={1}><>Episode ID {episodeId} not found in "{feedKey}" feed. Check the URL query params for a valid feed and episode.</></Heading>
     );
   };
 
   if (feed == undefined) {
     return (
-      <Heading level={1}><>Feed "{feedKey}" not found. Check the URL for a valid feedKey.</></Heading>
+      <Heading level={1}><>Feed "{feedKey}" not found. Check the URL for a valid feed.</></Heading>
     );
   };
 

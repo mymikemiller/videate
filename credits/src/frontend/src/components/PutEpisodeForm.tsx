@@ -117,7 +117,7 @@ const PutEpisodeForm = (): JSX.Element => {
     );
   };
 
-  const confirmAndCopyOverMostRecentEpisodeValues = async () => {
+  const copyFromRecent = async () => {
     const mostRecentEpisodeId = feed?.episodeIds.at(feed?.episodeIds.length - 1);
     if (!mostRecentEpisodeId) {
       alert("No previous episode found to copy values from");
@@ -191,7 +191,7 @@ const PutEpisodeForm = (): JSX.Element => {
   };
 
   if (!feedKey) {
-    return <h1>feedKey must be specified as a search param so we know which feed to add the episode to.</h1>
+    return <h1>feed must be specified as a search param so we know which feed to add the episode to.</h1>
   };
 
   if (!profile) {
@@ -213,7 +213,7 @@ const PutEpisodeForm = (): JSX.Element => {
         {
           feed && feed.episodeIds.length > 0 ?
             <div style={{ flex: "1", paddingLeft: "15px" }}>
-              <ActionButton onPress={confirmAndCopyOverMostRecentEpisodeValues}>Copy previous episode's values</ActionButton>
+              <ActionButton onPress={copyFromRecent}>Copy previous episode's values</ActionButton>
             </div> : null
         }
       </div>

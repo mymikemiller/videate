@@ -7,7 +7,7 @@ module {
   public type StableCredits = {
     mediaEntries : [Media];
     episodeEntries : [Episode];
-    feedEntries : [(Text, Feed)];
+    feedEntries : [(FeedKey, Feed)];
     custodianEntries : [Principal];
   };
 

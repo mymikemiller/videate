@@ -6,7 +6,7 @@ import Result "mo:base/Result";
 module {
   /* Serve */
   public type HeaderField = (Text, Text);
-  
+
   public type Token = {};
 
   public type StreamingCallbackHttpResponse = {
@@ -22,16 +22,16 @@ module {
   };
 
   public type HttpRequest = {
-    method: Text;
-    headers: [HeaderField];
-    url: Text;
-    body: Blob;
+    method : Text;
+    headers : [HeaderField];
+    url : Text;
+    body : Blob;
   };
 
   public type HttpResponse = {
-    status_code: Nat16;
-    headers: [HeaderField];
-    body: Blob;
+    status_code : Nat16;
+    headers : [HeaderField];
+    body : Blob;
     streaming_strategy : ?StreamingStrategy;
   };
 
@@ -43,7 +43,7 @@ module {
     #ContributorsError : ContributorsTypes.ContributorsError;
   };
 
-  // PutFeedFullResult differs from Credits.PutFeedResult in that it might
-  // result in an error when updating the contributor's list of owned feeds.
-  public type PutFeedFullResult = Result.Result<CreditsTypes.PutSuccess, { #CreditsError: CreditsTypes.CreditsError; #ContributorsError: ContributorsTypes.ContributorsError }>;
-}
+  // PutFeedFullResult differs from Credits.PutResult in that it might result
+  // in an error when updating the contributor's list of owned feeds.
+  public type PutFeedFullResult = Result.Result<CreditsTypes.PutSuccess, { #CreditsError : CreditsTypes.CreditsError; #ContributorsError : ContributorsTypes.ContributorsError }>;
+};

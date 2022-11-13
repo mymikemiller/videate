@@ -20,7 +20,7 @@ import {
 import CreateProfile from "./components/CreateProfile";
 import ManageProfile from "./components/ManageProfile";
 import ManageFeeds from "./components/ManageFeeds";
-import ListMedia from "./components/ListMedia";
+import ListEpisodes from "./components/ListEpisodes";
 import Loading from "./components/Loading";
 import { emptyProfile, useAuthClient } from "./hooks";
 import { AuthClient } from "@dfinity/auth-client";
@@ -29,7 +29,7 @@ import { useEffect } from "react";
 import { compareProfiles } from "./utils";
 import { _SERVICE, ProfileUpdate } from "../../declarations/serve/serve.did";
 import Logout from '../assets/logout.svg'
-import PutMediaForm from "./components/PutMediaForm";
+import PutEpisodeForm from "./components/PutEpisodeForm";
 
 const Header = styled.header`
   position: relative;
@@ -134,7 +134,7 @@ const App = () => {
             sanitizedLandingPath = splitLandingPath[1];
           }
           const searchParams = new URLSearchParams(sanitizedLandingPath);
-          const feedKey = searchParams.get('feedKey');
+          const feedKey = searchParams.get('feed');
           if (feedKey) {
             profileResult = await actor.addRequestedFeedKey(feedKey);
           }
@@ -247,8 +247,8 @@ const App = () => {
                     <Route path="/manageFeeds" element={<ManageFeeds />} />
                     <Route path="/create" element={<CreateProfile />} />
                     <Route path="/putFeed" element={<PutFeedForm />} />
-                    <Route path="/putMedia" element={<PutMediaForm />} />
-                    <Route path="/listMedia" element={<ListMedia />} />
+                    <Route path="/putEpisode" element={<PutEpisodeForm />} />
+                    <Route path="/listEpisodes" element={<ListEpisodes />} />
                     <Route path="/nft" element={<NftForm />} />
                   </Routes>
                 )}

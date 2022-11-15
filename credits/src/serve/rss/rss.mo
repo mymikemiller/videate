@@ -6,12 +6,13 @@ import Contributors "../contributors/contributors";
 import Types "../types";
 import Utils "../utils";
 import Array "mo:base/Array";
+import Debug "mo:base/Debug";
 import List "mo:base/List";
 import Nat "mo:base/Nat";
-import Debug "mo:base/Debug";
 import Option "mo:base/Option";
 import Result "mo:base/Result";
 import Principal "mo:base/Principal";
+import Text "mo:base/Text";
 
 module {
   type Document = Xml.Document;
@@ -21,7 +22,6 @@ module {
   type EpisodeID = Credits.EpisodeID;
   type Media = Credits.Media;
   type Episode = Credits.Episode;
-  type UriTransformer = Types.UriTransformer;
 
   // todo: this can be significantly cleaned up using default values. See
   // https://forum.dfinity.org/t/initializing-an-object-with-optional-nullable-fields/1790
@@ -37,9 +37,9 @@ module {
     episodeId : ?EpisodeID,
     requestorPrincipal : ?Text,
     frontendUri : Text,
+    feedUri : Text,
     contributors : Contributors.Contributors,
     nftDb : NftDb.NftDb,
-    mediaUriTransformers : [UriTransformer],
   ) : Document {
     let episodeIds : [EpisodeID] = switch (episodeId) {
       case null {
@@ -212,9 +212,9 @@ module {
                       episode,
                       requestorPrincipal,
                       frontendUri,
+                      feedUri,
                       contributors,
                       nftDb,
-                      mediaUriTransformers,
                     );
                   },
                 ),
@@ -231,9 +231,9 @@ module {
     episode : Episode,
     requestorPrincipal : ?Text,
     frontendUri : Text,
+    feedUri : Text,
     contributors : Contributors.Contributors,
     nftDb : NftDb.NftDb,
-    mediaUriTransformers : [UriTransformer],
   ) : Element {
     let videateSettingsUri = frontendUri # "?feed=" # episode.feedKey;
     let nftPurchaseUri = frontendUri # "/nft?feed=" # episode.feedKey # "&episode=" # debug_show (episode.id);
@@ -242,7 +242,7 @@ module {
 
     let nftOwnerMessage = switch (episode.nftTokenId) {
       case (null) {
-        "The NFT for this episode is currently unclaimed! Click here to by the NFT: ";
+        "The NFT for this episode is currently unclaimed! Click here to buy the NFT: ";
       };
       case (?nftTokenId) {
         switch (NftDb.ownerOfDip721(nftDb, nftTokenId)) {
@@ -287,7 +287,15 @@ module {
       };
     };
 
-    let uri = transformUri(media.uri, mediaUriTransformers);
+    // If the feedUri already includes a query param (likely for the
+    // canisterId), we use "&" to add additional, otherwise we use "?" to add
+    // the first
+    let queryParamStart = if (Text.contains(feedUri, #text("?"))) { "&" } else {
+      "?";
+    };
+
+    let episodeUri = feedUri # queryParamStart # "episode=" # Nat.toText(episode.id);
+    let mediaUri = episodeUri # "&media=true";
 
     // Episode ID is unique per Episode in the Feed and can be used as the guid
     let guid = Nat.toText(episode.id);
@@ -318,14 +326,13 @@ module {
         {
           name = "link";
           attributes = [];
-          // todo: this should link to a page describing the Episode, not to the media itself
-          text = uri;
+          text = episodeUri;
           children = [];
         },
         {
           name = "enclosure";
           attributes = [
-            ("url", uri),
+            ("url", mediaUri),
             // todo: use correct media type
             ("type", "video/mpeg"),
             // todo: use lengthInBytes
@@ -364,20 +371,11 @@ module {
         },
         {
           name = "guid";
-          attributes = [];
+          attributes = [("isPermaLink", "false")];
           text = guid;
           children = [];
         },
       ];
     };
-  };
-
-  func transformUri(input : Text, uriTransformers : [UriTransformer]) : Text {
-    // Run all the transformers in order
-    return Array.foldLeft(
-      uriTransformers,
-      input,
-      func(previousValue : Text, transformer : UriTransformer) : Text = transformer(previousValue),
-    );
   };
 };

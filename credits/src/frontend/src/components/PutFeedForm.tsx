@@ -89,7 +89,7 @@ const PutFeedForm = (): JSX.Element => {
   };
 
   const onSubmit = (feed: Feed): void => {
-    feed.link = "test.com"; //todo: generate correct link using the key and the user's principal
+    feed.link = "http://www.test.com"; //todo: generate correct link using the key and the user's principal
     feed.episodeIds = episodeIds ?? [];
     feed.subtitle = "test subtitle";
     feed.owner = authClient.getIdentity().getPrincipal(); // Feeds are always owned by the user who created them.

@@ -91,6 +91,7 @@ actor class Serve() = Self {
     // Short-circuit simple requests
     if (request.url == "/favicon.ico") {
       return {
+        upgrade = false;
         status_code = Nat16.fromNat(200);
         headers = [("content-type", "image/x-icon")];
         body = Text.encodeUtf8(""); // Send empty icon
@@ -100,6 +101,7 @@ actor class Serve() = Self {
       // https://www.textfixer.com/tools/remove-line-breaks.php
       // https://onlinestringtools.com/escape-string
       return {
+        upgrade = false;
         status_code = Nat16.fromNat(200);
         headers = [("content-type", "text/xml")];
         body = Text.encodeUtf8(sampleFeed);
@@ -119,8 +121,8 @@ actor class Serve() = Self {
       case null Utils.generateErrorResponse("Unrecognized feed: " # feedKey);
       case (?feed) {
         let requestorPrincipal = getQueryParam("principal", request.url);
-        let episodeNumberAsText : ?Text = getQueryParam("episode", request.url);
-        let episodeNumber : ?Nat = switch (episodeNumberAsText) {
+        let episodeIdAsText : ?Text = getQueryParam("episode", request.url);
+        let episodeId : ?Nat = switch (episodeIdAsText) {
           case null {
             null;
           };
@@ -128,6 +130,32 @@ actor class Serve() = Self {
             switch (Utils.textToNat(t)) {
               case null return Utils.generateErrorResponse("Failed to parse episode number: " # t);
               case (num) {
+                // If we're requesting the media file, perform an upgrade and
+                // redirect
+                let requestingMediaFile : ?Text = getQueryParam("media", request.url);
+                switch (requestingMediaFile) {
+                  case null ();
+                  case (?requestingMediaFile) {
+                    if (requestingMediaFile == "true" or requestingMediaFile == "True" or requestingMediaFile == "TRUE") {
+                      // Upgrade to an update call so we can track access and
+                      // redirect to the media file. Note that we don't use a
+                      // 303 redirect here like could be expected. Instead we
+                      // use a 200 code and upgrade, and perform the tracking
+                      // and 303 redirect in http_request_update below. See
+                      // https://forum.dfinity.org/t/changes-regarding-redirect-handling-by-the-service-worker/15047
+                      return {
+                        upgrade = true;
+                        status_code = Nat16.fromNat(200);
+                        headers = [];
+                        body = "";
+                        streaming_strategy = null;
+                      };
+                    };
+                  };
+                };
+                // If we didn't exit this function above, return the episode
+                // number to the enclosing switch statement and continue
+                // generating xml
                 num;
               };
             };
@@ -135,33 +163,25 @@ actor class Serve() = Self {
         };
 
         let frontendUri = getFrontendUri(request);
+        var feedUri = getRequestHost(request) # "/" # feed.key;
 
-        let mediaHost = "videate.org";
-
-        // Todo: Translate all media links that point to web/media to point to
-        // whatever host was used in the rss request, which might be localhost or a
-        // localhost.run tunnel. This can be done by setting the host to the
-        // following instead:
-        //
-        // let mediaHost = getRequestHost(request);
-        let uriTransformers : [UriTransformer] = [
-          func(input : Text) : Text {
-            Text.replace(
-              input,
-              #text("file:///Users/mikem/web/media/"),
-              "https://" # mediaHost # "/",
-            );
-          },
-        ];
+        // If the request host didn't include the canister id, we need to
+        // insert it as a query param. This is necessary for cases when the
+        // host is, for example, ssh'd through localhost.run where subdomains
+        // (which would normally contain the cid) don't work
+        let thisActorCid = Principal.toText(Principal.fromActor(Self));
+        if (not Text.contains(feedUri, #text(thisActorCid))) {
+          feedUri := feedUri # "?canisterId=" # thisActorCid;
+        };
 
         var xml = getFeedXml(
           feed,
-          episodeNumber,
+          episodeId,
           requestorPrincipal,
           frontendUri,
+          feedUri,
           contributors,
           nftDb,
-          uriTransformers,
         );
 
         Utils.generateFeedResponse(xml);
@@ -171,10 +191,89 @@ actor class Serve() = Self {
   };
 
   public shared func http_request_update(request : HttpRequest) : async HttpResponse {
+    let splitUrl = Iter.toArray(Text.split(request.url, #text("?")));
+    let beforeQueryParams : Text = Text.trim(splitUrl[0], #text("/"));
+    if (beforeQueryParams == "") {
+      return Utils.generateErrorResponse("No feed key specified. Expected URL format: <cid>.<host>:<port>/{feed_key}?principal=...&episode={episode_id}&media=true");
+    };
+    let feedKey : Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[0];
+
+    let feed : ?Feed = credits.getFeed(feedKey);
+    switch (feed) {
+      case null return Utils.generateErrorResponse("Unrecognized feed: " # feedKey);
+      case (?feed) {
+        let requestorPrincipal = getQueryParam("principal", request.url);
+        let episodeIdAsText : ?Text = getQueryParam("episode", request.url);
+        let episodeId : ?Nat = switch (episodeIdAsText) {
+          case null {
+            null;
+          };
+          case (?t) {
+            switch (Utils.textToNat(t)) {
+              case null return Utils.generateErrorResponse("Failed to parse episode number: " # t);
+              case (?num) {
+                let requestingMediaFile : ?Text = getQueryParam("media", request.url);
+                switch (requestingMediaFile) {
+                  case null ();
+                  case (?requestingMediaFile) {
+                    // Upgrade to an update call so we can track access and
+                    // redirect to the media file
+                    if (requestingMediaFile == "true" or requestingMediaFile == "True" or requestingMediaFile == "TRUE") {
+                      let episode : ?Episode = credits.getEpisode(feed.key, num);
+                      switch (episode) {
+                        case null ();
+                        case (?episode) {
+                          switch (credits.getMedia(episode.mediaId)) {
+                            case null ();
+                            case (?media) {
+                              // Transform the actual URL before redirecting
+                              let mediaHost = getRequestHost(request);
+                              let uriTransformers : [UriTransformer] = [
+                                func(input : Text) : Text {
+                                  // Translate all media links that point to
+                                  // /web/media to point to whatever host was
+                                  // used in the rss request, which might be
+                                  // localhost or a localhost.run tunnel
+                                  Text.replace(
+                                    input,
+                                    #text("file:///Users/mikem/web/media/"),
+                                    "https://" # mediaHost # "/",
+                                  );
+                                },
+                              ];
+
+                              let transformedMediaUri = transformUri(media.uri, uriTransformers);
+
+                              // Redirect to the actual media file location
+                              return {
+                                upgrade = false;
+                                status_code = Nat16.fromNat(303); // 303 is "See Other" redirect
+                                headers = [("Location", transformedMediaUri)];
+                                body = "";
+                                streaming_strategy = null;
+                              };
+                            };
+                          };
+                        };
+                      };
+                    };
+                  };
+                };
+                // Return the episode number to the switch statement above, and
+                // continue generating xml
+                Option.make(num);
+              };
+            };
+          };
+        };
+      };
+    };
+
     {
-      status_code = 200;
+      upgrade = false;
+      status_code = Nat16.fromNat(404);
       headers = [];
-      body = Text.encodeUtf8("Response to " # request.method # " request (update)");
+      body = "Failed to parse 'feed' and/or 'episode' in order to redirect to the proper media file";
       streaming_strategy = null;
     };
   };
@@ -217,7 +316,7 @@ actor class Serve() = Self {
 
     // We should never get the below error text. The host header should always
     // be defined in requests.
-    Option.get(hostHeader, ("host", "ERROR_NO_HOST_HEADER")).1;
+    "http://" # Option.get(hostHeader, ("host", "ERROR_NO_HOST_HEADER")).1;
   };
 
   private func getFrontendUri(request : HttpRequest) : Text {
@@ -499,9 +598,9 @@ actor class Serve() = Self {
     episodeId : ?EpisodeID,
     requestorPrincipal : ?Text,
     frontendUri : Text,
+    feedUri : Text,
     contributors : Contributors.Contributors,
     nftDb : NftDb.NftDb,
-    uriTransformers : [UriTransformer],
   ) : Text {
     let doc : Document = Rss.format(
       credits,
@@ -509,11 +608,20 @@ actor class Serve() = Self {
       episodeId,
       requestorPrincipal,
       frontendUri,
+      feedUri,
       contributors,
       nftDb,
-      uriTransformers,
     );
     Xml.stringifyDocument(doc);
+  };
+
+  func transformUri(input : Text, uriTransformers : [UriTransformer]) : Text {
+    // Run all the transformers in order
+    return Array.foldLeft(
+      uriTransformers,
+      input,
+      func(previousValue : Text, transformer : UriTransformer) : Text = transformer(previousValue),
+    );
   };
 
   /* Contributors interface */

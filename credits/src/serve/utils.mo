@@ -34,6 +34,7 @@ module {
     var bodyBlob = toBlob(body);
 
     var response : HttpResponse = {
+      upgrade = false;
       status_code = statusNat16;
       headers = headers;
       body = bodyBlob;

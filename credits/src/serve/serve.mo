@@ -224,9 +224,9 @@ actor class Serve() = Self {
     // accessed through localhost.run)
     let thisActorCid = Principal.toText(Principal.fromActor(Self));
     let baseUri = if (thisActorCid == "mvjun-2yaaa-aaaah-aac3q-cai") {
-      // Hard-code the IC network frontend cid if we're responding
+      // Hard-code the IC network frontend url if we're responding
       // from within the IC network serve canister
-      "https://44ejt-7yaaa-aaaao-aabqa-cai.raw.ic0.app";
+      "https://44ejt-7yaaa-aaaao-aabqa-cai.ic0.app";
     } else {
       // Parse the frontend canister cid from the query params, which we
       // specify if we're locally hosting. This is necessary since there's no

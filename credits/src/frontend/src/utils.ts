@@ -43,17 +43,3 @@ const storeOrRemoveSearchParam = (searchParams: URLSearchParams, paramName: stri
     localStorage.removeItem(paramName);
   }
 };
-
-
-export async function getEpisode(actor: ActorSubclass<_SERVICE>, feedKey: string, number: number): Promise<Episode | undefined> {
-  const feedResult: [Feed] | [] = await actor.getFeed(feedKey);
-  const feed: Feed = feedResult[0]!;
-  if (feed == undefined) {
-    return undefined;
-  };
-  if (feed.episodes.length < number) {
-    return undefined;
-  }
-
-  return feed.episodes[number - 1];
-};

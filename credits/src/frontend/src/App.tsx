@@ -85,6 +85,11 @@ const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Prevent the user from accidentally loading the raw version
+  if (window.location.origin.includes(".raw.")) {
+    return <h1>The raw version of the frontend is not supported. Remove '.raw' from the url.</h1>;
+  };
+
   // At the page we first land on, record the URL the user was attempting to
   // load so we can navigate to it once we're logged in
   useEffect(() => {

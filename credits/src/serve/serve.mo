@@ -109,204 +109,101 @@ actor class Serve() = Self {
       };
     };
 
-    let splitUrl = Iter.toArray(Text.split(request.url, #text("?")));
-    let beforeQueryParams : Text = Text.trim(splitUrl[0], #text("/"));
-    if (beforeQueryParams == "") {
-      return Utils.generateErrorResponse("No feed key specified. Expected URL format: <cid>.<host>:<port>/{feed_key}?principal=...");
-    };
-    let feedKey : Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[0];
+    // Attempt to parse the feed early, since we may trap there and won't need
+    // to bother upgrading the request
+    let feed : Feed = _parseFeed(request);
 
-    let feed : ?Feed = credits.getFeed(feedKey);
-    switch (feed) {
-      case null Utils.generateErrorResponse("Unrecognized feed: " # feedKey);
-      case (?feed) {
-        let requestorPrincipal = getQueryParam("principal", request.url);
-        let episodeIdAsText : ?Text = getQueryParam("episode", request.url);
-        let episodeId : ?Nat = switch (episodeIdAsText) {
-          case null {
-            null;
-          };
-          case (?t) {
-            switch (Utils.textToNat(t)) {
-              case null return Utils.generateErrorResponse("Failed to parse episode number: " # t);
-              case (num) {
-                // If we're requesting the media file, perform an upgrade and
-                // redirect
-                let requestingMediaFile : ?Text = getQueryParam("media", request.url);
-                switch (requestingMediaFile) {
-                  case null ();
-                  case (?requestingMediaFile) {
-                    if (requestingMediaFile == "true" or requestingMediaFile == "True" or requestingMediaFile == "TRUE") {
-                      // Upgrade to an update call so we can track access and
-                      // redirect to the media file. Note that we don't use a
-                      // 303 redirect here like could be expected. Instead we
-                      // use a 200 code and upgrade, and perform the tracking
-                      // and 303 redirect in http_request_update below. See
-                      // https://forum.dfinity.org/t/changes-regarding-redirect-handling-by-the-service-worker/15047
-                      return {
-                        upgrade = true;
-                        status_code = Nat16.fromNat(200);
-                        headers = [];
-                        body = "";
-                        streaming_strategy = null;
-                      };
-                    };
-                  };
-                };
-                // If we didn't exit this function above, return the episode
-                // number to the enclosing switch statement and continue
-                // generating xml
-                num;
-              };
-            };
-          };
-        };
-
-        let frontendUri = getFrontendUri(request);
-        var feedUri = getRequestHost(request) # "/" # feed.key;
-
-        // If the request host didn't include the canister id, we need to
-        // insert it as a query param. This is necessary for cases when the
-        // host is, for example, ssh'd through localhost.run where subdomains
-        // (which would normally contain the cid) don't work
-        let thisActorCid = Principal.toText(Principal.fromActor(Self));
-        if (not Text.contains(feedUri, #text(thisActorCid))) {
-          feedUri := feedUri # "?canisterId=" # thisActorCid;
-        };
-
-        var xml = getFeedXml(
-          feed,
-          episodeId,
-          requestorPrincipal,
-          frontendUri,
-          feedUri,
-          contributors,
-          nftDb,
-        );
-
-        Utils.generateFeedResponse(xml);
+    if (_isMediaRequest(request)) {
+      // Upgrade to an update call so we can track access and redirect to the
+      // media file. Note that we don't use a 303 redirect here like could be
+      // expected. Instead we use a 200 code and upgrade, and perform the
+      // tracking and 303 redirect in http_request_update below. See
+      // https://forum.dfinity.org/t/changes-regarding-redirect-handling-by-the-service-worker/15047
+      return {
+        upgrade = true;
+        status_code = Nat16.fromNat(200);
+        headers = [];
+        body = "";
+        streaming_strategy = null;
       };
     };
 
+    let requestorPrincipal : ?Text = _parsePrincipal(request);
+    let episodeId : ?Nat = _parseEpisodeId(request);
+    let frontendUri : Text = _parseFrontendUri(request);
+    var feedUri : Text = _parseHost(request) # "/" # feed.key;
+
+    // If the request host didn't include the canister id, we need to
+    // insert it as a query param. This is necessary for cases when the
+    // host is, for example, ssh'd through localhost.run where subdomains
+    // (which would normally contain the cid) don't work
+    let thisActorCid = Principal.toText(Principal.fromActor(Self));
+    if (not Text.contains(feedUri, #text(thisActorCid))) {
+      feedUri := feedUri # "?canisterId=" # thisActorCid;
+    };
+
+    var xml = getFeedXml(
+      feed,
+      episodeId,
+      requestorPrincipal,
+      frontendUri,
+      feedUri,
+      contributors,
+      nftDb,
+    );
+
+    Utils.generateFeedResponse(xml);
   };
 
   public shared func http_request_update(request : HttpRequest) : async HttpResponse {
-    let splitUrl = Iter.toArray(Text.split(request.url, #text("?")));
-    let beforeQueryParams : Text = Text.trim(splitUrl[0], #text("/"));
-    if (beforeQueryParams == "") {
-      return Utils.generateErrorResponse("No feed key specified. Expected URL format: <cid>.<host>:<port>/{feed_key}?principal=...&episode={episode_id}&media=true");
-    };
-    let feedKey : Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[0];
-
-    let feed : ?Feed = credits.getFeed(feedKey);
-    switch (feed) {
-      case null return Utils.generateErrorResponse("Unrecognized feed: " # feedKey);
-      case (?feed) {
-        let requestorPrincipal = getQueryParam("principal", request.url);
-        let episodeIdAsText : ?Text = getQueryParam("episode", request.url);
-        let episodeId : ?Nat = switch (episodeIdAsText) {
-          case null {
-            null;
-          };
-          case (?t) {
-            switch (Utils.textToNat(t)) {
-              case null return Utils.generateErrorResponse("Failed to parse episode number: " # t);
-              case (?num) {
-                let requestingMediaFile : ?Text = getQueryParam("media", request.url);
-                switch (requestingMediaFile) {
-                  case null ();
-                  case (?requestingMediaFile) {
-                    // Upgrade to an update call so we can track access and
-                    // redirect to the media file
-                    if (requestingMediaFile == "true" or requestingMediaFile == "True" or requestingMediaFile == "TRUE") {
-                      let episode : ?Episode = credits.getEpisode(feed.key, num);
-                      switch (episode) {
-                        case null ();
-                        case (?episode) {
-                          switch (credits.getMedia(episode.mediaId)) {
-                            case null ();
-                            case (?media) {
-                              // Transform the actual URL before redirecting
-                              let mediaHost = getRequestHost(request);
-                              let uriTransformers : [UriTransformer] = [
-                                func(input : Text) : Text {
-                                  // Translate all media links that point to
-                                  // /web/media to point to whatever host was
-                                  // used in the rss request, which might be
-                                  // localhost or a localhost.run tunnel
-                                  Text.replace(
-                                    input,
-                                    #text("file:///Users/mikem/web/media/"),
-                                    "https://" # mediaHost # "/",
-                                  );
-                                },
-                              ];
-
-                              let transformedMediaUri = transformUri(media.uri, uriTransformers);
-
-                              // Redirect to the actual media file location
-                              return {
-                                upgrade = false;
-                                status_code = Nat16.fromNat(303); // 303 is "See Other" redirect
-                                headers = [("Location", transformedMediaUri)];
-                                body = "";
-                                streaming_strategy = null;
-                              };
-                            };
-                          };
-                        };
-                      };
-                    };
-                  };
-                };
-                // Return the episode number to the switch statement above, and
-                // continue generating xml
-                Option.make(num);
-              };
-            };
-          };
-        };
-      };
+    // Verify that we are requesting a media file, as that is the only way the
+    // request should have been upgraded to an update call (we don't currently
+    // track feed requests, so those don't get upgraded)
+    if (not _isMediaRequest(request)) {
+      Debug.trap("Error: non-media request was upgraded to an update call");
     };
 
-    {
+    let feed : Feed = _parseFeed(request);
+    let episodeId : Nat = switch (_parseEpisodeId(request)) {
+      case null Debug.trap("Media request did not specify episode");
+      case (?episodeId) episodeId;
+    };
+    let episode : Episode = switch (credits.getEpisode(feed.key, episodeId)) {
+      case null Debug.trap("Episode not found in feed. Feed: " # feed.key # ", episode: " # Nat.toText(episodeId));
+      case (?episode) episode;
+    };
+    let media : Media = switch (credits.getMedia(episode.mediaId)) {
+      case null Debug.trap("Media not found. mediaId: " # Nat.toText(episode.mediaId));
+      case (?media) media;
+    };
+
+    // Transform the actual URL before redirecting
+    let mediaHost = _parseHost(request);
+    let uriTransformers : [UriTransformer] = [
+      func(input : Text) : Text {
+        // Translate all media links that point to /web/media to point to
+        // whatever host was used in the request, which might be localhost or a
+        // localhost.run tunnel
+        Text.replace(
+          input,
+          #text("file:///Users/mikem/web/media/"),
+          "https://" # mediaHost # "/",
+        );
+      },
+    ];
+    let transformedMediaUri = transformUri(media.uri, uriTransformers);
+
+    // Redirect to the actual media file location
+    return {
       upgrade = false;
-      status_code = Nat16.fromNat(404);
-      headers = [];
-      body = "Failed to parse 'feed' and/or 'episode' in order to redirect to the proper media file";
+      status_code = Nat16.fromNat(303); // 303 is "See Other" redirect
+      headers = [("Location", transformedMediaUri)];
+      body = "";
       streaming_strategy = null;
     };
   };
 
-  private func getQueryParam(param : Text, url : Text) : ?Text {
-    let splitUrl = Iter.toArray(Text.split(url, #text("?")));
-
-    if (splitUrl.size() == 1) {
-      return null;
-    };
-
-    let queryParamsText : Text = splitUrl[1];
-
-    let queryParamsArray = Iter.toArray(Text.split(queryParamsText, #text("&")));
-    let queryParamsPairs = Array.map<Text, (Text, Text)>(
-      queryParamsArray,
-      func keyAndValue {
-        let pair = Iter.toArray(Text.split(keyAndValue, #text("=")));
-        return (pair[0], pair[1]);
-      },
-    );
-
-    let found = Array.find<(Text, Text)>(
-      queryParamsPairs,
-      func pair { pair.0 == param },
-    );
-    return switch (found) {
-      case null null;
-      case (?f) Option.make(f.1);
-    };
-  };
-
-  private func getRequestHost(request : HttpRequest) : Text {
+  private func _parseHost(request : HttpRequest) : Text {
     // Get the host from the request header so we can tell if we're using
     // localhost or a localhost.run tunnel
     let hostHeader = Array.find<(Text, Text)>(
@@ -319,7 +216,7 @@ actor class Serve() = Self {
     "http://" # Option.get(hostHeader, ("host", "ERROR_NO_HOST_HEADER")).1;
   };
 
-  private func getFrontendUri(request : HttpRequest) : Text {
+  private func _parseFrontendUri(request : HttpRequest) : Text {
     // If this 'serve' canister is hosted on the IC, use the hard-coded IC
     // frontend canister as the host for the videate settings page. Otherwise,
     // use the same host as in the request, since that host should also work
@@ -338,12 +235,12 @@ actor class Serve() = Self {
       // specify it manually in the url when subscribing to a feed. See
       // https://forum.dfinity.org/t/programmatically-find-the-canister-id-of-a-frontend-canister
       let frontendCid = Option.get(
-        getQueryParam("frontendCid", request.url),
+        Utils.getQueryParam("frontendCid", request.url),
         "ERROR_NO_FRONTEND_CID_QUERY_PARAM",
       );
 
       // Replace this server's cid in the host with the frontend cid
-      let requestHost = getRequestHost(request);
+      let requestHost = _parseHost(request);
       let correctedUri = Text.replace(
         requestHost,
         #text(thisActorCid),
@@ -355,12 +252,52 @@ actor class Serve() = Self {
       // frontend running on port 3000 in cases where this server is on running
       // port 8000.
       let port = Option.get(
-        getQueryParam("port", request.url),
+        Utils.getQueryParam("port", request.url),
         "8000",
       );
       Text.replace(correctedUri, #text(":8000"), ":" # port);
     };
     return baseUri;
+  };
+
+  func _parseFeed(request : HttpRequest) : Feed {
+    let splitUrl = Iter.toArray(Text.split(request.url, #text("?")));
+    let beforeQueryParams : Text = Text.trim(splitUrl[0], #text("/"));
+    if (beforeQueryParams == "") {
+      Debug.trap("No feed key specified. Expected URL format: <cid>.<host>:<port>/{feed_key}?principal=... Actual url received: " # request.url);
+    };
+    let feedKey : Text = Iter.toArray(Text.split(beforeQueryParams, #text("/")))[0];
+
+    let feed : ?Feed = credits.getFeed(feedKey);
+    switch (feed) {
+      case null Debug.trap("Unrecognized feed: " # feedKey);
+      case (?feed) feed;
+    };
+  };
+
+  func _parsePrincipal(request : HttpRequest) : ?Text {
+    Utils.getQueryParam("principal", request.url);
+  };
+
+  func _parseEpisodeId(request : HttpRequest) : ?Nat {
+    let episodeIdAsText : ?Text = Utils.getQueryParam("episode", request.url);
+    let episodeId : ?Nat = switch (episodeIdAsText) {
+      case null null;
+      case (?t) {
+        switch (Utils.textToNat(t)) {
+          case null Debug.trap("Failed to parse episode number: " # t);
+          case (num) num;
+        };
+      };
+    };
+  };
+
+  func _isMediaRequest(request : HttpRequest) : Bool {
+    let requestingMediaFile : ?Text = Utils.getQueryParam("media", request.url);
+    switch (requestingMediaFile) {
+      case null false;
+      case (?requestingMediaFile) requestingMediaFile == "true" or requestingMediaFile == "True" or requestingMediaFile == "TRUE";
+    };
   };
 
   /* Public Application interface */

@@ -34,6 +34,7 @@ module {
     var bodyBlob = toBlob(body);
 
     var response : HttpResponse = {
+      upgrade = false;
       status_code = statusNat16;
       headers = headers;
       body = bodyBlob;
@@ -91,5 +92,33 @@ module {
     };
 
     newBuffer;
+  };
+
+  public func getQueryParam(param : Text, url : Text) : ?Text {
+    let splitUrl = Iter.toArray(Text.split(url, #text("?")));
+
+    if (splitUrl.size() == 1) {
+      return null;
+    };
+
+    let queryParamsText : Text = splitUrl[1];
+
+    let queryParamsArray = Iter.toArray(Text.split(queryParamsText, #text("&")));
+    let queryParamsPairs = Array.map<Text, (Text, Text)>(
+      queryParamsArray,
+      func keyAndValue {
+        let pair = Iter.toArray(Text.split(keyAndValue, #text("=")));
+        return (pair[0], pair[1]);
+      },
+    );
+
+    let found = Array.find<(Text, Text)>(
+      queryParamsPairs,
+      func pair { pair.0 == param },
+    );
+    return switch (found) {
+      case null null;
+      case (?f) Option.make(f.1);
+    };
   };
 };

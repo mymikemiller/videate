@@ -140,7 +140,11 @@ const PutEpisodeForm = (): JSX.Element => {
     };
 
     // Until we want to reuse Media in multiple Episodes, we add a new Media
-    // for every Episode using mostly dummy information for now
+    // for every Episode using mostly dummy information for now. Note that this
+    // will create a new Media even if we were only changing information for
+    // the Episode, not changing anything about the Media.
+    // todo: allow updating of Episode while keeping reference to Media if 
+    // Media is unchanged
     const mediaData: MediaData = {
       source: {
         id: "roF5zFCgAhc",
@@ -168,25 +172,45 @@ const PutEpisodeForm = (): JSX.Element => {
     };
     let mediaId = mediaAddResult.ok.id;
 
-    // Add the Episode
-    const episodeData: EpisodeData = {
-      feedKey: feed.key,
-      title: data.title,
-      description: data.description,
-      mediaId: mediaId,
-    };
+    if (episode) {
+      // We came into this page with an existing Episode to edit
+      episode.title = data.title;
+      episode.description = data.description;
+      episode.mediaId = mediaId;
 
-    let addEpisodeResult = await actor!.addEpisode(episodeData);
-    if ("ok" in addEpisodeResult) {
-      toast.success("Episode successfully added!");
-      navigate('/listEpisodes?feed=' + feedKey, { state: { feedInfo: { key: feedKey, feed } } });
-    } else {
-      if ("FeedNotFound" in addEpisodeResult.err) {
-        toast.error("Feed not found: " + feedKey);
+      let updateEpisodeResult = await actor!.updateEpisode(episode);
+      if ("ok" in updateEpisodeResult) {
+        toast.success("Episode successfully updated!");
+        navigate('/listEpisodes?feed=' + feedKey, { state: { feedInfo: { key: feedKey, feed } } });
       } else {
-        toast.error("Error adding episode.");
+        if ("FeedNotFound" in updateEpisodeResult.err) {
+          toast.error("Feed not found: " + feedKey);
+        } else {
+          toast.error("Error updating episode.");
+        }
+        console.error(updateEpisodeResult.err);
       }
-      console.error(addEpisodeResult.err);
+    } else {
+      // We came into this page intending to create a new Episode from scratch
+      const episodeData: EpisodeData = {
+        feedKey: feed.key,
+        title: data.title,
+        description: data.description,
+        mediaId: mediaId,
+      };
+
+      let addEpisodeResult = await actor!.addEpisode(episodeData);
+      if ("ok" in addEpisodeResult) {
+        toast.success("Episode successfully added!");
+        navigate('/listEpisodes?feed=' + feedKey, { state: { feedInfo: { key: feedKey, feed } } });
+      } else {
+        if ("FeedNotFound" in addEpisodeResult.err) {
+          toast.error("Feed not found: " + feedKey);
+        } else {
+          toast.error("Error adding episode.");
+        }
+        console.error(addEpisodeResult.err);
+      }
     }
   };
 

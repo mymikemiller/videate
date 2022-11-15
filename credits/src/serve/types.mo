@@ -29,6 +29,7 @@ module {
   };
 
   public type HttpResponse = {
+    upgrade : Bool;
     status_code : Nat16;
     headers : [HeaderField];
     body : Blob;

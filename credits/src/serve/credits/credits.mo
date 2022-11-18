@@ -81,7 +81,7 @@ module {
     var custodians = List.fromArray<Principal>(init.custodianEntries);
 
     public func asStable() : StableCredits = {
-      mediaEntries = media.toArray();
+      mediaEntries = Utils.bufferToArray(media);
 
       // Flatten the values from the map of FeedKey->Buffer<Episode> into an
       // array of all Episodes on the platform
@@ -90,7 +90,7 @@ module {
           Iter.map<Buffer.Buffer<Episode>, [Episode]>(
             episodes.vals(),
             func(buffer : Buffer.Buffer<Episode>) : [Episode] {
-              buffer.toArray();
+              Utils.bufferToArray(buffer);
             },
           ),
         ),
@@ -148,7 +148,7 @@ module {
       switch (buffer) {
         case null [];
         case (?buffer) {
-          buffer.toArray();
+          Utils.bufferToArray(buffer);
         };
       };
     };
@@ -296,11 +296,11 @@ module {
       // Get the new list of episodeIds for the feed
       let buffer = Utils.bufferFromArray<EpisodeID>(feed.episodeIds);
       buffer.add(episode.id);
-      let newEpisodeIds : [EpisodeID] = buffer.toArray();
+      let newEpisodeIds : [EpisodeID] = Utils.bufferToArray(buffer);
 
       // The following should work to modify the feed's episode list, but gives "unexpected token 'and'" or "unexpected token 'with'"
       // let updatedFeed : Feed = {
-      //   episode.feed with episodes = episodesBuffer.toArray();
+      //   episode.feed with episodes = episodesUtils.bufferToArray();
       // }
 
       // Why doesn't this work? See https://internetcomputer.org/docs/current/developer-docs/build/cdks/motoko-dfinity/language-manual#object-combinationextension and https://github.com/dfinity/motoko/pull/3084
@@ -402,7 +402,7 @@ module {
         let summary = getFeedSummary(key);
         buffer.add(summary);
       };
-      buffer.toArray();
+      Utils.bufferToArray(buffer);
       // Not sure why this doesn't work instead of the above:
       // Array.map(keys, func(key: Text) : (Text, Text)
       //     {getFeedSummary(key);

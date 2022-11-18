@@ -35,7 +35,7 @@ module {
     credits : Credits.Credits,
     feed : Feed,
     episodeId : ?EpisodeID,
-    requestorPrincipal : ?Text,
+    requestorPrincipal : Principal,
     frontendUri : Text,
     feedUri : Text,
     contributors : Contributors.Contributors,
@@ -229,7 +229,7 @@ module {
   func getEpisodeElement(
     credits : Credits.Credits,
     episode : Episode,
-    requestorPrincipal : ?Text,
+    requestorPrincipal : Principal,
     frontendUri : Text,
     feedUri : Text,
     contributors : Contributors.Contributors,
@@ -250,7 +250,7 @@ module {
             "Error retrieving NFT owner. See NFT details here: ";
           };
           case (#ok(nftOwnerPrincipal : Principal)) {
-            let msg = if (Option.get(requestorPrincipal, "null") == Principal.toText(nftOwnerPrincipal)) {
+            let msg = if (requestorPrincipal == nftOwnerPrincipal) {
               "You own the NFT for this episode! See details here: ";
             } else {
               let nftOwnerName = contributors.getName(nftOwnerPrincipal);
@@ -295,7 +295,7 @@ module {
     };
 
     let episodeUri = feedUri # queryParamStart # "episode=" # Nat.toText(episode.id);
-    let mediaUri = episodeUri # "&media=true";
+    let mediaUri = episodeUri # "&principal=" # Principal.toText(requestorPrincipal) # "&media=true";
 
     // Episode ID is unique per Episode in the Feed and can be used as the guid
     let guid = Nat.toText(episode.id);

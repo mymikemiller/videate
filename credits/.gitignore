@@ -16,3 +16,8 @@ src/declarations
 # Frontend code
 node_modules/
 dist/
+
+# Misc
+internet_identity.wasm
+internet_identity.did
+internet_identity.old.did

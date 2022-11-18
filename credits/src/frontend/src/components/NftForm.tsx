@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useSearchParams } from 'react-router-dom';
 import styled from "styled-components";
-import { getEpisode } from "../utils";
 import {
   Feed,
   Episode,

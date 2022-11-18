@@ -19,9 +19,3 @@ doc/api/
 
 # Mac
 .DS_Store
-
-# Misc
-credits/canister_ids.json
-credits/internet_identity.wasm
-credits/internet_identity.did
-credits/internet_identity.old.did

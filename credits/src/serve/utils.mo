@@ -94,6 +94,15 @@ module {
     newBuffer;
   };
 
+  // Similar to bufferFromArray, this function is also duplicated here to avoid
+  // errors
+  public func bufferToArray<X>(buffer : Buffer.Buffer<X>) : [X] =
+  // immutable clone of array
+  Array.tabulate<X>(
+    buffer.size(),
+    func(i : Nat) : X { buffer.get(i) },
+  );
+
   public func getQueryParam(param : Text, url : Text) : ?Text {
     let splitUrl = Iter.toArray(Text.split(url, #text("?")));
 

@@ -88,4 +88,5 @@ export const emptyProfile: ProfileUpdate = {
   },
   feedKeys: [],
   ownedFeedKeys: [],
+  downloads: [],
 };

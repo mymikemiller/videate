@@ -10,6 +10,7 @@ import Nat64 "mo:base/Nat64";
 import Char "mo:base/Char";
 import List "mo:base/List";
 import Debug "mo:base/Debug";
+import Time "mo:base/Time";
 import Option "mo:base/Option";
 import HashMap "mo:base/HashMap";
 import Error "mo:base/Error";
@@ -41,6 +42,7 @@ actor class Serve() = Self {
   type EpisodeData = Credits.EpisodeData;
   type OwnerResult = NftDb.OwnerResult;
   type Profile = Contributors.Profile;
+  type Download = Contributors.Download;
   type ProfileResult = Contributors.ProfileResult;
   type ProfileUpdate = Contributors.ProfileUpdate;
   type BuyNftResult = Contributors.BuyNftResult;
@@ -63,7 +65,10 @@ actor class Serve() = Self {
     custodianEntries = [];
   };
   var credits : Credits.Credits = Credits.Credits(stableCredits);
-  stable var stableContributors : StableContributors = { profileEntries = [] };
+  stable var stableContributors : StableContributors = {
+    profileEntries = [];
+    downloadEntries = [];
+  };
   var contributors : Contributors.Contributors = Contributors.Contributors(stableContributors);
 
   // nftDb can be stable since it does not have functions that manipulate its
@@ -128,7 +133,7 @@ actor class Serve() = Self {
       };
     };
 
-    let requestorPrincipal : ?Text = _parsePrincipal(request);
+    let requestorPrincipal : Principal = _parsePrincipal(request);
     let episodeId : ?Nat = _parseEpisodeId(request);
     let frontendUri : Text = _parseFrontendUri(request);
     var feedUri : Text = _parseHost(request) # "/" # feed.key;
@@ -162,7 +167,7 @@ actor class Serve() = Self {
     if (not _isMediaRequest(request)) {
       Debug.trap("Error: non-media request was upgraded to an update call");
     };
-
+    let requestorPrincipal : Principal = _parsePrincipal(request);
     let feed : Feed = _parseFeed(request);
     let episodeId : Nat = switch (_parseEpisodeId(request)) {
       case null Debug.trap("Media request did not specify episode");
@@ -192,6 +197,15 @@ actor class Serve() = Self {
       },
     ];
     let transformedMediaUri = transformUri(media.uri, uriTransformers);
+
+    // Record the user's download
+    let download : Download = {
+      time = Time.now();
+      feedKey = feed.key;
+      episodeId = episodeId;
+    };
+    let logResult = contributors.logDownload(requestorPrincipal, download);
+    if (logResult == null) Debug.trap("Failed to log download");
 
     // Redirect to the actual media file location
     return {
@@ -224,9 +238,9 @@ actor class Serve() = Self {
     // accessed through localhost.run)
     let thisActorCid = Principal.toText(Principal.fromActor(Self));
     let baseUri = if (thisActorCid == "mvjun-2yaaa-aaaah-aac3q-cai") {
-      // Hard-code the IC network frontend cid if we're responding
+      // Hard-code the IC network frontend url if we're responding
       // from within the IC network serve canister
-      "https://44ejt-7yaaa-aaaao-aabqa-cai.raw.ic0.app";
+      "https://44ejt-7yaaa-aaaao-aabqa-cai.ic0.app";
     } else {
       // Parse the frontend canister cid from the query params, which we
       // specify if we're locally hosting. This is necessary since there's no
@@ -250,12 +264,12 @@ actor class Serve() = Self {
       // If the 'port' query param was specified, use that port for frontend
       // urls. This way we can generate links to the hot-reload enabled
       // frontend running on port 3000 in cases where this server is on running
-      // port 8000.
+      // port 4943.
       let port = Option.get(
         Utils.getQueryParam("port", request.url),
-        "8000",
+        "4943",
       );
-      Text.replace(correctedUri, #text(":8000"), ":" # port);
+      Text.replace(correctedUri, #text(":4943"), ":" # port);
     };
     return baseUri;
   };
@@ -275,8 +289,13 @@ actor class Serve() = Self {
     };
   };
 
-  func _parsePrincipal(request : HttpRequest) : ?Text {
-    Utils.getQueryParam("principal", request.url);
+  func _parsePrincipal(request : HttpRequest) : Principal {
+    switch (Utils.getQueryParam("principal", request.url)) {
+      case null Debug.trap("Request did not specify principal");
+      case (?principalAsText) {
+        Principal.fromText(principalAsText);
+      };
+    };
   };
 
   func _parseEpisodeId(request : HttpRequest) : ?Nat {
@@ -412,7 +431,7 @@ actor class Serve() = Self {
   ) : async PutFeedFullResult {
     if (not credits.isInitialized()) {
       Debug.print("Credits module is uninitialized. Please execute `dfx canister call serve initialize` after initial deploy.");
-      return #err(#CreditsError(#Uninitialized("Credits module has not been initialized. See dfx output for details.")));
+      return #err(#CreditsError(#Uninitialized("Credits module is uninitialized. Please execute `dfx canister call serve initialize` after initial deploy.")));
     };
     let putFeedResult = credits.putFeed(msg.caller, feed);
 
@@ -533,7 +552,7 @@ actor class Serve() = Self {
   func getFeedXml(
     feed : Feed,
     episodeId : ?EpisodeID,
-    requestorPrincipal : ?Text,
+    requestorPrincipal : Principal,
     frontendUri : Text,
     feedUri : Text,
     contributors : Contributors.Contributors,
@@ -565,6 +584,9 @@ actor class Serve() = Self {
 
   public func getContributorName(principal : Principal) : async ?Text {
     contributors.getName(principal);
+  };
+  public func getDownloads(principal : Principal) : async ?[Download] {
+    contributors.getDownloads(principal);
   };
   public shared (msg) func addRequestedFeedKey(feedKey : Text) : async ProfileResult {
     contributors.addRequestedFeedKey(msg.caller, feedKey);

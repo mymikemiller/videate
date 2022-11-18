@@ -33,17 +33,13 @@
       "packtool": ""
     }
   },
-  "dfx": "0.11.2",
+  "dfx": "0.12.1",
   "networks": {
     "ic": {
       "providers": [
         "https://gw.dfinity.network"
       ],
       "type": "persistent"
-    },
-    "local": {
-      "bind": "127.0.0.1:8000",
-      "type": "ephemeral"
     }
   },
   "version": 1

@@ -59,19 +59,23 @@ internet-identity/.dfx/local/canister_ids.json under "internet_identity") is
 written in webpack.config.js for the development II_URL.
 
 Once that is running locally (and so are this package's canisters), navigating
-to http://localhost:8000?canisterId=[local frontend cid] will load
+to http://localhost:4943?canisterId=[local frontend cid] will load
 the login UI and authenticating with Internet Identity will redirect to
-http://localhost:8000/authorize?canisterId=[cid found above]
+http://localhost:4943/authorize?canisterId=[cid found above]
+
+note: 4943 is the default port for locally running replicas. Use `dfx start
+--verbose` to see if a different port is being used, and if necessary, specify
+the port in ~/.config/dfx/networks.json
 
 ### Launch the automatically-generated, interactive Candid frontend for the appropriate canister
 
-`localhost:8000/canisterId={__CANDID_UI cid from .dfx/local/canisters}`
+`localhost:4943/canisterId={__CANDID_UI cid from .dfx/local/canisters}`
 
 ### Launch the frontend, hosted in the frontend canister
 
 #### Locally:
 
-`localhost:8000/?canisterId={frontend cid from .dfx/local/canisters}`
+`localhost:4943/?canisterId={frontend cid from .dfx/local/canisters}`
 
 If you get a "Register Device. This user does not have access to this wallet."
 page when clicking the login link (likely after a `dfx start --clean`),
@@ -116,13 +120,13 @@ Navigate to a feed!
 Use an existing feed key and the correct local canisterIds for the `serve` and
 `frontend` canister)
 
-localhost:8000/nsp?canisterId=rrkah-fqaaa-aaaaa-aaaaq-cai&frontendCid=r7inp-6aaaa-aaaaa-aaabq-cai&principal=s7v5n-xcubz-fcpgx-bmtwn-a7gvr-eigeg-idpzg-bsiuv-3th53-uee3c-2qe
+http://r7inp-6aaaa-aaaaa-aaabq-cai.localhost:4943/test?frontendCid=rrkah-fqaaa-aaaaa-aaaaq-cai&port=3000&principal=pato7-ox3im-uiosj-vsthj-lmb35-q44gg-cn5p7-w6tmd-hyxhw-wsaxy-eae
 
 To test locally hosted feeds on a phone, use localhost.run to expose the feed
 to outside networks:
 
 ```
-ssh -R 80:localhost:8000 localhost.run
+ssh -R 80:localhost:4943 localhost.run
 ```
 
 Then subscribe in a podcatcher to the address printed out after "tunneled with

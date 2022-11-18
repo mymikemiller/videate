@@ -115,7 +115,7 @@ module.exports = {
       FRONTEND_CANISTER_ID: canisters["frontend"],
       SERVE_CANISTER_ID: canisters["serve"],
       II_URL: isDevelopment
-        ? "http://r7inp-6aaaa-aaaaa-aaabq-cai.localhost:8000/"
+        ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:4943/"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({
@@ -124,11 +124,11 @@ module.exports = {
     }),
     isDevelopment && new ReactRefreshWebpackPlugin(),
   ].filter(Boolean),
-  // proxy /api to port 8000 during development
+  // proxy /api to port 4943 during development
   devServer: {
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:8000",
+        target: "http://127.0.0.1:4943",
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api",

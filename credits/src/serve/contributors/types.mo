@@ -1,5 +1,6 @@
 import Buffer "mo:base/Buffer";
 import Result "mo:base/Result";
+import Time "mo:base/Time";
 import NftTypes "../nft_db/types";
 import CreditsTypes "../credits/types";
 
@@ -7,25 +8,33 @@ module {
   // Used to store the contents of the Contributors "database" in stable types
   // between upgrades
   public type StableContributors = {
-      profileEntries: [(Principal, Profile)];
+    profileEntries : [(Principal, Profile)];
+  };
+
+  public type Download = {
+    time : Time.Time;
+    feedKey : CreditsTypes.FeedKey;
+    episodeId : CreditsTypes.EpisodeID;
   };
 
   public type Bio = {
-    name: ?Text;
+    name : ?Text;
   };
 
   public type Profile = {
-    id: Principal;
+    id : Principal;
 
-    bio: Bio;
-    feedKeys: [Text]; // The feeds this user has indicated that they subscribe to
-    ownedFeedKeys: [Text]; // The feeds this user created (owns) and manages
+    bio : Bio;
+    feedKeys : [Text]; // The feeds this user has indicated that they subscribe to
+    ownedFeedKeys : [Text]; // The feeds this user created (owns) and manages
+    downloads : [Download]; // Every download performed by the user (or user's podcast app), in order
   };
 
   public type ProfileUpdate = {
-    bio: Bio;
-    feedKeys: [Text];
-    ownedFeedKeys: [Text];
+    bio : Bio;
+    feedKeys : [Text];
+    ownedFeedKeys : [Text];
+    downloads : [Download];
   };
 
   public type ContributorsError = {
@@ -36,11 +45,5 @@ module {
 
   public type ProfileResult = Result.Result<Profile, ContributorsError>;
 
-  public type BuyNftResult = Result.Result<{
-      #MintReceiptPart : NftTypes.MintReceiptPart;
-      #TransferTransactionId : Nat;
-    }, {
-      #NftError : NftTypes.NftError;
-      #CreditsError : CreditsTypes.CreditsError;
-    }>;
+  public type BuyNftResult = Result.Result<{ #MintReceiptPart : NftTypes.MintReceiptPart; #TransferTransactionId : Nat }, { #NftError : NftTypes.NftError; #CreditsError : CreditsTypes.CreditsError }>;
 };

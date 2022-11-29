@@ -3,18 +3,24 @@ import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import {
   _SERVICE,
   Episode,
+  EpisodeID,
   EpisodeData,
   Feed,
   Media,
   MediaData,
+  WeightedResource,
+  FeedKey,
 } from "../../../declarations/serve/serve.did";
 import Loop from "../../assets/loop.svg";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, Controller, useWatch, Control } from "react-hook-form";
 import { AppContext } from "../App";
 import toast from "react-hot-toast";
 import { Button, ActionButton, Icon } from "@adobe/react-spectrum";
-import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton, LargeBorder, LargeBorderWrap, ValidationError } from "./styles/styles";
+import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton, LargeBorder, LargeBorderWrap, ValidationError, Table, TableHead, Header, TableBody, Row, Cell } from "./styles/styles";
 import DataAdd from "@spectrum-icons/workflow/DataAdd";
+import RemoveCircle from "@spectrum-icons/workflow/RemoveCircle";
+import AddCircle from "@spectrum-icons/workflow/AddCircle";
+import { Principal } from "@dfinity/principal";
 
 // We'll use dummy information for some fields for now, so we just ask for the
 // ones we support right now
@@ -23,7 +29,9 @@ type Submission = {
   title: string;
   description: string;
   uri: string;
-}
+  individualResources: Array<[string, bigint]>; // Principal, weight
+  mediaResources: Array<[FeedKey, EpisodeID, bigint]>; // FeedKey, EpisodeID, weight
+};
 
 interface PutEpisodeFormProps {
   // If feed is specified, we'll be able to copy over values from the most
@@ -52,7 +60,42 @@ const PutEpisodeForm = (): JSX.Element => {
   const { feed: incomingFeed, episode } = state as PutEpisodeFormProps || {};
   const [feed, setFeed] = useState(incomingFeed);
   const navigate = useNavigate();
-  const { register, getValues, setValue, handleSubmit, formState: { errors } } = useForm<Submission>();//{ defaultValues });
+  const { register, control, getValues, setValue, handleSubmit, formState: { errors } } = useForm<Submission>();//{ defaultValues });
+  const { fields: individualResourcesFields, append: individualResourcesAppend, remove: individualResourcesRemove } = useFieldArray({
+    control,
+    name: "individualResources",
+  });
+  // const { fields: mediaResourcesFields, append: mediaResourcesAppend, remove: mediaResourcesRemove } = useFieldArray({
+  //   control,
+  //   name: "mediaResources"
+  // });
+
+  const getWeightAsPercentage = (weight: bigint): string => {
+    let totalWeight = 0;
+    getValues()['individualResources'].forEach((field) => {
+      totalWeight += Number(field[1]);
+    });
+    const percent = (Number(weight) / totalWeight * 100).toFixed(2);
+    return percent;
+  };
+
+  const WeightPercentage = ({ control, index, field }: { control: Control<Submission, any>, index: number, field: any }) => {
+    const value = useWatch({
+      name: "individualResources",
+      control
+    });
+
+    return (
+      <Controller
+        control={control}
+        name={`individualResources.${index}.1`} // 1 is the index for 'weight'
+        render={({ field }) =>
+          <span>{getWeightAsPercentage(field.value)}%</span>
+        }
+        defaultValue={BigInt(100)}
+      />
+    );
+  };
 
   const allFieldsAreEmpty = () => {
     const values = getValues();
@@ -75,6 +118,17 @@ const PutEpisodeForm = (): JSX.Element => {
       if (mediaResult.length == 1) {
         let media: Media = mediaResult[0];
         setValue('uri', media.uri, { shouldValidate: true });
+
+        const individualResources = media.resources.map<[string, bigint]>((weightedResource) => {
+          if ("individual" in weightedResource.resource) {
+            let principal = weightedResource.resource.individual;
+            return [principal.toText(), weightedResource.weight];
+          } else {
+            console.error("weightedResource did not contain individual principal");
+            return ['ERROR: unrecognized principal', weightedResource.weight];
+          };
+        });
+        setValue('individualResources', individualResources, { shouldValidate: true });
       }
     };
   };
@@ -139,6 +193,14 @@ const PutEpisodeForm = (): JSX.Element => {
       return;
     };
 
+    const individualResources: Array<WeightedResource> = data.individualResources.map((value: [string, bigint]) => {
+      return { resource: { individual: Principal.fromText(value[0]) }, weight: value[1] };
+    });
+    // const mediaResources = data.mediaResources.map((value: [string, bigint, bigint]) => {
+    //   return { resource: { media: mediaId }, BigInt(weight) };
+    // });
+    const resources: Array<WeightedResource> = individualResources;
+
     // Until we want to reuse Media in multiple Episodes, we add a new Media
     // for every Episode using mostly dummy information for now. Note that this
     // will create a new Media even if we were only changing information for
@@ -155,6 +217,7 @@ const PutEpisodeForm = (): JSX.Element => {
         },
         releaseDate: "1970-01-01T00:00:00.000Z",
       },
+      resources: resources,
       durationInMicroseconds: BigInt(100),
       uri: data.uri,
       etag: "example",
@@ -226,6 +289,33 @@ const PutEpisodeForm = (): JSX.Element => {
     return <h1>You do not own the "{feedKey}" feed. You can only edit episodes for feeds you own.</h1>
   };
 
+  // Returns true if the provided text can be parsed as a Principal, otherwise
+  // returns an error string to be displayed
+  const validatePrincipal = (text: string): boolean | string => {
+    try {
+      const principal = Principal.fromText(text);
+      if (principal.isAnonymous()) {
+        return "Anonymous principal is invalid";
+      };
+    } catch (error) {
+      return "Invalid principal"
+    };
+    return true;
+  };
+
+  // This function is necessary to prevent typescript complaining about values
+  // possibly being undefined even though we're using optional chaining
+  const getPrincipalValidationError = (index: number) => {
+    if (errors == undefined) {
+      return undefined;
+    };
+    if (errors.individualResources == undefined) {
+      return undefined;
+    };
+    const res = errors.individualResources!;
+    return res[index]?.[0]!.message;
+  };
+
   return (
     <FormContainer>
       <div style={{ display: 'flex' }}>
@@ -272,6 +362,83 @@ const PutEpisodeForm = (): JSX.Element => {
             {...register("uri", { required: "Media URL is required" })}
             placeholder="www.example.com/test.mp4" />
           <ValidationError>{errors.uri?.message}</ValidationError>
+        </Label>
+
+        <Title>In the sections below, specify all parties that deserve a portion of this Episode's earnings, and the relative weight of their contribution.</Title>
+
+        <Label>
+          Individuals involved in the creation of this episode:
+          <Table
+            aria-label="Table listing all episode resources who earn when this episode earns"
+          >
+            <TableHead>
+              <Row>
+                <Header style={{ width: "5em" }}>Weight</Header>
+                <Header style={{ width: "5em" }}>Percent</Header>
+                <Header>Principal</Header>
+                <Header style={{ width: "1em" }}></Header>
+              </Row>
+            </TableHead>
+            <TableBody>
+              {individualResourcesFields.map((field, index) => {
+                return (
+                  <Row key={field.id}>
+                    <Cell>
+                      {/* The proportional weight of this Resource */}
+                      <Controller
+                        name={`individualResources.${index}.1` as const}
+                        render={({ field: controlledField }) => (
+                          <Input
+                            placeholder="Weight"
+                            style={{ marginTop: "0", marginBottom: "0" }}
+                            type="number"
+                            min="0"
+                            // {...props}
+                            onChange={(e) => {
+                              controlledField.onChange(parseInt(e.target.value, 10));
+                            }}
+                            defaultValue={controlledField.value.toString()} />
+                        )}
+                        control={control}
+                      />
+                    </Cell>
+                    <Cell>
+                      <WeightPercentage {...{ control, index, field }} />
+                    </Cell>
+                    <Cell>
+                      <Input
+                        placeholder="Principal"
+                        style={{ marginTop: "0", marginBottom: "0" }}
+                        {...register(`individualResources.${index}.0` as const, {
+                          required: "Please enter the user's Principal",
+                          validate: validatePrincipal,
+                        })}
+                        type="text"
+                      />
+                      <ValidationError>{getPrincipalValidationError(index)}</ValidationError>
+                    </Cell>
+                    <Cell>
+                      <ActionButton isQuiet onPress={() => {
+                        individualResourcesRemove(index)
+                      }}>
+                        <RemoveCircle color="negative" />
+                      </ActionButton>
+                    </Cell>
+                  </Row>
+                );
+              })}
+
+            </TableBody>
+          </Table>
+          <ActionButton
+            isQuiet
+            onPress={(e) => {
+              individualResourcesAppend([["", BigInt(1)]])
+            }}
+          >
+            <AddCircle></AddCircle>
+            Add individual
+          </ActionButton>
         </Label>
 
         <LargeBorderWrap>

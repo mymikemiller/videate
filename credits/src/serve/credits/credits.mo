@@ -233,6 +233,7 @@ module {
         // MediaID matches the size of the buffer before this one is added
         id = media.size();
         source = mediaData.source;
+        resources = mediaData.resources;
         durationInMicroseconds = mediaData.durationInMicroseconds;
         uri = mediaData.uri;
         etag = mediaData.etag;

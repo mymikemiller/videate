@@ -69,3 +69,17 @@ export const ValidationError = styled.div`
   color: #D00000;
   padding: 0px 0px 10px 0px;
 `;
+
+export const Table = styled.table`
+  width: 100%;
+`;
+export const TableHead = styled.thead`
+`;
+export const Header = styled.th`
+`;
+export const TableBody = styled.tbody`
+`;
+export const Row = styled.tr`
+`;
+export const Cell = styled.td`
+`;

@@ -11,6 +11,7 @@ import {
   WeightedResource,
   FeedKey,
 } from "../../../declarations/serve/serve.did";
+import { jsonStringify } from "../utils";
 import Loop from "../../assets/loop.svg";
 import { useForm, useFieldArray, Controller, useWatch, Control } from "react-hook-form";
 import { AppContext } from "../App";
@@ -131,17 +132,10 @@ const PutEpisodeForm = (): JSX.Element => {
     );
   };
 
-  const allFieldsAreEmpty = () => {
+  // Returns true if all fields have their default values
+  const allFieldsAreDefault = () => {
     const values = getValues();
-    for (const [k, v] of Object.entries(values)) {
-      if (typeof v != "string") {
-        throw "Encountered non-string value in form. allFieldsAreEmpty may need to be updated to know what to expect for a 'blank' value for that type";
-      }
-      if (v as string != "") {
-        return false;
-      }
-    }
-    return true;
+    return jsonStringify(values) == jsonStringify(defaultValues);
   }
 
   const populate = async (episode: Episode) => {
@@ -220,7 +214,7 @@ const PutEpisodeForm = (): JSX.Element => {
       let episodeResult = await actor.getEpisode(feed!.key, mostRecentEpisodeId);
       if (episodeResult.length == 1) {
         let mostRecentEpisode = episodeResult[0];
-        if (allFieldsAreEmpty() || window.confirm("Are you sure you want to replace all form values with values from episode titled \"" + mostRecentEpisode.title + "\"?")) {
+        if (allFieldsAreDefault() || window.confirm("Are you sure you want to replace all form values with values from episode titled \"" + mostRecentEpisode.title + "\"?")) {
           populate(mostRecentEpisode);
         };
       }

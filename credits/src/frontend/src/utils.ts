@@ -43,3 +43,13 @@ const storeOrRemoveSearchParam = (searchParams: URLSearchParams, paramName: stri
     localStorage.removeItem(paramName);
   }
 };
+
+// Parse json objects that contain BigInts, which fail to parse under
+// JSON.stringify's default implementation
+export const jsonStringify = (obj: Object | undefined) => {
+  return JSON.stringify(obj, (key, value) =>
+    typeof value === 'bigint'
+      ? value.toString()
+      : value
+  );
+}

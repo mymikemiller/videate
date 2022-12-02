@@ -43,15 +43,6 @@ interface PutEpisodeFormProps {
   episode?: Episode;
 };
 
-// Specify defaultValues to pre-fill the form with actual values (not just
-// placeholders)
-const defaultValues = {
-  // title: "Episode Title",
-  // description: "Episode Description",
-  // durationInMicroseconds: BigInt(100), // todo: determine this from the linked media
-  // uri: "www.example.com/test.mp4",
-};
-
 const PutEpisodeForm = (): JSX.Element => {
   const { actor, authClient, login, profile } = useContext(AppContext);
   const { state } = useLocation();
@@ -60,7 +51,34 @@ const PutEpisodeForm = (): JSX.Element => {
   const { feed: incomingFeed, episode } = state as PutEpisodeFormProps || {};
   const [feed, setFeed] = useState(incomingFeed);
   const navigate = useNavigate();
-  const { register, control, getValues, setValue, handleSubmit, formState: { errors } } = useForm<Submission>();//{ defaultValues });
+
+  console.log("getting principal");
+  console.log(authClient?.getIdentity().getPrincipal().toText());
+
+  // If we were not given an episode to edit, specify defaultValues to pre-fill
+  // the form with actual values (not just placeholders). Typescript makes us
+  // specify values for everything here, not just the things we want to set.
+  const defaultValues: Submission | undefined = episode != undefined ? undefined : {
+    individualResources: [[BigInt(1), authClient!.getIdentity().getPrincipal().toText()]],
+    title: "",
+    description: "",
+    uri: "",
+    mediaResources: [],
+    feed: {
+      key: '',
+      title: '',
+      owner: authClient!.getIdentity().getPrincipal(),
+      link: '',
+      description: '',
+      email: '',
+      author: '',
+      episodeIds: [],
+      imageUrl: '',
+      subtitle: '',
+    },
+  };
+
+  const { register, control, getValues, setValue, handleSubmit, formState: { errors } } = useForm<Submission>({ defaultValues });//{ defaultValues });
   const { fields: individualResourcesFields, append: individualResourcesAppend, remove: individualResourcesRemove } = useFieldArray({
     control,
     name: "individualResources",

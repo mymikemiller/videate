@@ -105,7 +105,7 @@ const ListEpisodes = (): JSX.Element => {
 
   if (!feed) return <h1>Loading feed...</h1>;
 
-  if (episodes == null) return <h1>"Loading episodes..."</h1>;
+  if (episodes == null) return <h1>Loading episodes...</h1>;
 
   return (
     <>

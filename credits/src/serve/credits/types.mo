@@ -40,9 +40,12 @@ module {
 
   // Something or someone that the creation of Media depends on
   public type Resource = {
-    // Another Media that was integral to the creation of the associated Media,
+    // Another Episode that was integral to the creation of the associated Media,
     // for example: a video that was used as part of a compilation video
-    #media: MediaID;
+    #episode: {
+      feedKey: Text;
+      episodeId: EpisodeID;
+    };
 
     // An individual that was integral to the creation of the associated Media,
     // for example: the editor of a video
@@ -50,14 +53,14 @@ module {
   };
 
   public type WeightedResource = {
-    // The Resource that gets paid when the associated Media earns income
-    resource: Resource;
-
     // The relative "weight" of this Resource. This dermines how much of a
     // Media's income should go to this Resource. The portion that goes to this
     // Resource is calculated by dividing this weight by the sum of all weights
     // for the given Episode.
     weight: Nat;
+    
+    // The Resource that gets paid when the associated Media earns income
+    resource: Resource;
   };
 
   public type MediaData = {

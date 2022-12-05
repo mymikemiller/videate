@@ -35,6 +35,7 @@ module {
   public type StableCredits = Types.StableCredits;
   public type EpisodeSearchResult = Types.EpisodeSearchResult;
   public type CreditsError = Types.CreditsError;
+  public type WeightedResource = Types.WeightedResource;
 
   // After creating an instance of this class, call addCustodian on it to add
   // the identity that can manage the entire class. Usually this should be the
@@ -233,6 +234,7 @@ module {
         // MediaID matches the size of the buffer before this one is added
         id = media.size();
         source = mediaData.source;
+        resources = mediaData.resources;
         durationInMicroseconds = mediaData.durationInMicroseconds;
         uri = mediaData.uri;
         etag = mediaData.etag;

@@ -38,13 +38,39 @@ module {
     releaseDate : Text;
   };
 
+  // Something or someone that the creation of Media depends on
+  public type Resource = {
+    // Another Episode that was integral to the creation of the associated Media,
+    // for example: a video that was used as part of a compilation video
+    #episode: {
+      feedKey: Text;
+      episodeId: EpisodeID;
+    };
+
+    // An individual that was integral to the creation of the associated Media,
+    // for example: the editor of a video
+    #individual: Principal;
+  };
+
+  public type WeightedResource = {
+    // The relative "weight" of this Resource. This dermines how much of a
+    // Media's income should go to this Resource. The portion that goes to this
+    // Resource is calculated by dividing this weight by the sum of all weights
+    // for the given Episode.
+    weight: Nat;
+    
+    // The Resource that gets paid when the associated Media earns income
+    resource: Resource;
+  };
+
   public type MediaData = {
     // The source of the media, which contains information about how to
     // access the media on the platform on which it was originally released
     source : Source;
 
-    // Everyone who participated in the media's creation or consumption
-    // contributors: [Contributor];
+    // All resources that this Media depended on for its creation. This
+    // determines who gets paid, and how much, when this Media earns income.
+    resources: [WeightedResource];
 
     // The duration of the media in microseconds
     durationInMicroseconds : Nat;

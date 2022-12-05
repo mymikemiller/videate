@@ -326,12 +326,13 @@ actor class Serve() = Self {
 
   // Returns an array of which principals should be given which amount given
   // the specified user's downloads that happened in the last month
-  public shared(msg) func getDistribution(amount: Float) : async [(Principal, Float)] {
+  public shared(msg) func getDistribution(amount: Float) : async [(Principal, ?Text, Float)] {
     let distributionProportions = _getDistributionProportions(msg.caller);
     let distributionProportionsArray = Iter.toArray(distributionProportions.entries());
 
-    let distributionAmounts = Array.map<(Principal, Float), (Principal, Float)>(distributionProportionsArray, func((principal: Principal, proportion: Float)) {
-      (principal, proportion * amount);
+    let distributionAmounts = Array.map<(Principal, Float), (Principal, ?Text, Float)>(distributionProportionsArray, func((principal: Principal, proportion: Float)) {
+      let name = contributors.getName(principal);
+      (principal, name, proportion * amount);
     });
 
     return distributionAmounts;

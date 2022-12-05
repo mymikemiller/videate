@@ -220,7 +220,7 @@ const App = () => {
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
                         <h5>
-                          {authClient.getIdentity().getPrincipal().toString()}
+                          {profile?.bio.name}
                         </h5>
                         <button onClick={logout} style={{ border: 'none', backgroundColor: 'transparent', cursor: 'pointer' }}>
                           <Logout />

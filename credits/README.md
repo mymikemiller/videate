@@ -140,7 +140,8 @@ properly, e.g.:
 
 # Deploy to the Internet Computer:
 ```
-dfx deploy --network ic --no-wallet
+dfx deploy serve --network ic --no-wallet
+dfx deploy frontend --network ic --no-wallet
 ```
 ## Navigate to a feed hosted on the Internet Computer. 
 ### Note that ".raw.ic0.app" must be used, not just ".ic0.app" since we're not hosting static files.

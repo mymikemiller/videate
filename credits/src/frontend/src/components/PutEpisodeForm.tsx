@@ -53,9 +53,6 @@ const PutEpisodeForm = (): JSX.Element => {
   const [feed, setFeed] = useState(incomingFeed);
   const navigate = useNavigate();
 
-  console.log("getting principal");
-  console.log(authClient?.getIdentity().getPrincipal().toText());
-
   // If we were not given an episode to edit, specify defaultValues to pre-fill
   // the form with actual values (not just placeholders). Typescript makes us
   // specify values for everything here, not just the things we want to set.
@@ -208,7 +205,7 @@ const PutEpisodeForm = (): JSX.Element => {
 
   const copyFromRecent = async () => {
     const mostRecentEpisodeId = feed?.episodeIds.at(feed?.episodeIds.length - 1);
-    if (!mostRecentEpisodeId) {
+    if (mostRecentEpisodeId == null) {
       alert("No previous episode found to copy values from");
     } else {
       let episodeResult = await actor.getEpisode(feed!.key, mostRecentEpisodeId);

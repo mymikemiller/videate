@@ -6,6 +6,7 @@ import Nat16 "mo:base/Nat16";
 import Nat32 "mo:base/Nat32";
 import Char "mo:base/Char";
 import Blob "mo:base/Blob";
+import HashMap "mo:base/HashMap";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 import Option "mo:base/Option";
@@ -102,6 +103,12 @@ module {
     buffer.size(),
     func(i : Nat) : X { buffer.get(i) },
   );
+
+  public func addValueToEntry(map: HashMap.HashMap<Principal, Float>, key: Principal, value: Float): HashMap.HashMap<Principal, Float> {
+    let currentValue = Option.get(map.get(key), 0.0);
+    map.put(key, currentValue + value);
+    map;
+  };
 
   public func getQueryParam(param : Text, url : Text) : ?Text {
     let splitUrl = Iter.toArray(Text.split(url, #text("?")));

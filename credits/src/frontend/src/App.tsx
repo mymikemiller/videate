@@ -160,10 +160,6 @@ const App = () => {
               toast.error("Your session expired. Please reauthenticate.");
               logout();
             } else if ("NotFound" in profileResult.err) {
-              // User has deleted account
-              if (profile) {
-                toast.error("Contributor profile not found. Please try creating again.");
-              }
               // Authenticated but no profile
               setProfile(undefined);
               navigate('/create');

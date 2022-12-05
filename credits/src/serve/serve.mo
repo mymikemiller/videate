@@ -1,13 +1,17 @@
+import Trie "mo:base/Trie";
 import Array "mo:base/Array";
 import Result "mo:base/Result";
 import Buffer "mo:base/Buffer";
 import Iter "mo:base/Iter";
+import Int "mo:base/Int";
+import Float "mo:base/Float";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
 import Nat8 "mo:base/Nat8";
 import Nat16 "mo:base/Nat16";
 import Nat64 "mo:base/Nat64";
 import Char "mo:base/Char";
+import TrieSet "mo:base/TrieSet";
 import List "mo:base/List";
 import Debug "mo:base/Debug";
 import Time "mo:base/Time";
@@ -40,6 +44,7 @@ actor class Serve() = Self {
   type Episode = Credits.Episode;
   type EpisodeID = Credits.EpisodeID;
   type EpisodeData = Credits.EpisodeData;
+  type WeightedResource = Credits.WeightedResource;
   type OwnerResult = NftDb.OwnerResult;
   type Profile = Contributors.Profile;
   type Download = Contributors.Download;
@@ -138,10 +143,10 @@ actor class Serve() = Self {
     let frontendUri : Text = _parseFrontendUri(request);
     var feedUri : Text = _parseHost(request) # "/" # feed.key;
 
-    // If the request host didn't include the canister id, we need to
-    // insert it as a query param. This is necessary for cases when the
-    // host is, for example, ssh'd through localhost.run where subdomains
-    // (which would normally contain the cid) don't work
+    // If the request host didn't include the canister id, we need to insert it
+    // as a query param. This is necessary for cases when the host is, for
+    // example, ssh'd through localhost.run where subdomains (which would
+    // normally contain the cid) don't work
     let thisActorCid = Principal.toText(Principal.fromActor(Self));
     if (not Text.contains(feedUri, #text(thisActorCid))) {
       feedUri := feedUri # "?canisterId=" # thisActorCid;
@@ -238,8 +243,8 @@ actor class Serve() = Self {
     // accessed through localhost.run)
     let thisActorCid = Principal.toText(Principal.fromActor(Self));
     let baseUri = if (thisActorCid == "mvjun-2yaaa-aaaah-aac3q-cai") {
-      // Hard-code the IC network frontend url if we're responding
-      // from within the IC network serve canister
+      // Hard-code the IC network frontend url if we're responding from within
+      // the IC network serve canister
       "https://44ejt-7yaaa-aaaao-aabqa-cai.ic0.app";
     } else {
       // Parse the frontend canister cid from the query params, which we
@@ -319,6 +324,178 @@ actor class Serve() = Self {
     };
   };
 
+  // Returns an array of which principals should be given which amount given
+  // the specified user's downloads that happened in the last month
+  public shared(msg) func getDistribution(amount: Float) : async [(Principal, Float)] {
+    let distributionProportions = _getDistributionProportions(msg.caller);
+    let distributionProportionsArray = Iter.toArray(distributionProportions.entries());
+
+    let distributionAmounts = Array.map<(Principal, Float), (Principal, Float)>(distributionProportionsArray, func((principal: Principal, proportion: Float)) {
+      (principal, proportion * amount);
+    });
+
+    return distributionAmounts;
+  };
+
+  // Returns an array of which principals should be given which percentage
+  // given the specified user's downloads that happened in the last month
+  func _getDistributionProportions(from: Principal) : HashMap.HashMap<Principal, Float> {
+    // Create the map that we will eventually return
+    var finalProportions = HashMap.fromIter<Principal, Float>(
+      Iter.fromArray([]),
+      1,
+      Principal.equal,
+      Principal.hash,
+    );
+
+    let downloads: [Download] = switch(contributors.getDownloads(from)) {
+      case null return finalProportions; // Return empty map
+      case (? downloads) downloads;
+    };
+
+    let monthAsNanoseconds: Int = Float.toInt(2.628e+15);
+    let earliestTime = Time.now() - monthAsNanoseconds;
+
+    var totalDurationInMicroseconds: Nat = 0;
+    
+    // Use a TrieSet to collect unique Episodes since we only count them once
+    // even if a user downloaded them multiple times
+    var episodeSet = TrieSet.empty<Episode>();
+
+    // Go through the user's downloads in reverse, adding each to a set (we
+    // only want to count media once even if it was downloaded multiple times)
+    // and calculating the total duration of all media, stopping when we get to
+    // one that occurred more than a month ago
+    label loopBreak for (i in Iter.revRange(downloads.size(), 1)) {
+      let download = downloads[Int.abs(i-1)];
+
+      if (download.time < earliestTime){
+        Debug.print("Encountered download that occured longer than a month ago. Breaking at index " # debug_show(i));
+        break loopBreak;
+      };
+
+      switch(credits.getEpisode(download.feedKey, download.episodeId)) {
+        case (null) { 
+          Debug.print("Skipping episode. Episode " # debug_show(download.episodeId) # " not found in feed " # download.feedKey);
+        };
+        case (? episode) {
+          switch(credits.getMedia(episode.mediaId)) {
+            case (null) {
+              Debug.print("Skipping episode. Media " # debug_show(episode.mediaId) # " not found. This media was referenced in episode " # debug_show(download.episodeId) # " of feed " # download.feedKey);
+            };
+            case (? media) {
+              let key = episode.feedKey # Nat.toText(episode.mediaId);
+              var sizeBeforeAdd = TrieSet.size(episodeSet);
+              episodeSet := TrieSet.put<Episode>(episodeSet, episode, Text.hash(key), func(a: Episode, b: Episode) {
+                a.feedKey == b.feedKey and a.id == b.id;
+              });
+              if (sizeBeforeAdd != TrieSet.size(episodeSet)) {
+                // The episode was added to the set (i.e. this is its first
+                // time being encountered), so include its duration in the
+                // total. We only count episodes once even if they were
+                // downloaded multiple times.
+                totalDurationInMicroseconds += media.durationInMicroseconds;
+              }
+            };
+          };
+        };
+      }
+    };
+
+    // Now that we know the total duration, we can calculate the proportion to
+    // distribute to each principal and add to finalPrincipals. This
+    // complicated-looking iterate syntax is just to iterate over episodeSet's
+    // entries so we can avoid converting to an Array first
+    Iter.iterate<(Episode, ())>(Trie.iter<Episode, ()>(episodeSet), func(episodeEntry: (Episode, ()), index: Nat){
+      let episode: Episode = episodeEntry.0;
+      let episodeProportion = switch(credits.getMedia(episode.mediaId)) {
+        case (null) {
+          Debug.trap("ERROR: Media " # debug_show(episode.mediaId) # " not found. This media was referenced in episode " # debug_show(episode.id) # " of feed " # episode.feedKey);
+          // todo: handle this gracefully, possibly ignoring this episode. This
+          // should never happen, though, given we would have failed to find
+          // the media above and not added the episode to the set
+        };
+        case (? media) {
+          Float.fromInt(media.durationInMicroseconds) / Float.fromInt(totalDurationInMicroseconds);
+        };
+      };
+
+      // Get the proportion of this episode's earnings to give to each of the
+      // episode's resources. These should total to 1, but they only include
+      // this episode's resources.
+      let resourceProportions: HashMap.HashMap<Principal, Float> = _getDistributionProportionResursive(episode);
+
+      // Multiply those proportions by the proportion this episode gets to
+      // determine the proportion of the total gift amount each resource gets
+      Iter.iterate(resourceProportions.entries(), func(entry: (Principal, Float), _index: Nat) {
+        let principal = entry.0;
+        let proportion = entry.1 * episodeProportion;
+        
+        finalProportions := Utils.addValueToEntry(finalProportions, principal, proportion);
+      });
+    });
+    return finalProportions;
+  };
+
+  // Return the principals that earn for the episode along with the proportion
+  // (0.0 - 1.0) they earn for that episode. If an episode contains another
+  // episode as a resource, this function is called recursively until only
+  // principals are returned.
+  func _getDistributionProportionResursive(episode: Episode) : HashMap.HashMap<Principal, Float> {
+    switch(credits.getMedia(episode.mediaId)) {
+      case (null) {
+        Debug.trap("ERROR: Media " # debug_show(episode.mediaId) # " not found for episode " # Nat.toText(episode.id) # " of " # episode.feedKey # " feed.");
+        // todo: handle gracefully, maybe just returning []
+      };
+      case (? media) {
+        var totalWeight = Array.foldRight<WeightedResource, Nat>(media.resources, 0, func(a: WeightedResource, b: Nat) { a.weight + b});
+        var principalProportionsMap = HashMap.fromIter<Principal, Float>(
+          Iter.fromArray([]),
+          1,
+          Principal.equal,
+          Principal.hash,
+        );
+
+        Iter.iterate<WeightedResource>(media.resources.vals(), func(weightedResource, _index) {
+          let thisResourceProportion = Float.fromInt(weightedResource.weight) / Float.fromInt(totalWeight);
+
+          switch (weightedResource.resource) {
+            case (#individual(principal)) {
+              // Add a new value, or add the proportion to an existing value if
+              // the principal was already in the map
+              principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, principal, thisResourceProportion);
+            };
+            case (#episode(details)) {
+              switch(credits.getEpisode(details.feedKey, details.episodeId)) {
+                case (null) { 
+                  Debug.trap("ERROR: Resource episode " # debug_show(details.episodeId) # " not found in feed " # details.feedKey);
+                  // todo: handle gracefully, maybe just ignoring this resource (return [])
+                };
+                case (? episode) {
+                  // Recursively get the proportions of the resource episode
+                  let resourceEpisodeProportions = _getDistributionProportionResursive(episode);
+
+                  // These proportions are the full proportions for the
+                  // resource episode, so we need to multiply each by this
+                  // episode's proportion 
+                  Iter.iterate<(Principal, Float)>(resourceEpisodeProportions.entries(), func(fullProportion: (Principal, Float), _index) {
+                    let resourcePrincipal = fullProportion.0;
+                    let resourceProportion = fullProportion.1 * thisResourceProportion;
+                    // Add a new value, or add the proportion to an existing
+                    // value if the principal was already in the map
+                    principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, resourcePrincipal, resourceProportion);
+                  });
+                };
+              };
+            };
+          };
+        });
+
+        return principalProportionsMap;
+      };
+    };
+  };
+
   /* Public Application interface */
 
   // Mint or transfer the NFT for the given episode into the logged-in user
@@ -344,9 +521,10 @@ actor class Serve() = Self {
         let txReceipt : NftDb.TxReceipt = NftDb.safeTransferFromDip721(
           nftDb,
           // Caller. Note that to transfer, we can't pass msg.caller because
-          // that refers to the logged-in new owner, not the previous owner who is
-          // the only one who has the right to transfer their NFT (except for this
-          // actor, which was made a custodian when this canister was initialized)
+          // that refers to the logged-in new owner, not the previous owner who
+          // is the only one who has the right to transfer their NFT (except
+          // for this actor, which was made a custodian when this canister was
+          // initialized)
           Principal.fromActor(Self),
           // From
           currentOwner,
@@ -476,7 +654,8 @@ actor class Serve() = Self {
       case (?feed) {
         let owner : Principal = feed.owner;
 
-        // First delete the owned feedKey from the Contributor who owns it, if any
+        // First delete the owned feedKey from the Contributor who owns it, if
+        // any
         let _ = contributors.removeOwnedFeedKey(owner, key);
 
         // Now delete the feed itself
@@ -544,10 +723,6 @@ actor class Serve() = Self {
   public func updateEpisode(episode : Episode) : async Result.Result<(), CreditsError> {
     credits.updateEpisode(episode);
   };
-
-  // public query func getSampleFeed() : async Feed {
-  //   credits.getSampleFeed();
-  // };
 
   func getFeedXml(
     feed : Feed,

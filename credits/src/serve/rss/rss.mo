@@ -202,7 +202,7 @@ module {
                       text = "";
                       children = [];
                     },
-                  ],
+                  ]
                 ),
                 List.map<Episode, Element>(
                   episodeListNewestToOldest,
@@ -218,7 +218,7 @@ module {
                     );
                   },
                 ),
-              ),
+              )
             );
           },
         ];

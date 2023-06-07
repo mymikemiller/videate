@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
-
-import 'package:vidlib/src/models/served_media.dart';
-import 'package:vidlib/src/models/media_file.dart';
-import 'package:vidlib/src/models/media.dart';
+import 'package:file/file.dart' as f;
 import 'package:vidlib/vidlib.dart';
 import '../../uploader.dart';
 
@@ -22,7 +19,7 @@ class InternetArchiveCliUploader extends Uploader {
   @override
   String get id => 'internet_archive_cli';
 
-  String credentialsFilePath;
+  String? credentialsFilePath;
 
   @override
   void configure(ClonerTaskArgs args) {
@@ -35,8 +32,7 @@ class InternetArchiveCliUploader extends Uploader {
   String getIdentifier(Media media) {
     // No need to repeat the source's id if that's also the title
     final title = media.title == media.source.id ? '' : '_${media.title}';
-    final base =
-        'videate_${media.source.platform.id}_${media.source.id}${title}';
+    final base = 'videate_${media.source.platform.id}_${media.source.id}$title';
 
     // Internet Archive only allows alphanumeric characters plus underscores,
     // dashes and periods. See
@@ -58,9 +54,9 @@ class InternetArchiveCliUploader extends Uploader {
 
   @override
   Future<ServedMedia> uploadMedia(MediaFile mediaFile,
-      [Function(double progress) callback]) async {
+      [Function(double progress)? callback]) async {
     final identifier = getIdentifier(mediaFile.media);
-    final file = await ensureLocal(mediaFile.file);
+    final file = await ensureLocal(mediaFile.file as f.File);
 
     final args = [
       '--config-file',
@@ -88,7 +84,7 @@ class InternetArchiveCliUploader extends Uploader {
         final progressRegex = RegExp(r'(\d+)%');
         final progressMatch = progressRegex.firstMatch(data);
         if (progressMatch != null) {
-          final progress = double.parse(progressMatch.group(1)) / 100.0;
+          final progress = double.parse(progressMatch.group(1)!) / 100.0;
           callback?.call(progress);
         }
       });

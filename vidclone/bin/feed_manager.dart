@@ -11,13 +11,13 @@ abstract class FeedManager extends ClonerTask {
   // Initialize this feed with the contents from the source by calling
   // `populate()`. Write its contents back to the source with write(). Thus,
   // the feed may be out of sync with the source until write() is called.
-  Feed _feed;
+  Feed? _feed;
   Feed get feed {
     if (_feed == null) {
       throw StateError(
           'Null feed. Set manually or call populate() before accessing.');
     }
-    return _feed;
+    return _feed!;
   }
 
   set feed(Feed feed) => _feed = feed;

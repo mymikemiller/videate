@@ -95,18 +95,36 @@ class Cloner {
     }
   }
 
-  // Clones all media published to the collection. If [after] is specified,
-  // only media published after the specified date are cloned.
+  // Clones all media
   //
   // Media will be cloned in chronological order (in the same order they were
   // originally published at the source).
-  Stream<ServedMedia> cloneCollection([DateTime after]) async* {
+  Stream<ServedMedia> cloneCollection() async* {
+    cloneCollectionStartingAtIndex(-1);
+  }
+
+  // Clones all media published after the specified date
+  //
+  // Media will be cloned in chronological order (in the same order they were
+  // originally published at the source).
+  Stream<ServedMedia> cloneCollectionAfterDate(DateTime date) async* {
     // Because reverseChronologicalMedia returns newest media first, we must
     // first get the list of all media and reverse it before cloning any media.
-    var stream = downloader.reverseChronologicalMedia(after);
+    var stream = downloader.reverseChronologicalMedia(date);
     final mediaList = (await stream.toList()).reversed;
     if (mediaList.isEmpty) {
-      print('No media found after $after');
+      print('No media found after date $date');
+    } else {
+      yield* _cloneAll(mediaList);
+    }
+  }
+
+  // Clones all media returned by downloader.allMedia() after and including the
+  // given index
+  Stream<ServedMedia> cloneCollectionStartingAtIndex(int index) async* {
+    var mediaList = await downloader.allMedia().skip(index).toList();
+    if (mediaList.isEmpty) {
+      print('No media found after index $index');
     } else {
       yield* _cloneAll(mediaList);
     }

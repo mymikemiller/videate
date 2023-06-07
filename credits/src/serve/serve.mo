@@ -86,6 +86,15 @@ actor class Serve() = Self {
   };
 
   system func postupgrade() {
+    // Call preupgrade to make sure it won't trap on the next upgrade, as per a
+    // conversation with paulyoung, if we trap in preupgrade we can get into a
+    // state where the canister can never be upgraded, so we run it now then
+    // throw away the results to make sure we won't trap the next time we try
+    // to upgrade.
+    preupgrade();
+
+    // Now empty the stable values because we don't need them until the next
+    // upgrade
     stableCredits := {
       feedEntries = [];
       episodeEntries = [];

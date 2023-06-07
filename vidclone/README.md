@@ -12,7 +12,7 @@ cd vidclone
 ### Run VidClone
 ```
 cd vidclone
-dart bin/main.dart [path_to_cloner_configs_json]
+dart bin/main.dart [path_to_cloner_configs_json] (defaults to $home/videate/cloner_configs.json)
 ```
 
 ### Run VidClone daily cloner configs via automator
@@ -62,6 +62,13 @@ Get app dependencies:
 ```
 cd vidclone
 pub get
+```
+
+Prepare vidlib, a dependency
+```
+cd ../vidlib
+pub get
+pub run build_runner build
 ```
 
 #### Cloner prerequisites

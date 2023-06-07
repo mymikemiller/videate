@@ -6,7 +6,10 @@ import 'package:meta/meta.dart';
 /// Base class for downloaders, which turn [Media] on a platform into
 /// [MediaFile]s that can be passed to any [Uploader]
 abstract class Downloader extends ClonerTask {
-  // The platform this downloader downloads from, e.g. the Youtube platform.
+  /// An id unique to this downloader, e.g. "youtube_playlist".
+  String get id;
+
+  // The platform this downloader downloads from, e.g. youtube.
   Platform get platform;
 
   // The size of window used to ensure [Media]s come back in order.
@@ -21,7 +24,7 @@ abstract class Downloader extends ClonerTask {
   // Downloads the specified media.
   @nonVirtual
   Future<MediaFile> download(Media media,
-      {Function(double progress) callback}) async {
+      {Function(double progress)? callback}) async {
     callback?.call(0);
     final mediaFile = await downloadMedia(media, callback);
     callback?.call(1);
@@ -31,21 +34,23 @@ abstract class Downloader extends ClonerTask {
   // Actual download logic. To be implemented by subclasses.
   @protected
   Future<MediaFile> downloadMedia(Media media,
-      [Function(double progress) callback]);
+      [Function(double progress)? callback]);
 
   // Returns a stream containing all media in the collection. The order of
   // [Media] is not guaranteed, but because reverseChronologicalMedia uses this
   // function, [Downloader]s should aim to return them in as close to reverse
-  // chronological order as possible so the slidingWindowSize can remain small.
+  // chronological order as possible so the slidingWindowSize can remain small,
+  // unless certain that revercseChronologicalMedia will not be called (e.g.
+  // for static playlists where the publish date doesn't matter)
   Stream<Media> allMedia();
 
   // Returns a stream that does its best to yield all media in the collection
   // in reverse order of date released (most recently released media first).
   // The [slidingWindowSize] property of this Downloader can be used to
   // increase the size of the sliding window used to better ensure order.
-  Stream<Media> reverseChronologicalMedia([DateTime after]) async* {
+  Stream<Media> reverseChronologicalMedia([DateTime? after]) async* {
     var slidingWindow = <Media>[];
-    Media previouslyYielded;
+    Media? previouslyYielded;
 
     // Essentially this acts like "was released more recently than", 1=yes,
     // -1=no, 0=same

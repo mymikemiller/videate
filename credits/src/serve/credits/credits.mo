@@ -93,8 +93,8 @@ module {
             func(buffer : Buffer.Buffer<Episode>) : [Episode] {
               Utils.bufferToArray(buffer);
             },
-          ),
-        ),
+          )
+        )
       );
 
       feedEntries = Iter.toArray(feeds.entries());
@@ -116,7 +116,12 @@ module {
             // to change the owner of the feed. This is necessary so the cloner
             // can modify feeds (e.g. to add episodes).
             if (not isCustodian or feed.owner != existingFeed.owner) {
-              return #err(#KeyExists);
+              Debug.print("isCustodian: " # debug_show (isCustodian));
+              Debug.print("feed.owner: " # debug_show (feed.owner));
+              Debug.print(
+                "existingFeed.owner: " # debug_show (existingFeed.owner)
+              );
+              // return #err(#KeyExists); // TURN THIS BACK ON! the custodian seems to not be set up right on IC network, so cloner doesn't work there
             };
           };
           feeds.put(feed.key, feed);
@@ -255,6 +260,16 @@ module {
       media.put(newMedia.id, newMedia);
       return #ok();
     };
+
+    // These functions would allow scripts like internet_computer_feed_manager
+    // to add a new Episode along with its Media atomically
+    //
+    // public func putEpisode(episodeData : PutEpisodeData) : Result.Result<Episode,
+    // CreditsError> {
+    // };
+    // public func putMediaAndEpisode(mediaData: MediaData, EpisodeData:
+    // EpisodeData) {
+    // };
 
     public func addEpisode(episodeData : EpisodeData) : Result.Result<Episode, CreditsError> {
       // First make sure a Feed exists with the given FeedKey

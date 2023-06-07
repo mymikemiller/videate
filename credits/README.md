@@ -69,7 +69,7 @@ the port in ~/.config/dfx/networks.json
 
 ### Launch the automatically-generated, interactive Candid frontend for the appropriate canister
 
-`localhost:4943/canisterId={__CANDID_UI cid from .dfx/local/canisters}`
+`localhost:4943/?canisterId={__CANDID_UI cid from .dfx/local/canisters}&id={serve cid from .dfx/local/canisters}`
 
 ### Launch the frontend, hosted in the frontend canister
 

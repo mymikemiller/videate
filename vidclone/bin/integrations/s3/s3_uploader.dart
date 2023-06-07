@@ -103,7 +103,7 @@ abstract class S3Uploader extends Uploader {
   }
 
   @override
-  Future<ServedMedia> getExistingServedMedia(Media media) async {
+  Future<ServedMedia?> getExistingServedMedia(Media media) async {
     final key = getKey(media);
     final bucket = getBucket(media);
     // var contents = await bucket.listContents(prefix: key, delimiter: '/');

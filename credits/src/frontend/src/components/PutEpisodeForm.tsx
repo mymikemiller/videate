@@ -45,6 +45,7 @@ interface PutEpisodeFormProps {
 };
 
 const PutEpisodeForm = (): JSX.Element => {
+  console.log("Hello, loading PutEpisodeForm");
   const { actor, authClient, login, profile } = useContext(AppContext);
   const { state } = useLocation();
   const [searchParams] = useSearchParams();
@@ -224,6 +225,9 @@ const PutEpisodeForm = (): JSX.Element => {
       console.error("Feed is undefined at time of form submission");
       return;
     };
+
+    console.log("onSubmit feed:");
+    console.dir(feed);
 
     // Add individual resources
     let resources: Array<WeightedResource> = data.individualResources.map((value: [bigint, string]) => {

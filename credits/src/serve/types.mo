@@ -47,4 +47,14 @@ module {
   // PutFeedFullResult differs from Credits.PutResult in that it might result
   // in an error when updating the contributor's list of owned feeds.
   public type PutFeedFullResult = Result.Result<CreditsTypes.PutSuccess, { #CreditsError : CreditsTypes.CreditsError; #ContributorsError : ContributorsTypes.ContributorsError }>;
+
+  public type Subaccount = Blob;
+  public type Account = {
+    owner : Principal;
+    subaccount : ?Subaccount;
+  };
+  public type Invoice = {
+    to : Account;
+    amount : Nat;
+  };
 };

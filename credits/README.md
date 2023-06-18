@@ -28,6 +28,10 @@ dfx deploy
 ```
 dfx canister call serve initialize
 ```
+And use the private did file when deploying the icrc1 ledger:
+```
+npm run private-dids ; npm run deploy
+```
 4. Run the frontend on port 3000 with hot reload capability in Chromium browsers
 ```
 npm start
@@ -139,6 +143,7 @@ Make sure to specify the current cid for frontend from
 properly, e.g.:
 
 # Adding ckBTC to an account for testing purposes
+## Note that this will obviously only work on a local ckbtc_ledger canister
 
 First use the Serve canister's candid frontend to call getAccount on the
 principal to mint funds to. Insert that Account type candid into the following

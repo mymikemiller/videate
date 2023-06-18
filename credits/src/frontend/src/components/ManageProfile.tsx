@@ -28,45 +28,83 @@ import { Input, Label } from "./styles/styles";
 
 function ManageProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [distributionSimAmount, setDistributionSimAmount] = useState(0.0);
-  const [distributionSimElement, setDistributionSimElement] = useState(<></>);
+  const [satPerUsd, setSatPerUsd] = useState(4_000); // This value is an estimate. todo: fetch actual value
+  const [distributionElement, setDistributionElement] = useState(<></>);
+  const [satoshiBalance, setSatoshiBalance] = useState<BigInt | undefined>(undefined);
+  const [balanceDisplay, setBalanceDisplay] = useState("Loading...");
   const { authClient, actor, profile, setProfile } = useContext(AppContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (distributionSimAmount == 0.0) {
-      setDistributionSimElement(<></>);
-      return;
-    };
+    (async () => {
+      // todo: fetch current value for Satoshi per USD and call setSatPerUsd()
+      await updateBalance();
+    })();
+  }, [actor]);
 
-    setDistributionSimElement(<Text>Please wait...</Text>);
+  // Update the balance display when the balance is changed
+  useEffect(() => {
+    if (actor !== undefined && satoshiBalance != undefined) {
+      (async () => {
+        const _usdBalance = Number(satoshiBalance) / satPerUsd;
+        setBalanceDisplay("$" + _usdBalance.toFixed(2) + " (" + satoshiBalance + " ckSat)");
+      })();
+    }
+  }, [satoshiBalance]);
+
+  const updateBalance = async () => {
+    const balanceResult = await actor?.getBalance();
+    if (balanceResult !== undefined && "ok" in balanceResult) {
+      const balance = balanceResult.ok;
+      setSatoshiBalance(balance);
+    };
+  }
+
+  const performDistribution = async (distributionAmountSatoshi: bigint) => {
+    if (actor == undefined) {
+      "Actor undefined";
+      return;
+    }
+    setDistributionElement(<Text>Please wait...</Text>);
 
     (async () => {
-      const distributionAmounts = await actor!.getDistribution(distributionSimAmount);
+      const distributionResult = await actor!.performDistribution(distributionAmountSatoshi);
 
-      const listElements = [];
-      for (let index in distributionAmounts) {
-        const values = distributionAmounts[index];
-        const principal = values[0];
-        const name = values[1] ? values[1] : "Contributor not found";
-        const amount = values[2];
-        const amountAsString = (Math.round(amount * 100) / 100).toFixed(2);
-        listElements.push(
-          <li key={index} style={{ listStyleType: 'none', marginBottom: '1em' }} >
-            <Text>${amountAsString}: {name}</Text>
-          </li>
-        );
-      };
+      if (distributionResult !== undefined && "ok" in distributionResult) {
+        const distributionAmountsSatoshi = distributionResult.ok;
+        const listElements = [];
+        for (let index in distributionAmountsSatoshi) {
+          const values = distributionAmountsSatoshi[index];
+          const principal = values[0];
+          const name = values[1] ? values[1] : "Contributor not found";
+          const satoshiAmount = values[2];
+          const usdAmount = Number(satoshiAmount / BigInt(satPerUsd));
+          const usdAmountAsString = usdAmount.toFixed(2);
+          listElements.push(
+            <li key={index} style={{ listStyleType: 'none', marginBottom: '1em' }} >
+              <Text>${usdAmountAsString} ({satoshiAmount.toString()} ckSat) sent to {name}</Text>
+            </li>
+          );
+        };
 
-      const element =
-        <ul style={{ padding: 0 }} >
-          {listElements}
-        </ul>
-
-      setDistributionSimElement(<div>{element}</div>);
+        if (listElements.length == 0) {
+          setDistributionElement(<Text>No videos watched this month. No distribution performed.</Text>);
+        } else {
+          const element =
+            <ul style={{ padding: 0 }} >
+              {listElements}
+            </ul>
+          setDistributionElement(<div>{element}</div>);
+        }
+        setBalanceDisplay("Loading...");
+        await updateBalance();
+      } else {
+        const element =
+          <Text>Error: {Object.values(distributionResult.err)}</Text>
+        setDistributionElement(<div>{element}</div>);
+      }
     })();
-
-  }, [distributionSimAmount]);
+  }
 
   const deleteProfile = async () => {
     if (
@@ -155,15 +193,15 @@ function ManageProfile() {
               )
             })}
           </ul>
+          <Text>Current balance: {balanceDisplay}</Text>
           <div>
             <ActionButton onPress={() => {
-              setDistributionSimAmount(0);
-              setDistributionSimAmount(10.0);
+              performDistribution(BigInt(10 * satPerUsd));
             }}>
-              <Text>Simulate $10 Gift</Text>
+              <Text>Give $10 ({10 * satPerUsd} ckSat)</Text>
             </ActionButton>
           </div>
-          {distributionSimElement}
+          {distributionElement}
         </section>
       )
       }

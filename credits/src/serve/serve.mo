@@ -4,6 +4,7 @@ import Result "mo:base/Result";
 import Buffer "mo:base/Buffer";
 import Iter "mo:base/Iter";
 import Int "mo:base/Int";
+import Int8 "mo:base/Int8";
 import Float "mo:base/Float";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
@@ -61,6 +62,8 @@ actor class Serve() = Self {
   type MintReceipt = NftDb.MintReceipt;
   type Account = Types.Account;
   type Subaccount = Types.Subaccount;
+  type DistributionAmounts = Types.DistributionAmounts;
+  type CkSat = Types.CkSat;
 
   let sampleFeed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" version=\"2.0\"> <channel> <atom:link href=\"http://mikem-18bd0e1e.localhost.run/\" rel=\"self\" type=\"application/rss+xml\"></atom:link> <title>Sample Feed</title> <link>http://example.com</link> <language>en-us</language> <itunes:subtitle>Just a sample</itunes:subtitle> <itunes:author>Mike Miller</itunes:author> <itunes:summary>A sample feed hosted on the Internet Computer</itunes:summary> <description>A sample feed hosted on the Internet Computer</description> <itunes:owner> <itunes:name>Mike Miller</itunes:name> <itunes:email>mike@videate.org</itunes:email> </itunes:owner> <itunes:explicit>no</itunes:explicit> <itunes:image href=\"https://brianchristner.io/content/images/2016/01/Success-loading.jpg\"></itunes:image> <itunes:category text=\"Arts\"></itunes:category> <item> <title>test</title> <itunes:summary>test</itunes:summary> <description>test</description> <link>http://example.com/podcast-1</link> <enclosure url=\"https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4\" type=\"video/mpeg\" length=\"1024\"></enclosure> <pubDate>21 Dec 2016 16:01:07 +0000</pubDate> <itunes:author>Mike Miller</itunes:author> <itunes:duration>00:32:16</itunes:duration> <itunes:explicit>no</itunes:explicit> <guid></guid> </item> </channel> </rss>";
 
@@ -207,6 +210,7 @@ actor class Serve() = Self {
     ];
     let transformedMediaUri = transformUri(media.uri, uriTransformers);
 
+    Debug.print("Logging user download");
     // Record the user's download
     let download : Download = {
       time = Time.now();
@@ -214,6 +218,8 @@ actor class Serve() = Self {
       episodeId = episodeId;
     };
     let logResult = contributors.logDownload(requestorPrincipal, download);
+    Debug.print("logResult:");
+    Debug.print(debug_show (logResult));
     if (logResult == null) Debug.trap("Failed to log download");
 
     // Redirect to the actual media file location
@@ -329,20 +335,90 @@ actor class Serve() = Self {
   };
 
   // Returns an array of which principals should be given which amount given
-  // the specified user's downloads that happened in the last month
-  public shared (msg) func getDistribution(amount : Float) : async [(Principal, ?Text, Float)] {
-    let distributionProportions = _getDistributionProportions(msg.caller);
+  // the specified user's downloads that happened in the last month.
+  public func getDistributionAmounts(from : Principal, amount : CkSat) : async DistributionAmounts {
+    let distributionProportions = _getDistributionProportions(from);
     let distributionProportionsArray = Iter.toArray(distributionProportions.entries());
 
-    let distributionAmounts = Array.map<(Principal, Float), (Principal, ?Text, Float)>(
+    let distributionTokenAmounts = Array.map<(Principal, Float), (Principal, ?Text, CkSat)>(
       distributionProportionsArray,
       func((principal : Principal, proportion : Float)) {
         let name = contributors.getName(principal);
-        (principal, name, proportion * amount);
+        let tokensForPrincipalFloat : Float = proportion * Float.fromInt(amount);
+        let tokensForPrincipalNat : Nat = Int.abs(Float.toInt(tokensForPrincipalFloat));
+        (principal, name, tokensForPrincipalNat);
       },
     );
 
-    return distributionAmounts;
+    Debug.print("distributionTokenAmounts:");
+    Debug.print(debug_show (distributionTokenAmounts));
+
+    return distributionTokenAmounts;
+  };
+
+  public shared (msg) func performDistribution(tokenAmount : CkSat) : async Result.Result<DistributionAmounts, Text> {
+    Debug.print("performDistribution. tokenAmount: " # debug_show (tokenAmount));
+
+    // check ckBTC token balance of the caller's dedicated account
+    let tokenBalanceResult = await getBalanceOf(msg.caller);
+    var tokenBalance = 0;
+    switch (tokenBalanceResult) {
+      case (#ok(balance)) {
+        Debug.print("got balance: " # debug_show (balance));
+        tokenBalance := balance;
+      };
+      case (#err(msg)) { return #err(msg) };
+    };
+    Debug.print("Balance before distribution: " # debug_show (tokenBalance) # " tokens");
+    if (tokenBalance < tokenAmount) {
+      Debug.print("Insufficent funds");
+      return #err("Insufficient Funds");
+    };
+
+    // Now figure out how much we're going to have to pay in transfer fees. For
+    // now, these will be taken out of the amount that gets distributed so that
+    // contributors are always charged the amount they signed up for.
+
+    // todo: don't transfer from each user to each user individually. Transfer
+    // to a pool (i.e make a single transfer of the total) that is pulled from
+    // each month so a single transfer can be made to each creator, not a
+    // transfer from each individual user. This will avoid unnecessary transfer
+    // fees.
+    let distributionAmounts = await getDistributionAmounts(msg.caller, tokenAmount);
+    let numRecipients = Array.size(distributionAmounts);
+    let individualTransferFeeTokens = await CkBtcLedger.icrc1_fee();
+    let totalFeeTokens = numRecipients * individualTransferFeeTokens;
+
+    if (tokenBalance < tokenAmount + totalFeeTokens) {
+      Debug.print("Insufficent funds for transfer fees");
+      return #err("Insuffient funds to cover all transfer fees. To transfer to " # debug_show (numRecipients) # " creators, you need at least " # debug_show (totalFeeTokens) # " ckSat in your account in addition to your gift amount.");
+    };
+
+    let sourceSubaccount : Subaccount = await getSubaccount(msg.caller);
+
+    for (distributionInfo in distributionAmounts.vals()) {
+      let recipientPrincipal = distributionInfo.0;
+      let recipientName = distributionInfo.1;
+      let tokenAmountForRecipient = distributionInfo.2;
+
+      let recipientAccount = await getAccount(recipientPrincipal);
+
+      Debug.print(debug_show (recipientName) # " tokenAmountForRecipient: " # debug_show (tokenAmountForRecipient));
+      Debug.print("performing transfer to " # debug_show (recipientName));
+
+      let transferResult = await CkBtcLedger.icrc1_transfer({
+        from_subaccount = Option.make(sourceSubaccount);
+        to = recipientAccount;
+        amount = tokenAmountForRecipient;
+        fee = Option.make(individualTransferFeeTokens);
+        created_at_time = null;
+        memo = null;
+      });
+
+      Debug.print(debug_show (transferResult));
+    };
+
+    return #ok(distributionAmounts);
   };
 
   // Returns an array of which principals should be given which percentage
@@ -426,9 +502,9 @@ actor class Serve() = Self {
         let episodeProportion = switch (credits.getMedia(episode.mediaId)) {
           case (null) {
             Debug.trap("ERROR: Media " # debug_show (episode.mediaId) # " not found. This media was referenced in episode " # debug_show (episode.id) # " of feed " # episode.feedKey);
-            // todo: handle this gracefully, possibly ignoring this episode. This
-            // should never happen, though, given we would have failed to find
-            // the media above and not added the episode to the set
+            // todo: handle this gracefully, possibly ignoring this episode.
+            // This should never happen, though, given we would have failed to
+            // find the media above and not added the episode to the set
           };
           case (?media) {
             Float.fromInt(media.durationInMicroseconds) / Float.fromInt(totalDurationInMicroseconds);
@@ -482,15 +558,16 @@ actor class Serve() = Self {
 
             switch (weightedResource.resource) {
               case (#individual(principal)) {
-                // Add a new value, or add the proportion to an existing value if
-                // the principal was already in the map
+                // Add a new value, or add the proportion to an existing value
+                // if the principal was already in the map
                 principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, principal, thisResourceProportion);
               };
               case (#episode(details)) {
                 switch (credits.getEpisode(details.feedKey, details.episodeId)) {
                   case (null) {
                     Debug.trap("ERROR: Resource episode " # debug_show (details.episodeId) # " not found in feed " # details.feedKey);
-                    // todo: handle gracefully, maybe just ignoring this resource (return [])
+                    // todo: handle gracefully, maybe just ignoring this
+                    // resource (return [])
                   };
                   case (?episode) {
                     // Recursively get the proportions of the resource episode
@@ -504,8 +581,9 @@ actor class Serve() = Self {
                       func(fullProportion : (Principal, Float), _index) {
                         let resourcePrincipal = fullProportion.0;
                         let resourceProportion = fullProportion.1 * thisResourceProportion;
-                        // Add a new value, or add the proportion to an existing
-                        // value if the principal was already in the map
+                        // Add a new value, or add the proportion to an
+                        // existing value if the principal was already in the
+                        // map
                         principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, resourcePrincipal, resourceProportion);
                       },
                     );
@@ -921,32 +999,35 @@ actor class Serve() = Self {
     };
   };
 
-  public shared ({ caller }) func getBalance() : async Result.Result<Text, Text> {
+  // Reports the balance for the caller. Calling this from the cli will report
+  // the cli user's balance.
+  public shared ({ caller }) func getBalance() : async Result.Result<Nat, Text> {
+    await getBalanceOf(caller);
+  };
 
-    // let sub : Subaccount = Blob.fromArray([0, 1, 2]);
+  public func getBalanceOf(principal : Principal) : async Result.Result<Nat, Text> {
+    Debug.print("getBalanceOf: " # debug_show (principal));
+    let account : Account = await getAccount(principal);
+    let balance = await CkBtcLedger.icrc1_balance_of(account);
+    return #ok(balance);
+  };
 
-    // let acct : Account = {
-    //   owner = Principal.fromText("hello");
-    //   subaccount = ?[Nat8.fromNat(0), Nat8.fromNat(1), Nat8.fromNat(2)];
-    // };
+  public func getSubaccount(principal : Principal) : async Subaccount {
+    return Utils.toSubaccount(principal);
+  };
 
-    let balance = 3;
-    // await CkBtcLedger.icrc1_balance_of({
-    //   owner = Principal.fromText("hello");
-    //   subaccount = ?[0, 1, 2];
-    // });
+  public func getAccount(principal : Principal) : async Account {
+    let account : Account = Utils.toAccount({
+      caller = principal;
+      canister = Principal.fromActor(Self);
+    });
+    return account;
+  };
 
-    // let account : Account = Utils.toAccount({
-    //   caller;
-    //   canister = Principal.fromActor(Self);
-    // });
-
-    // let balance = await CkBtcLedger.icrc1_balance_of({
-    //   owner = Principal.fromText("hello");
-    //   subaccount = ?[Nat8.fromNat(0), Nat8.fromNat(1), Nat8.fromNat(2)];
-    // });
-    // let balance = CkBtcLedger.icrc1_balance_of({owner : Principal.fromText("s7v5n-xcubz-fcpgx-bmtwn-a7gvr-eigeg-idpzg-bsiuv-3th53-uee3c-2qe"));
-    return #ok("balance: " # debug_show (balance));
-    // return #ok("ok");
+  public func ckBtcLedgerDecimals() : async Nat8 {
+    return await CkBtcLedger.icrc1_decimals();
+  };
+  public func ckBtcLedgerTransferFee() : async Nat {
+    return await CkBtcLedger.icrc1_fee();
   };
 };

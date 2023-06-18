@@ -13,7 +13,10 @@
     },
     "serve": {
       "main": "src/serve/serve.mo",
-      "type": "motoko"
+      "type": "motoko",
+      "dependencies": [
+        "ckbtc_ledger"
+      ]
     },
     "frontend": {
       "dependencies": [

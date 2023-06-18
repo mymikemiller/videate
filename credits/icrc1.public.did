@@ -259,7 +259,7 @@ type DataCertificate = record {
     hash_tree : blob;
 };
 
-service : () -> {
+service : {
     icrc1_name : () -> (text) query;
     icrc1_symbol : () -> (text) query;
     icrc1_decimals : () -> (nat8) query;
@@ -273,4 +273,4 @@ service : () -> {
     get_transactions : (GetTransactionsRequest) -> (GetTransactionsResponse) query;
     get_blocks : (GetBlocksArgs) -> (GetBlocksResponse) query;
     get_data_certificate : () -> (DataCertificate) query;
-};
+}

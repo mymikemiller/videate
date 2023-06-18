@@ -138,6 +138,18 @@ Make sure to specify the current cid for frontend from
 .dfx/local/canister_ids.json so the generated videate settings links will work
 properly, e.g.:
 
+# Adding ckBTC to an account for testing purposes
+
+First use the Serve canister's candid frontend to call getAccount on the
+principal to mint funds to. Insert that Account type candid into the following
+dfx command. Note that the "owner" principal is the Serve canister's principal
+and the subaccount vec is derived from the given principal. Specify the amount
+in Satoshis, not BTC (i.e. multiply BTC by 100,000,000)
+
+```
+dfx canister call ckbtc_ledger icrc1_transfer '(record {to = (record {owner=principal "bd3sg-teaaa-aaaaa-qaaba-cai"; subaccount=opt vec {0; 0; 29; 106; 101; 141; 60; 52; 200; 192; 101; 70; 9; 4; 64; 162; 183; 223; 196; 220; 35; 235; 26; 114; 105; 218; 204; 161; 101; 218; 43; 2}}); amount=50000},)'
+```
+
 # Deploy to the Internet Computer:
 ```
 dfx deploy serve --network ic --no-wallet

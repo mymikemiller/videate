@@ -6,9 +6,17 @@
   "scripts": {
     "build": "webpack",
     "prebuild": "npm run generate:types",
-    "start": "webpack serve --mode development --env development",
+    "web": "webpack serve --mode development --env development",
     "prestart": "npm run generate:types",
-    "generate:types": "dfx generate serve"
+    "generate:types": "dfx generate serve",
+    "start": "npm run replica && npm run private-dids && npm run deploy",
+    "replica": "dfx stop && rm -rf .dfx && dfx start --clean --background && dfx canister create ckbtc_ledger && dfx canister create serve",
+    "deploy": "npm run deploy:ckbtc_ledger && npm run deploy:serve",
+    "public-dids": "perl -i -pe 's|icrc1\\.did|icrc1\\.public\\.did|g' dfx.json",
+    "private-dids": "perl -i -pe 's|icrc1\\.public\\.did|icrc1\\.did|g' dfx.json",
+    "deploy:ckbtc_ledger": "PRINCIPAL=$(dfx identity get-principal) && dfx deploy ckbtc_ledger --argument \"(variant {Init = record {minting_account = record { owner = principal \\\"$PRINCIPAL\\\" };transfer_fee = 10;token_symbol = \\\"ckBTC\\\";token_name = \\\"Token ckBTC\\\";metadata = vec {};initial_balances = vec {record { record {owner = principal \\\"$PRINCIPAL\\\"}; 100_000_000_000 } };archive_options = record {num_blocks_to_archive = 10_000;trigger_threshold = 20_000;cycles_for_archive_creation = opt 4_000_000_000_000;controller_id = principal \\\"$PRINCIPAL\\\";};}})\"  --mode=reinstall -y",
+    "deploy:serve": "npm run public-dids && dfx deploy serve",
+    "mint": "read -p \"Enter a principal you want to mint tokens to. By default 1000 ckBTC will be minted to your current dfx identity.\n\" recipient && if [ -z \"$recipient\" ]; then echo \"No recipient specified, skipping minting.\"; else dfx canister call ckbtc_ledger icrc1_transfer \"(record {to = record {owner = principal \\\"$recipient\\\"};amount=100_000_000_000},)\"; fi"
   },
   "devDependencies": {
     "@dfinity/agent": "0.14.1",

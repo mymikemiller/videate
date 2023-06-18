@@ -4,6 +4,7 @@ import Result "mo:base/Result";
 import Buffer "mo:base/Buffer";
 import Iter "mo:base/Iter";
 import Int "mo:base/Int";
+import Int8 "mo:base/Int8";
 import Float "mo:base/Float";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
@@ -26,6 +27,8 @@ import Rss "rss/rss";
 import Xml "rss/xml";
 import Types "types";
 import Utils "utils";
+import Blob "mo:base/Blob";
+import CkBtcLedger "canister:ckbtc_ledger";
 
 actor class Serve() = Self {
   type HttpRequest = Types.HttpRequest;
@@ -57,6 +60,10 @@ actor class Serve() = Self {
   type ContributorsError = Contributors.ContributorsError;
   type MintReceiptPart = NftDb.MintReceiptPart;
   type MintReceipt = NftDb.MintReceipt;
+  type Account = Types.Account;
+  type Subaccount = Types.Subaccount;
+  type DistributionAmounts = Types.DistributionAmounts;
+  type CkSat = Types.CkSat;
 
   let sampleFeed = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" version=\"2.0\"> <channel> <atom:link href=\"http://mikem-18bd0e1e.localhost.run/\" rel=\"self\" type=\"application/rss+xml\"></atom:link> <title>Sample Feed</title> <link>http://example.com</link> <language>en-us</language> <itunes:subtitle>Just a sample</itunes:subtitle> <itunes:author>Mike Miller</itunes:author> <itunes:summary>A sample feed hosted on the Internet Computer</itunes:summary> <description>A sample feed hosted on the Internet Computer</description> <itunes:owner> <itunes:name>Mike Miller</itunes:name> <itunes:email>mike@videate.org</itunes:email> </itunes:owner> <itunes:explicit>no</itunes:explicit> <itunes:image href=\"https://brianchristner.io/content/images/2016/01/Success-loading.jpg\"></itunes:image> <itunes:category text=\"Arts\"></itunes:category> <item> <title>test</title> <itunes:summary>test</itunes:summary> <description>test</description> <link>http://example.com/podcast-1</link> <enclosure url=\"https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4\" type=\"video/mpeg\" length=\"1024\"></enclosure> <pubDate>21 Dec 2016 16:01:07 +0000</pubDate> <itunes:author>Mike Miller</itunes:author> <itunes:duration>00:32:16</itunes:duration> <itunes:explicit>no</itunes:explicit> <guid></guid> </item> </channel> </rss>";
 
@@ -203,6 +210,7 @@ actor class Serve() = Self {
     ];
     let transformedMediaUri = transformUri(media.uri, uriTransformers);
 
+    Debug.print("Logging user download");
     // Record the user's download
     let download : Download = {
       time = Time.now();
@@ -210,6 +218,8 @@ actor class Serve() = Self {
       episodeId = episodeId;
     };
     let logResult = contributors.logDownload(requestorPrincipal, download);
+    Debug.print("logResult:");
+    Debug.print(debug_show (logResult));
     if (logResult == null) Debug.trap("Failed to log download");
 
     // Redirect to the actual media file location
@@ -325,22 +335,95 @@ actor class Serve() = Self {
   };
 
   // Returns an array of which principals should be given which amount given
-  // the specified user's downloads that happened in the last month
-  public shared(msg) func getDistribution(amount: Float) : async [(Principal, ?Text, Float)] {
-    let distributionProportions = _getDistributionProportions(msg.caller);
+  // the specified user's downloads that happened in the last month.
+  public func getDistributionAmounts(from : Principal, amount : CkSat) : async DistributionAmounts {
+    let distributionProportions = _getDistributionProportions(from);
     let distributionProportionsArray = Iter.toArray(distributionProportions.entries());
 
-    let distributionAmounts = Array.map<(Principal, Float), (Principal, ?Text, Float)>(distributionProportionsArray, func((principal: Principal, proportion: Float)) {
-      let name = contributors.getName(principal);
-      (principal, name, proportion * amount);
-    });
+    let distributionTokenAmounts = Array.map<(Principal, Float), (Principal, ?Text, CkSat)>(
+      distributionProportionsArray,
+      func((principal : Principal, proportion : Float)) {
+        let name = contributors.getName(principal);
+        let tokensForPrincipalFloat : Float = proportion * Float.fromInt(amount);
+        let tokensForPrincipalNat : Nat = Int.abs(Float.toInt(tokensForPrincipalFloat));
+        (principal, name, tokensForPrincipalNat);
+      },
+    );
 
-    return distributionAmounts;
+    Debug.print("distributionTokenAmounts:");
+    Debug.print(debug_show (distributionTokenAmounts));
+
+    return distributionTokenAmounts;
+  };
+
+  public shared (msg) func performDistribution(tokenAmount : CkSat) : async Result.Result<DistributionAmounts, Text> {
+    Debug.print("performDistribution. tokenAmount: " # debug_show (tokenAmount));
+
+    // check ckBTC token balance of the caller's dedicated account
+    let tokenBalanceResult = await getBalanceOf(msg.caller);
+    var tokenBalance = 0;
+    switch (tokenBalanceResult) {
+      case (#ok(balance)) {
+        Debug.print("got balance: " # debug_show (balance));
+        tokenBalance := balance;
+      };
+      case (#err(msg)) { return #err(msg) };
+    };
+    Debug.print("Balance before distribution: " # debug_show (tokenBalance) # " tokens");
+    if (tokenBalance < tokenAmount) {
+      Debug.print("Insufficent funds");
+      return #err("Insufficient Funds");
+    };
+
+    // Now figure out how much we're going to have to pay in transfer fees. For
+    // now, these will be taken out of the amount that gets distributed so that
+    // contributors are always charged the amount they signed up for.
+
+    // todo: don't transfer from each user to each user individually. Transfer
+    // to a pool (i.e make a single transfer of the total) that is pulled from
+    // each month so a single transfer can be made to each creator, not a
+    // transfer from each individual user. This will avoid unnecessary transfer
+    // fees.
+    let distributionAmounts = await getDistributionAmounts(msg.caller, tokenAmount);
+    let numRecipients = Array.size(distributionAmounts);
+    let individualTransferFeeTokens = await CkBtcLedger.icrc1_fee();
+    let totalFeeTokens = numRecipients * individualTransferFeeTokens;
+
+    if (tokenBalance < tokenAmount + totalFeeTokens) {
+      Debug.print("Insufficent funds for transfer fees");
+      return #err("Insuffient funds to cover all transfer fees. To transfer to " # debug_show (numRecipients) # " creators, you need at least " # debug_show (totalFeeTokens) # " ckSat in your account in addition to your gift amount.");
+    };
+
+    let sourceSubaccount : Subaccount = await getSubaccount(msg.caller);
+
+    for (distributionInfo in distributionAmounts.vals()) {
+      let recipientPrincipal = distributionInfo.0;
+      let recipientName = distributionInfo.1;
+      let tokenAmountForRecipient = distributionInfo.2;
+
+      let recipientAccount = await getAccount(recipientPrincipal);
+
+      Debug.print(debug_show (recipientName) # " tokenAmountForRecipient: " # debug_show (tokenAmountForRecipient));
+      Debug.print("performing transfer to " # debug_show (recipientName));
+
+      let transferResult = await CkBtcLedger.icrc1_transfer({
+        from_subaccount = Option.make(sourceSubaccount);
+        to = recipientAccount;
+        amount = tokenAmountForRecipient;
+        fee = Option.make(individualTransferFeeTokens);
+        created_at_time = null;
+        memo = null;
+      });
+
+      Debug.print(debug_show (transferResult));
+    };
+
+    return #ok(distributionAmounts);
   };
 
   // Returns an array of which principals should be given which percentage
   // given the specified user's downloads that happened in the last month
-  func _getDistributionProportions(from: Principal) : HashMap.HashMap<Principal, Float> {
+  func _getDistributionProportions(from : Principal) : HashMap.HashMap<Principal, Float> {
     // Create the map that we will eventually return
     var finalProportions = HashMap.fromIter<Principal, Float>(
       Iter.fromArray([]),
@@ -349,16 +432,16 @@ actor class Serve() = Self {
       Principal.hash,
     );
 
-    let downloads: [Download] = switch(contributors.getDownloads(from)) {
+    let downloads : [Download] = switch (contributors.getDownloads(from)) {
       case null return finalProportions; // Return empty map
-      case (? downloads) downloads;
+      case (?downloads) downloads;
     };
 
-    let monthAsNanoseconds: Int = Float.toInt(2.628e+15);
+    let monthAsNanoseconds : Int = Float.toInt(2628000000000000); //2.628e+15
     let earliestTime = Time.now() - monthAsNanoseconds;
 
-    var totalDurationInMicroseconds: Nat = 0;
-    
+    var totalDurationInMicroseconds : Nat = 0;
+
     // Use a TrieSet to collect unique Episodes since we only count them once
     // even if a user downloaded them multiple times
     var episodeSet = TrieSet.empty<Episode>();
@@ -368,73 +451,84 @@ actor class Serve() = Self {
     // and calculating the total duration of all media, stopping when we get to
     // one that occurred more than a month ago
     label loopBreak for (i in Iter.revRange(downloads.size(), 1)) {
-      let download = downloads[Int.abs(i-1)];
+      let download = downloads[Int.abs(i -1)];
 
-      if (download.time < earliestTime){
-        Debug.print("Encountered download that occured longer than a month ago. Breaking at index " # debug_show(i));
+      if (download.time < earliestTime) {
+        Debug.print("Encountered download that occured longer than a month ago. Breaking at index " # debug_show (i));
         break loopBreak;
       };
 
-      switch(credits.getEpisode(download.feedKey, download.episodeId)) {
-        case (null) { 
-          Debug.print("Skipping episode. Episode " # debug_show(download.episodeId) # " not found in feed " # download.feedKey);
+      switch (credits.getEpisode(download.feedKey, download.episodeId)) {
+        case (null) {
+          Debug.print("Skipping episode. Episode " # debug_show (download.episodeId) # " not found in feed " # download.feedKey);
         };
-        case (? episode) {
-          switch(credits.getMedia(episode.mediaId)) {
+        case (?episode) {
+          switch (credits.getMedia(episode.mediaId)) {
             case (null) {
-              Debug.print("Skipping episode. Media " # debug_show(episode.mediaId) # " not found. This media was referenced in episode " # debug_show(download.episodeId) # " of feed " # download.feedKey);
+              Debug.print("Skipping episode. Media " # debug_show (episode.mediaId) # " not found. This media was referenced in episode " # debug_show (download.episodeId) # " of feed " # download.feedKey);
             };
-            case (? media) {
+            case (?media) {
               let key = episode.feedKey # Nat.toText(episode.mediaId);
               var sizeBeforeAdd = TrieSet.size(episodeSet);
-              episodeSet := TrieSet.put<Episode>(episodeSet, episode, Text.hash(key), func(a: Episode, b: Episode) {
-                a.feedKey == b.feedKey and a.id == b.id;
-              });
+              episodeSet := TrieSet.put<Episode>(
+                episodeSet,
+                episode,
+                Text.hash(key),
+                func(a : Episode, b : Episode) {
+                  a.feedKey == b.feedKey and a.id == b.id;
+                },
+              );
               if (sizeBeforeAdd != TrieSet.size(episodeSet)) {
                 // The episode was added to the set (i.e. this is its first
                 // time being encountered), so include its duration in the
                 // total. We only count episodes once even if they were
                 // downloaded multiple times.
                 totalDurationInMicroseconds += media.durationInMicroseconds;
-              }
+              };
             };
           };
         };
-      }
+      };
     };
 
     // Now that we know the total duration, we can calculate the proportion to
     // distribute to each principal and add to finalPrincipals. This
     // complicated-looking iterate syntax is just to iterate over episodeSet's
     // entries so we can avoid converting to an Array first
-    Iter.iterate<(Episode, ())>(Trie.iter<Episode, ()>(episodeSet), func(episodeEntry: (Episode, ()), index: Nat){
-      let episode: Episode = episodeEntry.0;
-      let episodeProportion = switch(credits.getMedia(episode.mediaId)) {
-        case (null) {
-          Debug.trap("ERROR: Media " # debug_show(episode.mediaId) # " not found. This media was referenced in episode " # debug_show(episode.id) # " of feed " # episode.feedKey);
-          // todo: handle this gracefully, possibly ignoring this episode. This
-          // should never happen, though, given we would have failed to find
-          // the media above and not added the episode to the set
+    Iter.iterate<(Episode, ())>(
+      Trie.iter<Episode, ()>(episodeSet),
+      func(episodeEntry : (Episode, ()), index : Nat) {
+        let episode : Episode = episodeEntry.0;
+        let episodeProportion = switch (credits.getMedia(episode.mediaId)) {
+          case (null) {
+            Debug.trap("ERROR: Media " # debug_show (episode.mediaId) # " not found. This media was referenced in episode " # debug_show (episode.id) # " of feed " # episode.feedKey);
+            // todo: handle this gracefully, possibly ignoring this episode.
+            // This should never happen, though, given we would have failed to
+            // find the media above and not added the episode to the set
+          };
+          case (?media) {
+            Float.fromInt(media.durationInMicroseconds) / Float.fromInt(totalDurationInMicroseconds);
+          };
         };
-        case (? media) {
-          Float.fromInt(media.durationInMicroseconds) / Float.fromInt(totalDurationInMicroseconds);
-        };
-      };
 
-      // Get the proportion of this episode's earnings to give to each of the
-      // episode's resources. These should total to 1, but they only include
-      // this episode's resources.
-      let resourceProportions: HashMap.HashMap<Principal, Float> = _getDistributionProportionResursive(episode);
+        // Get the proportion of this episode's earnings to give to each of the
+        // episode's resources. These should total to 1, but they only include
+        // this episode's resources.
+        let resourceProportions : HashMap.HashMap<Principal, Float> = _getDistributionProportionResursive(episode);
 
-      // Multiply those proportions by the proportion this episode gets to
-      // determine the proportion of the total gift amount each resource gets
-      Iter.iterate(resourceProportions.entries(), func(entry: (Principal, Float), _index: Nat) {
-        let principal = entry.0;
-        let proportion = entry.1 * episodeProportion;
-        
-        finalProportions := Utils.addValueToEntry(finalProportions, principal, proportion);
-      });
-    });
+        // Multiply those proportions by the proportion this episode gets to
+        // determine the proportion of the total gift amount each resource gets
+        Iter.iterate(
+          resourceProportions.entries(),
+          func(entry : (Principal, Float), _index : Nat) {
+            let principal = entry.0;
+            let proportion = entry.1 * episodeProportion;
+
+            finalProportions := Utils.addValueToEntry(finalProportions, principal, proportion);
+          },
+        );
+      },
+    );
     return finalProportions;
   };
 
@@ -442,14 +536,14 @@ actor class Serve() = Self {
   // (0.0 - 1.0) they earn for that episode. If an episode contains another
   // episode as a resource, this function is called recursively until only
   // principals are returned.
-  func _getDistributionProportionResursive(episode: Episode) : HashMap.HashMap<Principal, Float> {
-    switch(credits.getMedia(episode.mediaId)) {
+  func _getDistributionProportionResursive(episode : Episode) : HashMap.HashMap<Principal, Float> {
+    switch (credits.getMedia(episode.mediaId)) {
       case (null) {
-        Debug.trap("ERROR: Media " # debug_show(episode.mediaId) # " not found for episode " # Nat.toText(episode.id) # " of " # episode.feedKey # " feed.");
+        Debug.trap("ERROR: Media " # debug_show (episode.mediaId) # " not found for episode " # Nat.toText(episode.id) # " of " # episode.feedKey # " feed.");
         // todo: handle gracefully, maybe just returning []
       };
-      case (? media) {
-        var totalWeight = Array.foldRight<WeightedResource, Nat>(media.resources, 0, func(a: WeightedResource, b: Nat) { a.weight + b});
+      case (?media) {
+        var totalWeight = Array.foldRight<WeightedResource, Nat>(media.resources, 0, func(a : WeightedResource, b : Nat) { a.weight + b });
         var principalProportionsMap = HashMap.fromIter<Principal, Float>(
           Iter.fromArray([]),
           1,
@@ -457,40 +551,48 @@ actor class Serve() = Self {
           Principal.hash,
         );
 
-        Iter.iterate<WeightedResource>(media.resources.vals(), func(weightedResource, _index) {
-          let thisResourceProportion = Float.fromInt(weightedResource.weight) / Float.fromInt(totalWeight);
+        Iter.iterate<WeightedResource>(
+          media.resources.vals(),
+          func(weightedResource, _index) {
+            let thisResourceProportion = Float.fromInt(weightedResource.weight) / Float.fromInt(totalWeight);
 
-          switch (weightedResource.resource) {
-            case (#individual(principal)) {
-              // Add a new value, or add the proportion to an existing value if
-              // the principal was already in the map
-              principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, principal, thisResourceProportion);
-            };
-            case (#episode(details)) {
-              switch(credits.getEpisode(details.feedKey, details.episodeId)) {
-                case (null) { 
-                  Debug.trap("ERROR: Resource episode " # debug_show(details.episodeId) # " not found in feed " # details.feedKey);
-                  // todo: handle gracefully, maybe just ignoring this resource (return [])
-                };
-                case (? episode) {
-                  // Recursively get the proportions of the resource episode
-                  let resourceEpisodeProportions = _getDistributionProportionResursive(episode);
+            switch (weightedResource.resource) {
+              case (#individual(principal)) {
+                // Add a new value, or add the proportion to an existing value
+                // if the principal was already in the map
+                principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, principal, thisResourceProportion);
+              };
+              case (#episode(details)) {
+                switch (credits.getEpisode(details.feedKey, details.episodeId)) {
+                  case (null) {
+                    Debug.trap("ERROR: Resource episode " # debug_show (details.episodeId) # " not found in feed " # details.feedKey);
+                    // todo: handle gracefully, maybe just ignoring this
+                    // resource (return [])
+                  };
+                  case (?episode) {
+                    // Recursively get the proportions of the resource episode
+                    let resourceEpisodeProportions = _getDistributionProportionResursive(episode);
 
-                  // These proportions are the full proportions for the
-                  // resource episode, so we need to multiply each by this
-                  // episode's proportion 
-                  Iter.iterate<(Principal, Float)>(resourceEpisodeProportions.entries(), func(fullProportion: (Principal, Float), _index) {
-                    let resourcePrincipal = fullProportion.0;
-                    let resourceProportion = fullProportion.1 * thisResourceProportion;
-                    // Add a new value, or add the proportion to an existing
-                    // value if the principal was already in the map
-                    principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, resourcePrincipal, resourceProportion);
-                  });
+                    // These proportions are the full proportions for the
+                    // resource episode, so we need to multiply each by this
+                    // episode's proportion
+                    Iter.iterate<(Principal, Float)>(
+                      resourceEpisodeProportions.entries(),
+                      func(fullProportion : (Principal, Float), _index) {
+                        let resourcePrincipal = fullProportion.0;
+                        let resourceProportion = fullProportion.1 * thisResourceProportion;
+                        // Add a new value, or add the proportion to an
+                        // existing value if the principal was already in the
+                        // map
+                        principalProportionsMap := Utils.addValueToEntry(principalProportionsMap, resourcePrincipal, resourceProportion);
+                      },
+                    );
+                  };
                 };
               };
             };
-          };
-        });
+          },
+        );
 
         return principalProportionsMap;
       };
@@ -606,7 +708,7 @@ actor class Serve() = Self {
   /* Credits interface */
 
   public shared (msg) func putFeed(
-    feed : Feed,
+    feed : Feed
   ) : async PutFeedFullResult {
     if (not credits.isInitialized()) {
       Debug.print("Credits module is uninitialized. Please execute `dfx canister call serve initialize` after initial deploy.");
@@ -895,5 +997,37 @@ actor class Serve() = Self {
         return #err(#CreditsError(e));
       };
     };
+  };
+
+  // Reports the balance for the caller. Calling this from the cli will report
+  // the cli user's balance.
+  public shared ({ caller }) func getBalance() : async Result.Result<Nat, Text> {
+    await getBalanceOf(caller);
+  };
+
+  public func getBalanceOf(principal : Principal) : async Result.Result<Nat, Text> {
+    Debug.print("getBalanceOf: " # debug_show (principal));
+    let account : Account = await getAccount(principal);
+    let balance = await CkBtcLedger.icrc1_balance_of(account);
+    return #ok(balance);
+  };
+
+  public func getSubaccount(principal : Principal) : async Subaccount {
+    return Utils.toSubaccount(principal);
+  };
+
+  public func getAccount(principal : Principal) : async Account {
+    let account : Account = Utils.toAccount({
+      caller = principal;
+      canister = Principal.fromActor(Self);
+    });
+    return account;
+  };
+
+  public func ckBtcLedgerDecimals() : async Nat8 {
+    return await CkBtcLedger.icrc1_decimals();
+  };
+  public func ckBtcLedgerTransferFee() : async Nat {
+    return await CkBtcLedger.icrc1_fee();
   };
 };

@@ -28,6 +28,10 @@ dfx deploy
 ```
 dfx canister call serve initialize
 ```
+And use the private did file when deploying the icrc1 ledger:
+```
+npm run private-dids ; npm run deploy
+```
 4. Run the frontend on port 3000 with hot reload capability in Chromium browsers
 ```
 npm start
@@ -137,6 +141,19 @@ https://8d0116fb626db2.lhr.life/example_feed_key?canisterId=r7inp-6aaaa-aaaaa-aa
 Make sure to specify the current cid for frontend from
 .dfx/local/canister_ids.json so the generated videate settings links will work
 properly, e.g.:
+
+# Adding ckBTC to an account for testing purposes
+## Note that this will obviously only work on a local ckbtc_ledger canister
+
+First use the Serve canister's candid frontend to call getAccount on the
+principal to mint funds to. Insert that Account type candid into the following
+dfx command. Note that the "owner" principal is the Serve canister's principal
+and the subaccount vec is derived from the given principal. Specify the amount
+in Satoshis, not BTC (i.e. multiply BTC by 100,000,000)
+
+```
+dfx canister call ckbtc_ledger icrc1_transfer '(record {to = (record {owner=principal "bd3sg-teaaa-aaaaa-qaaba-cai"; subaccount=opt vec {0; 0; 29; 106; 101; 141; 60; 52; 200; 192; 101; 70; 9; 4; 64; 162; 183; 223; 196; 220; 35; 235; 26; 114; 105; 218; 204; 161; 101; 218; 43; 2}}); amount=50000},)'
+```
 
 # Deploy to the Internet Computer:
 ```

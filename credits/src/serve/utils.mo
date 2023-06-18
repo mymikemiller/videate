@@ -1,9 +1,14 @@
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
+import Float "mo:base/Float";
 import Text "mo:base/Text";
 import Nat8 "mo:base/Nat8";
+import Int "mo:base/Int";
+import Int8 "mo:base/Int8";
+import Int64 "mo:base/Int8";
 import Nat16 "mo:base/Nat16";
 import Nat32 "mo:base/Nat32";
+import Nat64 "mo:base/Nat64";
 import Char "mo:base/Char";
 import Blob "mo:base/Blob";
 import HashMap "mo:base/HashMap";
@@ -13,6 +18,8 @@ import Option "mo:base/Option";
 import Buffer "mo:base/Buffer";
 import Xml "rss/xml";
 import Types "types";
+import Principal "mo:base/Principal";
+import CkBtcLedger "canister:ckbtc_ledger";
 
 module {
   type Document = Xml.Document;
@@ -64,7 +71,7 @@ module {
         func(textTuple : (Text, Text)) : blobTuple {
           (toBlob(textTuple.0), toBlob(textTuple.1));
         },
-      ),
+      )
     );
   };
 
@@ -104,7 +111,7 @@ module {
     func(i : Nat) : X { buffer.get(i) },
   );
 
-  public func addValueToEntry(map: HashMap.HashMap<Principal, Float>, key: Principal, value: Float): HashMap.HashMap<Principal, Float> {
+  public func addValueToEntry(map : HashMap.HashMap<Principal, Float>, key : Principal, value : Float) : HashMap.HashMap<Principal, Float> {
     let currentValue = Option.get(map.get(key), 0.0);
     map.put(key, currentValue + value);
     map;
@@ -135,6 +142,38 @@ module {
     return switch (found) {
       case null null;
       case (?f) Option.make(f.1);
+    };
+  };
+
+  /// Convert Principal to ICRC1.Subaccount
+  // from https://github.com/research-ag/motoko-lib/blob/2772d029c1c5087c2f57b022c84882f2ac16b79d/src/TokenHandler.mo#L51
+  public func toSubaccount(p : Principal) : Types.Subaccount {
+    // p blob size can vary, but 29 bytes as most. We preserve it'subaccount size in result blob
+    // and it'subaccount data itself so it can be deserialized back to p
+    let bytes = Blob.toArray(Principal.toBlob(p));
+    let size = bytes.size();
+
+    assert size <= 29;
+
+    let a = Array.tabulate<Nat8>(
+      32,
+      func(i : Nat) : Nat8 {
+        if (i + size < 31) {
+          0;
+        } else if (i + size == 31) {
+          Nat8.fromNat(size);
+        } else {
+          bytes[i + size - 32];
+        };
+      },
+    );
+    Blob.fromArray(a);
+  };
+
+  public func toAccount({ caller : Principal; canister : Principal }) : Types.Account {
+    {
+      owner = canister;
+      subaccount = ?toSubaccount(caller);
     };
   };
 };

@@ -115,7 +115,7 @@ module.exports = {
       FRONTEND_CANISTER_ID: canisters["frontend"],
       SERVE_CANISTER_ID: canisters["serve"],
       II_URL: isDevelopment
-        ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:4943/"
+        ? "http://bw4dl-smaaa-aaaaa-qaacq-cai.localhost:4943/"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({

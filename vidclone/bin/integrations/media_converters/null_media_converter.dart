@@ -11,7 +11,7 @@ class NullMediaConverter extends MediaConverter {
 
   @override
   Future<MediaFile> convertMedia(MediaFile mediaFile,
-      [Function(double progress) callback]) async {
+      [Function(double progress)? callback]) async {
     return mediaFile;
   }
 }

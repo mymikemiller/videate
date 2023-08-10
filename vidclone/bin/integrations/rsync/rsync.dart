@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:file/file.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart';
@@ -13,7 +12,7 @@ mixin Rsync {
   dynamic get rsyncProcessRunner;
 
   Future<void> push(File file, String destinationPath) async {
-    file = await ensureLocal(file);
+    var localFile = await ensureLocal(file);
 
     // rsync -e "ssh -i ~/.ssh/cdn77_id_rsa" "/path/to/source.txt"
     // user_amhl64ul@push-24.cdn77.com:/www/path/to/destination.txt
@@ -21,7 +20,7 @@ mixin Rsync {
       '--protect-args',
       '-e',
       'ssh -i ~/.ssh/cdn77_id_rsa',
-      file.path,
+      localFile.path,
       'user_amhl64ul@push-24.cdn77.com:/www/$destinationPath',
     ]);
 

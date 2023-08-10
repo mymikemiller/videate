@@ -1,8 +1,7 @@
-import 'dart:io' as io;
 import 'package:file/local.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
-import 'package:dotenv/dotenv.dart' show load, env;
+import 'package:dotenv/dotenv.dart';
 import 'integrations/cdn77/cdn77_feed_manager.dart';
 import 'integrations/cdn77/cdn77_uploader.dart';
 import 'integrations/internet_archive/internet_archive_cli_uploader.dart';
@@ -14,6 +13,7 @@ import 'integrations/local/save_to_disk_uploader.dart';
 import 'integrations/media_converters/ffmpeg_media_converter.dart';
 import 'integrations/media_converters/null_media_converter.dart';
 import 'integrations/youtube/youtube_downloader.dart';
+import 'integrations/youtube/youtube_playlist_downloader.dart';
 import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
@@ -23,11 +23,11 @@ final forcedCloneStartDate = null;
 
 void main(List<String> arguments) async {
   // Load environment variables from local .env file
-  load();
+  var env = DotEnv(includePlatformEnvironment: true)..load();
 
   print('starting clone');
 
-  final home = io.Platform.environment['HOME'];
+  final home = env['HOME'];
   final localFileSystem = LocalFileSystem();
 
   // The first argument specifies the cloner configuration file to override the
@@ -47,6 +47,7 @@ void main(List<String> arguments) async {
 
   final downloaders = [
     YoutubeDownloader(),
+    YoutubePlaylistDownloader(),
     LocalDownloader(),
   ];
   final mediaConverters = [
@@ -67,7 +68,7 @@ void main(List<String> arguments) async {
   ];
 
   // Generate a map to the downloaders keyed on the downloader's id.
-  final downloaderMap = {for (var e in downloaders) e.platform.id: e};
+  final downloaderMap = {for (var e in downloaders) e.id: e};
   final mediaConverterMap = {for (var e in mediaConverters) e.id: e};
   final uploaderMap = {for (var e in uploaders) e.id: e};
   final feedManagerMap = {for (var e in feedManagers) e.id: e};
@@ -76,9 +77,10 @@ void main(List<String> arguments) async {
   final clonerConfigurationsString =
       clonerConfigurationsFile.readAsStringSync();
   final clonerConfigurationsObj = json.decode(clonerConfigurationsString);
-  BuiltList<ClonerConfiguration> clonerConfigurations =
-      jsonSerializers.deserialize(clonerConfigurationsObj,
-          specifiedType: FullType(BuiltList, [FullType(ClonerConfiguration)]));
+  var clonerConfigurations = jsonSerializers.deserialize(
+          clonerConfigurationsObj,
+          specifiedType: FullType(BuiltList, [FullType(ClonerConfiguration)]))
+      as BuiltList<ClonerConfiguration>;
 
   // Verify that all feed destinations are unique since the file doesn't
   // guarantee it, but we want to avoid writing to the same feed twice. We
@@ -93,14 +95,14 @@ void main(List<String> arguments) async {
   }
 
   for (var clonerConfiguration in clonerConfigurations) {
-    final feedManager = feedManagerMap[clonerConfiguration.feedManager.id]
+    final feedManager = feedManagerMap[clonerConfiguration.feedManager.id]!
       ..configure(clonerConfiguration.feedManager);
-    final downloader = downloaderMap[clonerConfiguration.downloader.id]
+    final downloader = downloaderMap[clonerConfiguration.downloader.id]!
       ..configure(clonerConfiguration.downloader);
     final mediaConverter =
-        mediaConverterMap[clonerConfiguration.mediaConverter.id]
+        mediaConverterMap[clonerConfiguration.mediaConverter.id]!
           ..configure(clonerConfiguration.mediaConverter);
-    final uploader = uploaderMap[clonerConfiguration.uploader.id]
+    final uploader = uploaderMap[clonerConfiguration.uploader.id]!
       ..configure(clonerConfiguration.uploader);
 
     final cloner = Cloner(feedManager, downloader, mediaConverter, uploader);
@@ -113,11 +115,26 @@ void main(List<String> arguments) async {
     }
 
     if (cloner.downloader is LocalDownloader) {
-      // Special case for LocalDownloader, where we always "download"
-      // everything regardless of date. This is necessary because all local
-      // files have the same hard-coded releaseDate.
+      // Special case for LocalDownloader where we always "download" everything
+      // regardless of date. This is necessary for LocalDownloader because all
+      // local files have the same hard-coded releaseDate
       await for (var servedMedia in cloner.cloneCollection()) {
         print('(Local) Cloned media available at ${servedMedia.uri}');
+      }
+    } else if (cloner.downloader is YoutubePlaylistDownloader) {
+      // Special case for YoutubePlaylistDownloader, where we always "download"
+      // everything regardless of date. This is necessary for
+      // YoutubePlaylistDownloader because videos can be added in any order to
+      // a playlist without regard to their releaseDate, and we want to retain
+      // all videos in the original playlist order
+
+      // Figure out what index we should start cloning from. This value will be
+      // null if the feed is currently empty.
+      final feedSize = cloner.feedManager.feed.mediaList.length;
+      await for (var servedMedia
+          in cloner.cloneCollectionStartingAtIndex(feedSize)) {
+        print(
+            '(Youtube Playlist) Cloned media available at ${servedMedia.uri}');
       }
     } else {
       // Figure out how far back in time we need to clone. This value will be
@@ -138,12 +155,18 @@ void main(List<String> arguments) async {
               'Forcing clone of all videos released on or after $forcedCloneStartDate, even if they\'re already in the feed. Duplicates may occur.');
           cloneStartDate = forcedCloneStartDate;
         } else {
-          print(
-              'Cloning media newer than the most recent media in feed (${mostRecentMediaAlreadyInFeed.media.title})');
-          cloneStartDate =
-              mostRecentMediaAlreadyInFeed.media.source.releaseDate;
+          if (mostRecentMediaAlreadyInFeed != null) {
+            print(
+                'Cloning media newer than the most recent media in feed (${mostRecentMediaAlreadyInFeed.media.title})');
+            cloneStartDate =
+                mostRecentMediaAlreadyInFeed.media.source.releaseDate;
+          } else {
+            print('Feed is empty. Cloning all media');
+            cloneStartDate = DateTime.fromMillisecondsSinceEpoch(0);
+          }
         }
-        await for (var servedMedia in cloner.cloneCollection(cloneStartDate)) {
+        await for (var servedMedia
+            in cloner.cloneCollectionAfterDate(cloneStartDate)) {
           print('(Additional) Cloned media available at ${servedMedia.uri}');
         }
       }

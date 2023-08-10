@@ -10,7 +10,7 @@ class JsonFileFeedManager extends FeedManager {
   @override
   String get id => 'json_file';
 
-  String path;
+  late String path;
 
   @override
   String get feedName => basenameWithoutExtension(path);
@@ -44,6 +44,7 @@ class JsonFileFeedManager extends FeedManager {
 
     // Rewrite the entire file with the feed
     final json = feed.toJson();
-    return file.writeAsString(json);
+    return file.writeAsString(json).then((value) =>
+        null); // mikem: Check that this works to strip the type from the future returned, but still allow the function to run async
   }
 }

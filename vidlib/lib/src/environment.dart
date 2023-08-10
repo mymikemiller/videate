@@ -1,6 +1,7 @@
 import 'dart:io';
+import 'package:dotenv/dotenv.dart';
 
-String getEnvVar(String key, [Map<String, String>? env]) {
+String getEnvVar(String key, [DotEnv? env]) {
   // First check the specified environment (which likely came from the dotenv
   // package and is specified in a local gitignored file)
   if (env != null) {

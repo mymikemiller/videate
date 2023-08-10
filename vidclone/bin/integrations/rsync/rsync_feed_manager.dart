@@ -13,7 +13,7 @@ abstract class RsyncFeedManager extends FeedManager with Rsync {
   // For example, for the file hosted at
   // https://1928422091.rsc.cdn77.org/feeds/myfeed.json, the feedPath is
   // 'feeds/myfeed.json'
-  String feedPath;
+  late String feedPath;
 
   @override
   String get feedName => basename(feedPath);

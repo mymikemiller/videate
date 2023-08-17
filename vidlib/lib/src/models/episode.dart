@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // Contains all the metadata associated with a piece of media
+=======
+>>>>>>> 0dcfd11 (rebase)
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:built_collection/built_collection.dart';

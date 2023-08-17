@@ -95,8 +95,6 @@ class Cloner {
     }
   }
 
-  // Clones all media
-  //
   // Media will be cloned in chronological order (in the same order they were
   // originally published at the source).
   Stream<ServedMedia> cloneCollection() async* {

@@ -169,6 +169,49 @@ getFeed:
     }
 
     feed = fromCandidString(stdout);
+
+    // Set mostRecentSourceId which requires a bit of work
+    episodeIds = getEpisodeIds(stdout);
+    if (episodeIds.isNotEmpty) {
+      final mostRecentEpisodeId = episodeIds.last;
+
+      // Get most recent episode
+      final mostRecentEpisode = await runDfxCommand(
+          'getEpisode', '("$feedKey", $mostRecentEpisodeId)');
+
+      // Get mediaId from episode
+      var regExp = RegExp(
+        r'mediaId = (\d+) : nat;',
+        caseSensitive: false,
+        multiLine: true,
+      );
+      var mostRecentMediaIdString = regExp
+          .firstMatch(mostRecentEpisode)?[1]; // Null implies no mediaId found
+      print('mostRecentMediaIdString: ' +
+          (mostRecentMediaIdString ?? 'not found'));
+
+      if (mostRecentMediaIdString != null) {
+        var mostRecentMediaId = int.parse(mostRecentMediaIdString);
+
+        // Get most recent media
+        final mostRecentMedia =
+            await runDfxCommand('getMedia', '$mostRecentMediaId');
+
+        // Get source id. That's what we'll match on since it's more likely to
+        // be unique than, e.g, the title
+        regExp = RegExp(
+          r'id = "(.*)";', // This may fail since other lines use this format, but the source should be the first
+          caseSensitive: false,
+          multiLine: true,
+        );
+        mostRecentMediaSourceId = regExp
+            .firstMatch(mostRecentMedia)?[1]; // Null implies no sourceId found
+        print('mostRecentSourceId: $mostRecentMediaSourceId');
+
+        // Now we have mostRecentEpisodeSourceId saved, which will be used on
+        // Write to make sure we only create and add Episodes *after* it
+      }
+    }
     episodeIds = getEpisodeIds(stdout);
 
     if (episodeIds.isNotEmpty) {
@@ -217,14 +260,13 @@ getFeed:
 
   @override
   Future<void> write() async {
-    // First update the Feed. Note that this won't add any new Episodes;
+    // First write the Feed. Note that this won't add any new Episodes;
     // they'll stay the same as what was returned in Populate. We'll add
     // Episodes next, but this call will update the feed with any other
     // modified data, like the title or description. It will also create the
     // feed if it doens't yet exist.
     final feedCandid = feedToCandidString(feedKey, feed, episodeIds, owner);
-    final putFeedResult = await runDfxCommand('putFeed', '($feedCandid)');
-    // print(putFeedResult);
+    await runDfxCommand('putFeed', '($feedCandid)');
 
     // Create any newly added Episodes
     var startIndex = 0;
@@ -252,8 +294,6 @@ getFeed:
 
       // Submit the Media to receive the MediaID, which we need for the Episode
       final addMediaResult = await runDfxCommand('addMedia', '($mediaCandid)');
-      //print('Added media.');
-      //print(addMediaResult);
 
       // Get the MediaID for the newly added Media
       var regExp = RegExp(
@@ -269,8 +309,6 @@ getFeed:
       final episodeCandid =
           episodeToCandidString(feedKey, servedMedia, mediaId);
       final addEpisodeResult = await runDfxCommand('addEpisode', episodeCandid);
-      print('Added episode. Result:');
-      print(addEpisodeResult);
 
       // Get the EpisodeId for the newly added Episode so we can update our
       // local list
@@ -295,34 +333,6 @@ getFeed:
 
     print('Done with write');
   }
-
-  // // Extract the list of numberical EpisodeIDs in the given feed candid
-  // List<int> getEpisodeIds(String feedCandid) {
-  //   // Find all the text between "episodeIds = vec {" and the next closing
-  //   // parenthesis. This will include the entire list of numbers.
-  //   var regExp = RegExp(
-  //     r'episodeIds = vec {([^}]*)}',
-  //     caseSensitive: false,
-  //     multiLine: true,
-  //   );
-  //   var fullCandidVec = regExp.firstMatch(feedCandid)?[1] ?? 'EMPTY';
-
-  //   if (fullCandidVec == 'EMPTY') {
-  //     return [];
-  //   } else {
-  //     // We found a list. Now extract all the numbers.
-  //     regExp = RegExp(
-  //       r'\d+',
-  //       caseSensitive: false,
-  //       multiLine: true,
-  //     );
-  //     var matches = regExp.allMatches(fullCandidVec);
-
-  //     return matches
-  //         .map((regExpMatch) => int.parse(regExpMatch.group(0)!))
-  //         .toList();
-  //   }
-  // }
 
   Future<String> runDfxCommand(String command, String arg) async {
     final args = [
@@ -358,10 +368,6 @@ getFeed:
     }
 
     return stdout;
-
-    // if (stdout == '(null)\n)') { // No feed found with the given name return
-    //   false;
-    // }
   }
 
   static String escape(String str) => str.replaceAll('\"', '\\\"');
@@ -403,21 +409,6 @@ getFeed:
   static String feedToCandidString(
       String key, Feed feed, List<int> episodeIds, String owner) {
     final episodeIdsCandid = episodeIds.join('; ');
-
-    // final mediaListCandid = feed.mediaList.map((servedMedia) => ''' record {
-    // etag="${escape(servedMedia.etag)}";
-    // lengthInBytes=${servedMedia.lengthInBytes}; uri="${servedMedia.uri}";
-    // title="${escape(servedMedia.media.title)}";
-    // description="${escape(servedMedia.media.description)}";
-    // durationInMicroseconds=${servedMedia.media.duration.inMicroseconds};
-    // resources=vec{}; source=record { id="${servedMedia.media.source.id}";
-    // uri="${servedMedia.media.source.uri}";
-    // releaseDate="${servedMedia.media.source.releaseDate}"; platform=record {
-    // id="${servedMedia.media.source.platform.id}";
-    // uri="${servedMedia.media.source.platform.uri}"
-    //     }
-    //   };
-    // }''').join('; ');
 
     final candid = '''
 record { 

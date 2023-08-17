@@ -40,7 +40,7 @@ abstract class Downloader extends ClonerTask {
   // [Media] is not guaranteed, but because reverseChronologicalMedia uses this
   // function, [Downloader]s should aim to return them in as close to reverse
   // chronological order as possible so the slidingWindowSize can remain small,
-  // unless certain that revercseChronologicalMedia will not be called (e.g.
+  // unless certain that reverseChronologicalMedia will not be called (e.g.
   // for static playlists where the publish date doesn't matter)
   Stream<Media> allMedia();
 

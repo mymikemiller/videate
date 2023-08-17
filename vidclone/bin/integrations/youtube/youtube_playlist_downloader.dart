@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:file/memory.dart';
 import 'dart:async';
 import 'package:vidlib/vidlib.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt_explode;
 import './youtube_downloader.dart';
-import 'package:path/path.dart' as p;
 
 final memoryFileSystem = MemoryFileSystem();
 
@@ -44,10 +42,6 @@ class YoutubePlaylistDownloader extends YoutubeDownloader {
         youtubeExplode.playlists.getVideos(playlistId); // Playlist order
 
     return stream.asyncMap((upload) async {
-      // mike: double check the statement below is true and upload.publishDate
-      // and upload.description doesn't exist when using playlists.getVideos as
-      // above doesn't exist
-
       // The publish date and the video description don't come through when
       // using channels.getUploads, so we have to fetch each video individually
       final video = await youtubeExplode.videos.get(upload.id);
@@ -55,7 +49,7 @@ class YoutubePlaylistDownloader extends YoutubeDownloader {
 
       final media = Media((v) => v
         ..title = upload.title
-        ..description = video.description // upload.description is ""
+        ..description = video.description
         ..duration = upload.duration
         ..source = Source((s) => s
           ..id = upload.id.toString()

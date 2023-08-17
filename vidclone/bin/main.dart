@@ -2,6 +2,7 @@ import 'package:file/local.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import 'cloner.dart';
 import 'package:dotenv/dotenv.dart';
+import 'package:dotenv/dotenv.dart';
 import 'integrations/cdn77/cdn77_feed_manager.dart';
 import 'integrations/cdn77/cdn77_uploader.dart';
 import 'integrations/internet_archive/internet_archive_cli_uploader.dart';
@@ -13,6 +14,7 @@ import 'integrations/local/save_to_disk_uploader.dart';
 import 'integrations/media_converters/ffmpeg_media_converter.dart';
 import 'integrations/media_converters/null_media_converter.dart';
 import 'integrations/youtube/youtube_downloader.dart';
+import 'integrations/youtube/youtube_playlist_downloader.dart';
 import 'integrations/youtube/youtube_playlist_downloader.dart';
 import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
@@ -131,6 +133,7 @@ void main(List<String> arguments) async {
       // Figure out what index we should start cloning from. This value will be
       // null if the feed is currently empty.
       final feedSize = cloner.feedManager.feed.mediaList.length;
+
       await for (var servedMedia
           in cloner.cloneCollectionStartingAtIndex(feedSize)) {
         print(

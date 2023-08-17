@@ -10,7 +10,7 @@ dependencies:
   http_server: ^0.9.8+3
   xml: ^5.0.2
   mime: ^0.9.6+3
-  dotenv: ^2.0.0
+  dotenv: ^4.1.0
   vidlib:
     path: ../vidlib
 dev_dependencies:

@@ -84,21 +84,34 @@ class CandidResult<V extends CandidValue> {
 
 // Manages a feed running on dfinity's Internet Computer (https://dfinity.org/)
 class InternetComputerFeedManager extends FeedManager {
-  String feedKey;
+  late String feedKey;
 
   @override
-  String feedName;
+  late String feedName;
 
   // The owner principal for all feeds created through this FeedManager
-  String owner;
+  late String owner;
 
-  // "local" to access a locally running IC instance
-  // "ic" to use canisters on the IC network
-  String network;
+  // "local" to access a locally running IC instance "ic" to use canisters on
+  // the IC network
+  late String network;
 
   // The working directory from which to run the dfx commands (i.e. the
   // directory containing a dfx.json file)
-  String dfxWorkingDirectory;
+  late String dfxWorkingDirectory;
+
+  // The EpisodeIds for the Episodes in this FeedManager's Feed. These IDs
+  // reference actual Episodes on the IC, so feed.mediaList will have more
+  // items than episodeIds until "write" is called when the Episodes will be
+  // created on the IC and this list will be updated to reference the newly
+  // created Episodes
+  List<int> episodeIds = [];
+
+  // The SourceID (unique identifier on source platform, e.g. the unique part
+  // of the YouTube URL) of the most recent episode on the feed as it exists on
+  // the Internet Computer. This is used to determine which episodes need to be
+  // written to the feed, as only episodes after this one need to be added.
+  String? mostRecentMediaSourceId;
 
   @override
   String get id => 'internet_computer';
@@ -111,6 +124,23 @@ class InternetComputerFeedManager extends FeedManager {
     network = feedManagerArgs.get('network').toLowerCase();
     dfxWorkingDirectory = feedManagerArgs.get('dfxWorkingDirectory');
   }
+
+  /* 
+getFeed:
+  (
+  opt record { key = "test"; title = "Test Feed"; owner = principal
+    "m5wvb-yrvsf-dv5em-uotcy-nvu2e-maoes-hgboi-6dpxr-m4wv4-aer2n-fqe"; link =
+    "http://www.test.com"; description = "A Test Feed"; email =
+    "tom@example.com"; author = "Tom Merritt"; episodeIds = vec { 0 : nat };
+    imageUrl =
+    "https://s3.amazonaws.com/creare-websites-wpms-legacy/wp-content/uploads/sites/32/2016/03/01200959/canstockphoto22402523-arcos-creator.com_-1024x1024.jpg";
+    subtitle = "test subtitle";
+  },
+)
+
+
+
+  */
 
   @override
   Future<bool> populate() async {
@@ -129,7 +159,7 @@ class InternetComputerFeedManager extends FeedManager {
     final stdout = output.stdout;
 
     final stderr = output.stderr;
-    if (stderr.isNotEmpty) {
+    if (stderr.toString().toLowerCase().contains('error')) {
       throw stderr;
     }
 
@@ -140,56 +170,219 @@ class InternetComputerFeedManager extends FeedManager {
 
     feed = fromCandidString(stdout);
 
+    // Set mostRecentSourceId which requires a bit of work
+    episodeIds = getEpisodeIds(stdout);
+    if (episodeIds.isNotEmpty) {
+      final mostRecentEpisodeId = episodeIds.last;
+
+      // Get most recent episode
+      final mostRecentEpisode = await runDfxCommand(
+          'getEpisode', '("$feedKey", $mostRecentEpisodeId)');
+
+      // Get mediaId from episode
+      var regExp = RegExp(
+        r'mediaId = (\d+) : nat;',
+        caseSensitive: false,
+        multiLine: true,
+      );
+      var mostRecentMediaIdString = regExp
+          .firstMatch(mostRecentEpisode)?[1]; // Null implies no mediaId found
+      print('mostRecentMediaIdString: ' +
+          (mostRecentMediaIdString ?? 'not found'));
+
+      if (mostRecentMediaIdString != null) {
+        var mostRecentMediaId = int.parse(mostRecentMediaIdString);
+
+        // Get most recent media
+        final mostRecentMedia =
+            await runDfxCommand('getMedia', '$mostRecentMediaId');
+
+        // Get source id. That's what we'll match on since it's more likely to
+        // be unique than, e.g, the title
+        regExp = RegExp(
+          r'id = "(.*)";', // This may fail since other lines use this format, but the source should be the first
+          caseSensitive: false,
+          multiLine: true,
+        );
+        mostRecentMediaSourceId = regExp
+            .firstMatch(mostRecentMedia)?[1]; // Null implies no sourceId found
+        print('mostRecentSourceId: $mostRecentMediaSourceId');
+
+        // Now we have mostRecentEpisodeSourceId saved, which will be used on
+        // Write to make sure we only create and add Episodes *after* it
+      }
+    }
+    episodeIds = getEpisodeIds(stdout);
+
+    if (episodeIds.isNotEmpty) {
+      final mostRecentEpisodeId = episodeIds.last;
+
+      // Get most recent episode
+      final mostRecentEpisode = await runDfxCommand(
+          'getEpisode', '("$feedKey", $mostRecentEpisodeId)');
+
+      // Get mediaId from episode
+      var regExp = RegExp(
+        r'mediaId = (\d+) : nat;',
+        caseSensitive: false,
+        multiLine: true,
+      );
+      var mostRecentMediaIdString = regExp
+          .firstMatch(mostRecentEpisode)?[1]; // Null implies no mediaId found
+      print('mostRecentMediaIdString: ' +
+          (mostRecentMediaIdString ?? 'not found'));
+
+      if (mostRecentMediaIdString != null) {
+        var mostRecentMediaId = int.parse(mostRecentMediaIdString);
+
+        // Get most recent media
+        final mostRecentMedia =
+            await runDfxCommand('getMedia', '$mostRecentMediaId');
+
+        // Get source id. That's what we'll match on since it's more likely to
+        // be unique than, e.g, the title
+        regExp = RegExp(
+          r'id = "(.*)";', // This may fail since other lines use this format, but the source should be the first
+          caseSensitive: false,
+          multiLine: true,
+        );
+        mostRecentMediaSourceId = regExp
+            .firstMatch(mostRecentMedia)?[1]; // Null implies no sourceId found
+        print('mostRecentSourceId: $mostRecentMediaSourceId');
+
+        // Now we have mostRecentEpisodeSourceId saved, which will be used on
+        // Write to make sure we only create and add Episodes *after* it
+      }
+    }
+
     return true;
   }
 
   @override
   Future<void> write() async {
-    final feedCandidString = toCandidString(feed, owner);
+    // First write the Feed. Note that this won't add any new Episodes;
+    // they'll stay the same as what was returned in Populate. We'll add
+    // Episodes next, but this call will update the feed with any other
+    // modified data, like the title or description. It will also create the
+    // feed if it doens't yet exist.
+    final feedCandid = feedToCandidString(feedKey, feed, episodeIds, owner);
+    await runDfxCommand('putFeed', '($feedCandid)');
 
+    // Create any newly added Episodes
+    var startIndex = 0;
+
+    // Find the most recent media in mediaList with the same source id. This
+    // may cause issues if the same video is in the feed multiple times, but
+    // that should be rare and would only cause a problem if the cloning
+    // hadn't been run after cloning the first duplicated video but before
+    // cloning the video after it (so the duplicated video is the most recent
+    // video), and also after the other duplicate was added to the source
+    // feed.
+    for (var i = feed.mediaList.length - 1; i >= 0; i--) {
+      final servedMedia = feed.mediaList[i];
+      if (servedMedia.media.source.id == mostRecentMediaSourceId) {
+        startIndex = i + 1; // Start after the one we found
+        break;
+      }
+    }
+
+    // Create Episodes for each newly added Media
+    for (var i = startIndex; i < feed.mediaList.length; i++) {
+      final servedMedia = feed.mediaList[i];
+
+      final mediaCandid = mediaToCandidString(servedMedia, owner);
+
+      // Submit the Media to receive the MediaID, which we need for the Episode
+      final addMediaResult = await runDfxCommand('addMedia', '($mediaCandid)');
+
+      // Get the MediaID for the newly added Media
+      var regExp = RegExp(
+        r'id = (\d*) \: nat;',
+        caseSensitive: false,
+        multiLine: true,
+      );
+      var mediaIdString = regExp.firstMatch(addMediaResult)![1]!;
+      print('Added mediaId $mediaIdString. title: ${servedMedia.media.title}');
+      var mediaId = int.parse(mediaIdString);
+
+      // Create the Episode. This also updates the Episode list on the IC Feed.
+      final episodeCandid =
+          episodeToCandidString(feedKey, servedMedia, mediaId);
+      final addEpisodeResult = await runDfxCommand('addEpisode', episodeCandid);
+
+      // Get the EpisodeId for the newly added Episode so we can update our
+      // local list
+      regExp = RegExp(
+        r'id = (\d*) \: nat;',
+        caseSensitive: false,
+        multiLine: true,
+      );
+      var episodeIdString = regExp.firstMatch(addEpisodeResult)![1]!;
+      print(
+          'Added episode $episodeIdString. Title: ${servedMedia.media.title}');
+      var episodeId = int.parse(episodeIdString);
+
+      print('adding episodeId $episodeId');
+
+      // Add the Episode's ID to our list
+      episodeIds.add(episodeId);
+
+      // Store the SourceId so we know where to start on the next call to Write
+      mostRecentMediaSourceId = servedMedia.media.source.id;
+    }
+
+    print('Done with write');
+  }
+
+  Future<String> runDfxCommand(String command, String arg) async {
     final args = [
       'canister',
       '--network',
       '$network',
       'call',
       'serve',
-      'putFeed',
-      '("$feedKey", $feedCandidString)'
+      '$command',
+      '$arg'
     ];
     final output =
         await processRunner('dfx', args, workingDirectory: dfxWorkingDirectory);
 
     final stderr = output.stderr;
     if (stderr.isNotEmpty) {
-      throw stderr;
+      if (!stderr.toString().startsWith('WARN:')) {
+        throw stderr;
+      }
     }
 
     final stdout = output.stdout;
     if (output.stdout.contains('err')) {
       // If the candid returned contains an error, throw it. Returned candid
       // comes back on stdout, not stderr.
+
+      if (output.stdout.contains('ContributorsError') &&
+          output.stdout.contains('NotFound')) {
+        print(
+            'Cannot execute command $command because a specified principal was not found. Check that all Contributors exist on the correct network ($network) or switch networks (IC/Local).');
+      }
       throw output.stdout;
     }
 
-    if (stdout == '(null)\n)') {
-      // No feed found with the given name
-      return false;
-    }
-
-    return true;
+    return stdout;
   }
 
-  static String toCandidString(Feed feed, String owner) {
-    String escape(String str) => str.replaceAll('\"', '\\\"');
+  static String escape(String str) => str.replaceAll('\"', '\\\"');
 
-    final mediaListCandid = feed.mediaList.map((servedMedia) => '''
+  static String mediaToCandidString(ServedMedia servedMedia, String owner) {
+    return '''
     record { 
       etag="${escape(servedMedia.etag)}";
       lengthInBytes=${servedMedia.lengthInBytes};
       uri="${servedMedia.uri}";
-      title="${escape(servedMedia.media.title)}";
       description="${escape(servedMedia.media.description)}";
       durationInMicroseconds=${servedMedia.media.duration.inMicroseconds};
+
+      resources=vec {record {weight=1; resource=variant {individual=principal "$owner"}}};
+
       source=record {
         id="${servedMedia.media.source.id}";
         uri="${servedMedia.media.source.uri}";
@@ -199,10 +392,27 @@ class InternetComputerFeedManager extends FeedManager {
           uri="${servedMedia.media.source.platform.uri}"
         }
       };
-    }''').join('; ');
+    }''';
+  }
+
+  static String episodeToCandidString(
+      String feedKey, ServedMedia servedMedia, int mediaId) {
+    return '''
+    record { 
+      feedKey="$feedKey";
+      title="${escape(servedMedia.media.title)}";
+      description="${escape(servedMedia.media.description)}";
+      mediaId=$mediaId; 
+    }''';
+  }
+
+  static String feedToCandidString(
+      String key, Feed feed, List<int> episodeIds, String owner) {
+    final episodeIdsCandid = episodeIds.join('; ');
 
     final candid = '''
 record { 
+  key="$key";
   title="${escape(feed.title)}";
   subtitle="${escape(feed.subtitle)}";
   description="${escape(feed.description)}";
@@ -211,72 +421,50 @@ record {
   owner=principal \"$owner\";
   email="${feed.email}";
   imageUrl="${feed.imageUrl}";
-  mediaList=vec {
-$mediaListCandid
+  episodeIds=vec {
+$episodeIdsCandid
   };
 }''';
     return candid;
   }
 
-  static Feed fromCandidString(String candid) {
+  static RecordValue getRecordValue(String candid) {
     final recordValue = parseCandid(candid).value;
     if (!(recordValue is RecordValue)) {
       throw 'Encountered non-record at the start of candid: $candid';
     }
-    final record = (recordValue as RecordValue).record;
-    final mediaListAsRecordValues = getVector(record['mediaList']);
-    final mediaList = mediaListAsRecordValues.map(
-      (mediaRecordValue) => ServedMedia(
-        (s) => s
-          ..etag = getString(mediaRecordValue, ['etag'], 'abcdefghijkl')
-          ..lengthInBytes =
-              getNumber(mediaRecordValue, ['lengthInBytes'], 0).ceil()
-          ..uri = Uri.parse(getString(mediaRecordValue, ['uri']))
-          ..media = Media(
-            (m) => m
-              ..title = getString(mediaRecordValue, ['title'])
-              ..description = getString(mediaRecordValue, ['description'])
-              ..duration = Duration(
-                  microseconds:
-                      getNumber(mediaRecordValue, ['durationInMicroseconds'], 0)
-                          .ceil())
-              ..source = Source((s) => s
-                ..id = getString(mediaRecordValue, ['source', 'id'])
-                ..uri =
-                    Uri.parse(getString(mediaRecordValue, ['source', 'uri']))
-                ..releaseDate = DateTime.parse(getString(mediaRecordValue,
-                    ['source', 'releaseDate'], '1970-01-01T00:00:00.000Z'))
-                ..platform = Platform((p) => p
-                  ..id =
-                      getString(mediaRecordValue, ['source', 'platform', 'id'])
-                  ..uri = Uri.parse(getString(mediaRecordValue,
-                      ['source', 'platform', 'uri']))).toBuilder()).toBuilder(),
-          ).toBuilder(),
-      ),
-    );
+    return recordValue;
+  }
+
+  static Feed fromCandidString(String candid) {
+    final record = getRecordValue(candid).record;
 
     return Feed((f) => f
-      ..title = getString(record['title'])
-      ..subtitle = getString(record['subtitle'])
-      ..description = getString(record['description'])
-      ..link = getString(record['link'])
-      ..author = getString(record['author'])
-      ..email = getString(record['email'])
-      ..imageUrl = getString(record['imageUrl'])
-      ..mediaList = BuiltList<ServedMedia>(mediaList).toBuilder());
+      ..title = getString(record['title']!)
+      ..subtitle = getString(record['subtitle']!)
+      ..description = getString(record['description']!)
+      ..link = getString(record['link']!)
+      ..author = getString(record['author']!)
+      ..email = getString(record['email']!)
+      ..imageUrl = getString(record['imageUrl']!));
+  }
+
+  // The Feed type in Dart does not include EpisodeIds even though the Feed
+  // type on the IC does, so we have to parse that separately since it isn't
+  // returned by fromCandidString
+  static List<int> getEpisodeIds(String candid) {
+    final record = getRecordValue(candid).record;
+    return getVector(record['episodeIds']!) as List<int>;
   }
 
   static String getString(CandidValue candidValue,
-      [List<String> path, String defaultValue]) {
+      [List<String>? path, String? defaultValue]) {
     String unescape(String str) => str.replaceAll('\\\"', '\"');
 
     if (candidValue is StringValue) {
       return candidValue.string;
     }
-    if (candidValue == null) {
-      throw 'Null CandidValue';
-    }
-    if (!(candidValue is RecordValue)) {
+    if (!(candidValue is RecordValue && path != null && path.isNotEmpty)) {
       throw 'Can only get a string from a StringValue or a RecordValue with a path to a StringValue';
     }
     final lastKey = path.removeLast();
@@ -284,7 +472,9 @@ $mediaListCandid
     if (!terminalRecord.containsKey(lastKey)) {
       throw 'Key not found: $lastKey';
     }
-    candidValue = terminalRecord[lastKey];
+
+    candidValue = terminalRecord[lastKey]!;
+
     if (candidValue is StringValue) {
       return unescape(candidValue.string);
     }
@@ -292,24 +482,23 @@ $mediaListCandid
   }
 
   static double getNumber(CandidValue candidValue,
-      [List<String> path, double defaultValue]) {
+      [List<String>? path, double? defaultValue]) {
     if (candidValue is NumberValue) {
       return candidValue.number;
     }
-    if (candidValue == null) {
-      throw 'Null CandidValue';
-    }
-    if (!(candidValue is RecordValue)) {
+    if (!(candidValue is RecordValue && path != null && path.isNotEmpty)) {
       throw 'Can only get a number from a NumberValue or a RecordValue with a path to a NumberValue';
     }
     final lastKey = path.removeLast();
     final terminalRecord = getRecord(candidValue, path);
     if (!terminalRecord.containsKey(lastKey)) {
       print('Key not found: $lastKey');
-      return defaultValue;
-      // throw 'Key not found: $lastKey';
+      if (defaultValue != null) {
+        return defaultValue;
+      }
+      throw 'Key not found: $lastKey and no default value provided';
     }
-    candidValue = terminalRecord[lastKey];
+    candidValue = terminalRecord[lastKey]!;
     if (candidValue is NumberValue) {
       return candidValue.number;
     }
@@ -317,41 +506,38 @@ $mediaListCandid
   }
 
   static List<RecordValue> getVector(CandidValue candidValue,
-      [List<String> path]) {
+      [List<String>? path]) {
     if (candidValue is VectorValue) {
       return candidValue.vector;
     }
-    if (!(candidValue is RecordValue)) {
+    if (!(candidValue is RecordValue && path != null && path.isNotEmpty)) {
       throw 'Can only get a vector from a VectorValue or a RecordValue with a path to a VectorValue';
     }
     final lastKey = path.removeLast();
     final terminalRecord = getRecord(candidValue, path);
-    candidValue = terminalRecord[lastKey];
-    if (candidValue is VectorValue) {
-      return candidValue.vector;
+    final terminalValue = terminalRecord[lastKey];
+    if (terminalValue is VectorValue) {
+      return terminalValue.vector;
     }
     throw 'Value is not a VectorValue';
   }
 
   static Map<String, CandidValue> getRecord(RecordValue recordValue,
-      [List<String> path]) {
-    if (recordValue == null) {
-      throw 'Cannot get record from a null RecordValue';
-    }
+      [List<String>? path]) {
     if (path == null || path.isEmpty) {
       return recordValue.record;
     }
     for (var key in path) {
-      if (!(recordValue is RecordValue)) {
-        throw 'Encountered non-record value in path';
-      }
       if (!recordValue.record.containsKey(key)) {
         throw 'Record does not contain key "$key"';
       }
-      recordValue = recordValue.record[key];
-    }
-    if (recordValue is RecordValue) {
-      return recordValue.record;
+      var valueAtKey = recordValue.record[key]!;
+
+      if (!(valueAtKey is RecordValue)) {
+        throw 'Encountered non-record value in path';
+      }
+
+      recordValue = valueAtKey;
     }
     throw 'Value is not a RecordValue';
   }
@@ -421,8 +607,8 @@ $mediaListCandid
           'Candid starts with: ${candid.substring(0, 50)}');
     }
 
-    final key = match.group(1);
-    final rest = match.group(2);
+    final key = match.group(1)!;
+    final rest = match.group(2)!;
 
     final valueResult = parseCandid(rest);
     if (valueResult.value is EntryValue) {
@@ -449,8 +635,8 @@ $mediaListCandid
           'escaped double quotes followed by a semicolon. Candid: $candid');
     }
 
-    final str = match.group(1);
-    final rest = match.group(2);
+    final str = match.group(1)!;
+    final rest = match.group(2)!;
     return CandidResult(StringValue(str), rest);
   }
 
@@ -470,8 +656,8 @@ $mediaListCandid
       throw ('Failed to find number in candid. Candid: $candid');
     }
 
-    final str = match.group(1).replaceAll('_', '');
-    final rest = match.group(3);
+    final str = match.group(1)!.replaceAll('_', '');
+    final rest = match.group(3)!;
 
     final num = double.parse(str);
 
@@ -554,8 +740,6 @@ $mediaListCandid
     tokens.forEach((token) {
       if (str.trimLeft().startsWith(token)) {
         str = str.substring(str.indexOf(token) + token.length);
-      } else {
-        return str;
       }
     });
     return str;

@@ -73,7 +73,7 @@ media.dart) you must run the following command to update the json serialization
 code file (e.g. media.g.dart):
 
 ```dart
-pub run build_runner build
+dart run build_runner build
 ```
 
 Alternatively, run this command in the background to have the generated files

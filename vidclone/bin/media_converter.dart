@@ -11,7 +11,7 @@ abstract class MediaConverter extends ClonerTask {
   // the ffmpeg tool
   String get id;
 
-  ClonerTaskArgs conversionArgs;
+  late ClonerTaskArgs conversionArgs;
 
   MediaConverter();
 
@@ -23,7 +23,7 @@ abstract class MediaConverter extends ClonerTask {
   // Converts the specified media.
   @nonVirtual
   Future<MediaFile> convert(MediaFile mediaFile,
-      {Function(double progress) callback}) async {
+      {Function(double progress)? callback}) async {
     callback?.call(0);
     final convertedMediaFile = await convertMedia(mediaFile, callback);
     callback?.call(1);
@@ -33,7 +33,7 @@ abstract class MediaConverter extends ClonerTask {
   // Actual conversion logic. To be implemented by subclasses.
   @protected
   Future<MediaFile> convertMedia(MediaFile mediaFile,
-      [Function(double progress) callback]);
+      [Function(double progress)? callback]);
 
   static ClonerTaskArgs createArgs(String id, List<String> args) =>
       ClonerTaskArgs((b) => b

@@ -17,7 +17,7 @@ class NullUploader extends Uploader {
 
   @override
   Future<ServedMedia> uploadMedia(MediaFile mediaFile,
-      [Function(double progress) callback]) async {
+      [Function(double progress)? callback]) async {
     final uri = getDestinationUri(mediaFile.media);
 
     final servedMedia = ServedMedia((b) => b
@@ -41,7 +41,7 @@ class NullUploader extends Uploader {
   }
 
   @override
-  Future<ServedMedia> getExistingServedMedia(Media media) async {
+  Future<ServedMedia?> getExistingServedMedia(Media media) async {
     final uri = getDestinationUri(media);
     final file = baseDirectory.fileSystem.file(Uri.decodeFull(uri.path));
     if (!file.existsSync()) {

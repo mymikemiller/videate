@@ -41,10 +41,10 @@ class DownloaderTest {
   final String testMediaUniqueId;
 
   DownloaderTest(
-      {this.downloader,
-      this.mediaAfterDate,
-      this.testMedia,
-      this.testMediaUniqueId});
+      {required this.downloader,
+      required this.mediaAfterDate,
+      required this.testMedia,
+      required this.testMediaUniqueId});
 }
 
 void main() async {

@@ -1,5 +1,6 @@
 import 'package:http/http.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
+import 'package:file/file.dart' as f;
 import '../../uploader.dart';
 import 'rsync.dart';
 
@@ -7,7 +8,7 @@ import 'rsync.dart';
 abstract class RsyncUploader extends Uploader with Rsync {
   // The subfolder to store the media in inside the platform's folder. Putting
   // media in a subfolder helps when looking for media that can be deleted.
-  String subfolder;
+  late String subfolder;
 
   // Use the Uploader's client for rsync requests
   @override
@@ -30,9 +31,9 @@ abstract class RsyncUploader extends Uploader with Rsync {
 
   @override
   Future<ServedMedia> uploadMedia(MediaFile mediaFile,
-      [Function(double progress) callback]) async {
+      [Function(double progress)? callback]) async {
     final key = getKey(mediaFile.media);
-    await push(mediaFile.file, key);
+    await push(mediaFile.file as f.File, key);
 
     return ServedMedia((b) => b
       ..uri = getDestinationUri(mediaFile.media)

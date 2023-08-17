@@ -24,11 +24,14 @@ dfx canister install --all
 ```
 dfx deploy
 ```
-3. If this is the first deploy to a replica (e.g. after using `dfx start --clean`), also initialize canister:
+3. If this is the first deploy to a replica (e.g. after using `dfx start
+   --clean` or `npm run reset`), also initialize the 'serve' canister:
 ```
 dfx canister call serve initialize
 ```
-And use the private did file when deploying the icrc1 ledger:
+And use the private did file when deploying the icrc1 ledger for the first time
+(the ck_btc canister) so it doesn't complain about "No more values on the
+wire":
 ```
 npm run private-dids ; npm run deploy
 ```
@@ -73,7 +76,7 @@ the port in ~/.config/dfx/networks.json
 
 ### Launch the automatically-generated, interactive Candid frontend for the appropriate canister
 
-`localhost:4943/canisterId={__CANDID_UI cid from .dfx/local/canisters}`
+`localhost:4943/?canisterId={__CANDID_UI cid from .dfx/local/canisters}&id={serve cid from .dfx/local/canisters}`
 
 ### Launch the frontend, hosted in the frontend canister
 

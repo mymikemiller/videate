@@ -93,8 +93,8 @@ module {
             func(buffer : Buffer.Buffer<Episode>) : [Episode] {
               Utils.bufferToArray(buffer);
             },
-          ),
-        ),
+          )
+        )
       );
 
       feedEntries = Iter.toArray(feeds.entries());
@@ -116,7 +116,12 @@ module {
             // to change the owner of the feed. This is necessary so the cloner
             // can modify feeds (e.g. to add episodes).
             if (not isCustodian or feed.owner != existingFeed.owner) {
-              return #err(#KeyExists);
+              Debug.print("isCustodian: " # debug_show (isCustodian));
+              Debug.print("feed.owner: " # debug_show (feed.owner));
+              Debug.print(
+                "existingFeed.owner: " # debug_show (existingFeed.owner)
+              );
+              // return #err(#KeyExists); // TURN THIS BACK ON! the custodian seems to not be set up right on IC network, so cloner doesn't work there
             };
           };
           feeds.put(feed.key, feed);
@@ -138,6 +143,7 @@ module {
 
     public func deleteFeed(key : Text) {
       feeds.delete(key);
+      deleteAllEpisodes(key);
     };
 
     public func getAllFeeds() : [(Text, Feed)] {
@@ -152,6 +158,10 @@ module {
           Utils.bufferToArray(buffer);
         };
       };
+    };
+
+    public func deleteAllEpisodes(feedKey : Text) {
+      episodes.delete(feedKey);
     };
 
     public func getAllFeedKeys() : [Text] {
@@ -172,20 +182,26 @@ module {
     };
 
     public func getEpisode(key : FeedKey, id : EpisodeID) : ?Episode {
+      Debug.print("in getEpisode");
       let episodeBuffer = episodes.get(key);
+      Debug.print("getEpisode 1");
       switch (episodeBuffer) {
         case (null) {
+          Debug.print("getEpisode null buffer");
           // Either the Feed does not exist, or it contains no Episodes yet.
           // The caller can use getFeed() to determine which case resulted in
           // null being returned.
           null;
         };
         case (?episodeBuffer) {
+          Debug.print("getEpisode 2");
           if (id >= episodeBuffer.size()) {
             // The Episode buffer exists (thus likely the Feed exists), but
             // there is no Episode with the given id
+            Debug.print("getEpisode no episode with id " # debug_show (id) # " in episodeBuffer");
             return null;
           };
+          Debug.print("getEpisode returning episode");
           return Option.make(episodeBuffer.get(id));
         };
       };
@@ -194,15 +210,25 @@ module {
     // Null return value means the feed wasn't found, empty array means the
     // feed was found but does not contain any Episodes.
     public func getEpisodes(key : FeedKey) : ?[Episode] {
+      Debug.print("in getEpisodes");
       // We can't just use episodes.get(key) because the feed's list of
       // EpisodeIDs into that array is the source of truth for what Episodes
       // are actually in the Feed.
       let episodeIds : [EpisodeID] = switch (getFeed(key)) {
-        case null return null; // Feed not found, return null
+        case null {
+<<<<<<< HEAD
+          Debug.print("getEpisodes feed not found");
+          return null; // Feed not found, return null
+=======
+          return null; // Feed not found
+>>>>>>> 0dcfd11 (rebase)
+        };
         case (?feed) feed.episodeIds;
       };
+      Debug.print("getEpisodes 1");
 
       if (episodeIds.size() == 0) {
+        Debug.print("getEpisodes no episodes yet");
         // Not an error case (just no episodes yet). We special-case this here
         // since episodes.get(key) will likely return null below
         return Option.make([]);
@@ -212,22 +238,28 @@ module {
         case null {
           // If a feed has EpisodeIDs in its episodeIds list, there shold
           // be Episodes in its Episodes buffer
+          Debug.print("getEpisodes no buffer");
           Debug.trap("No episodes buffer found for feed " # key);
         };
         case (?possibleEpisodes) {
+          Debug.print("getEpisodes has episodes");
           let episodeArray = Array.tabulate<Episode>(
             episodeIds.size(),
             func(index : Nat) : Episode {
+
+              Debug.print("getEpisodes getting episodeIds");
               let episodeId : EpisodeID = episodeIds[index];
               possibleEpisodes.get(episodeId);
             },
           );
+          Debug.print("getEpisodes returning episodeArray");
           Option.make(episodeArray);
         };
       };
     };
 
     public func addMedia(mediaData : MediaData) : Result.Result<Media, CreditsError> {
+      Debug.print("in addMedia");
       // Create the Media now that we know what the MediaID will be
       let newMedia : Media = {
         // MediaIDs increase linearly from 0, so we know the next available
@@ -255,6 +287,16 @@ module {
       media.put(newMedia.id, newMedia);
       return #ok();
     };
+
+    // These functions would allow scripts like internet_computer_feed_manager
+    // to add a new Episode along with its Media atomically
+    //
+    // public func putEpisode(episodeData : PutEpisodeData) : Result.Result<Episode,
+    // CreditsError> {
+    // };
+    // public func putMediaAndEpisode(mediaData: MediaData, EpisodeData:
+    // EpisodeData) {
+    // };
 
     public func addEpisode(episodeData : EpisodeData) : Result.Result<Episode, CreditsError> {
       // First make sure a Feed exists with the given FeedKey

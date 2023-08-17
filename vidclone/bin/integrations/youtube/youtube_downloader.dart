@@ -16,13 +16,16 @@ class YoutubeDownloader extends Downloader {
   // data-channel-external-id. Alternatively, use the YouTube API if you know
   // the user's username:
   // https://www.googleapis.com/youtube/v3/channels?key={YOUR_API_KEY}&forUsername={USERNAME}&part=id
-  yt_explode.ChannelId channelId;
+  late yt_explode.ChannelId channelId;
 
   @override
   void configure(ClonerTaskArgs downloaderArgs) {
     final channelIdString = downloaderArgs.get('channelId');
     channelId = yt_explode.ChannelId(channelIdString);
   }
+
+  @override
+  String get id => 'youtube_channel';
 
   static Platform getPlatform() => Platform(
         (p) => p
@@ -40,15 +43,15 @@ class YoutubeDownloader extends Downloader {
   @override
   int get slidingWindowSize => 10;
 
-  final yt_explode.YoutubeExplode _youtubeExplode;
+  final yt_explode.YoutubeExplode youtubeExplode;
 
-  YoutubeDownloader([yt_explode.YoutubeExplode youtubeExplode])
-      : _youtubeExplode = youtubeExplode ?? yt_explode.YoutubeExplode(),
+  YoutubeDownloader([yt_explode.YoutubeExplode? _youtubeExplode])
+      : youtubeExplode = _youtubeExplode ?? yt_explode.YoutubeExplode(),
         super();
 
   @override
   Future<MediaFile> downloadMedia(Media media,
-      [Function(double progress) callback]) async {
+      [Function(double progress)? callback]) async {
     final videoId = getSourceUniqueId(media);
 
     // Set up a temporary file to hold the contents of the download
@@ -57,7 +60,7 @@ class YoutubeDownloader extends Downloader {
     final file = memoryFileSystem.file(path);
     // Get the video media stream.
     var manifest =
-        await _youtubeExplode.videos.streamsClient.getManifest(videoId);
+        await youtubeExplode.videos.streamsClient.getManifest(videoId);
 
     // Get the first muxed video (the one with the lowest bitrate to save space
     // and make downloads faster for now). note that mediaStreams.muxed will
@@ -78,8 +81,7 @@ class YoutubeDownloader extends Downloader {
     var success = false;
     while (success == false) {
       try {
-        final stream =
-            _youtubeExplode.videos.streamsClient.get(videoStreamInfo);
+        final stream = youtubeExplode.videos.streamsClient.get(videoStreamInfo);
         await for (var data in stream) {
           count += data.length;
           var progress = count / len;
@@ -114,21 +116,24 @@ class YoutubeDownloader extends Downloader {
     return MediaFile(media, file);
   }
 
+  // Channel videos are returned in (mostly) chronological order, Playlist
+  // videos are returned in the order they exist in the playlist
   @override
   Stream<Media> allMedia() {
     if (channelId == null) {
-      throw 'The Youtube downloader currently only supports ChannelId SourceCollections';
+      throw 'The Youtube channel downloader requires ChannelId to be set';
     }
-    final stream = _youtubeExplode.channels.getUploads(channelId);
+    final stream =
+        youtubeExplode.channels.getUploads(channelId); // Mostly chronological
 
-    DateTime previousVideoPublishDate;
-    Media previousMedia;
+    DateTime? previousVideoPublishDate;
+    Media? previousMedia;
 
     return stream.asyncMap((upload) async {
       // The publish date and the video description don't come through when
       // using channels.getUploads, so we have to fetch each video individually
-      final video = await _youtubeExplode.videos.get(upload.id);
-      var publishDate = video.publishDate.toUtc();
+      final video = await youtubeExplode.videos.get(upload.id);
+      var publishDate = video.publishDate?.toUtc();
 
       if (publishDate == previousVideoPublishDate) {
         // youtube_explode returns the same time (midnight UTC) for all
@@ -139,13 +144,13 @@ class YoutubeDownloader extends Downloader {
         // decrement the date from the last Media returned becuse it's already
         // been decremented the correct number of times from the videos before
         // it if more than two share a publishDate)
-        publishDate = previousMedia.source.releaseDate
+        publishDate = previousMedia?.source.releaseDate
             .subtract(Duration(microseconds: 1));
       }
 
       final media = Media((v) => v
         ..title = upload.title
-        ..description = video.description // upload.description is  ""
+        ..description = video.description // upload.description is ""
         ..duration = upload.duration
         ..source = Source((s) => s
           ..id = upload.id.toString()
@@ -153,7 +158,11 @@ class YoutubeDownloader extends Downloader {
           ..platform = getPlatform().toBuilder()
           ..releaseDate = publishDate).toBuilder());
 
-      previousVideoPublishDate = publishDate.toUtc();
+      previousVideoPublishDate = publishDate?.toUtc();
+
+      print('Found channel media:');
+      print(media);
+
       previousMedia = media;
       return media;
     });
@@ -161,20 +170,25 @@ class YoutubeDownloader extends Downloader {
 
   @override
   void close() {
-    _youtubeExplode.close();
+    youtubeExplode.close();
     super.close();
   }
 
   @override
   String getSourceUniqueId(Media media) =>
-      yt_explode.VideoId.parseVideoId(media.source.uri.toString());
+      yt_explode.VideoId.parseVideoId(media.source.uri.toString())!;
 
   @override
   Future<Feed> createEmptyFeed() async {
-    final metadata = await _youtubeExplode.channels.get(channelId);
+    return createEmptyFeedFromChannel(channelId);
+  }
+
+  Future<Feed> createEmptyFeedFromChannel(
+      yt_explode.ChannelId _channelId) async {
+    final metadata = await youtubeExplode.channels.get(_channelId);
 
     // The about page is necessary to get the channel description
-    final aboutPage = await _youtubeExplode.channels.getAboutPage(channelId);
+    final aboutPage = await youtubeExplode.channels.getAboutPage(_channelId);
 
     return Examples.emptyFeed.rebuild((b) => b
       ..title = metadata.title

@@ -1,5 +1,6 @@
 import 'package:file/local.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:file/file.dart' as f;
 import 'package:vidlib/vidlib.dart';
 import 'dart:io';
 import '../../downloader.dart';
@@ -8,7 +9,10 @@ import 'package:path/path.dart';
 // Doesn't actually download anything, instead constructs Media objects based
 // on files in a folder.
 class LocalDownloader extends Downloader {
-  Directory sourceDirectory;
+  late Directory sourceDirectory;
+
+  @override
+  String get id => 'local';
 
   static Platform getPlatform() => Platform(
         (p) => p
@@ -60,7 +64,7 @@ class LocalDownloader extends Downloader {
 
     for (var file in files) {
       // Only 'download' video files for now
-      if (isVideo(file)) {
+      if (isVideo(file as f.File)) {
         final duration = await getDuration(file, processRunner: ffprobeRunner);
 
         final media = Media(
@@ -98,7 +102,7 @@ class LocalDownloader extends Downloader {
   /// the [File] at the [Media]'s uri
   @override
   Future<MediaFile> downloadMedia(Media media,
-      [Function(double progress) callback]) {
+      [Function(double progress)? callback]) {
     callback?.call(0);
     final path = Uri.decodeFull(media.source.uri.path.toString());
     final sourceFile = LocalFileSystem().file(path);

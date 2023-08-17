@@ -108,102 +108,100 @@ module {
             text = "";
             children = List.toArray(
               List.append(
-                List.fromArray(
-                  [
-                    {
-                      name = "atom:link";
-                      attributes = [
-                        //todo: use correct link, probably with all the user-specific metadata
-                        ("href", "http://videate.org/link-to-self.xml"),
-                        ("rel", "self"),
-                        ("type", "application/rss+xml"),
-                      ];
-                      text = "";
-                      children = [];
-                    },
-                    {
-                      name = "title";
-                      attributes = [];
-                      text = feed.title;
-                      children = [];
-                    },
-                    {
-                      name = "link";
-                      attributes = [];
-                      text = feed.link;
-                      children = [];
-                    },
-                    {
-                      name = "language";
-                      attributes = [];
-                      text = "en-us";
-                      children = [];
-                    },
-                    {
-                      name = "itunes:subtitle";
-                      attributes = [];
-                      text = feed.subtitle;
-                      children = [];
-                    },
-                    {
-                      name = "itunes:author";
-                      attributes = [];
-                      text = feed.author;
-                      children = [];
-                    },
-                    {
-                      name = "itunes:summary";
-                      attributes = [];
-                      text = feed.description;
-                      children = [];
-                    },
-                    {
-                      name = "description";
-                      attributes = [];
-                      text = feed.description;
-                      children = [];
-                    },
-                    {
-                      name = "itunes:owner";
-                      attributes = [];
-                      text = "";
-                      children = [
-                        {
-                          name = "itunes:name";
-                          attributes = [];
-                          text = feed.author;
-                          children = [];
-                        },
-                        {
-                          name = "itunes:email";
-                          attributes = [];
-                          text = feed.email;
-                          children = [];
-                        },
-                      ];
-                    },
-                    {
-                      name = "itunes:explicit";
-                      attributes = [];
-                      //todo: use correct explicit
-                      text = "no";
-                      children = [];
-                    },
-                    {
-                      name = "itunes:image";
-                      attributes = [("href", feed.imageUrl)];
-                      text = "";
-                      children = [];
-                    },
-                    {
-                      name = "itunes:category";
-                      // todo: use correct category
-                      attributes = [("text", "Arts")];
-                      text = "";
-                      children = [];
-                    },
-                  ],
-                ),
+                List.fromArray([
+                  {
+                    name = "atom:link";
+                    attributes = [
+                      //todo: use correct link, probably with all the user-specific metadata
+                      ("href", "http://videate.org/link-to-self.xml"),
+                      ("rel", "self"),
+                      ("type", "application/rss+xml"),
+                    ];
+                    text = "";
+                    children = [];
+                  },
+                  {
+                    name = "title";
+                    attributes = [];
+                    text = feed.title;
+                    children = [];
+                  },
+                  {
+                    name = "link";
+                    attributes = [];
+                    text = feed.link;
+                    children = [];
+                  },
+                  {
+                    name = "language";
+                    attributes = [];
+                    text = "en-us";
+                    children = [];
+                  },
+                  {
+                    name = "itunes:subtitle";
+                    attributes = [];
+                    text = feed.subtitle;
+                    children = [];
+                  },
+                  {
+                    name = "itunes:author";
+                    attributes = [];
+                    text = feed.author;
+                    children = [];
+                  },
+                  {
+                    name = "itunes:summary";
+                    attributes = [];
+                    text = feed.description;
+                    children = [];
+                  },
+                  {
+                    name = "description";
+                    attributes = [];
+                    text = feed.description;
+                    children = [];
+                  },
+                  {
+                    name = "itunes:owner";
+                    attributes = [];
+                    text = "";
+                    children = [
+                      {
+                        name = "itunes:name";
+                        attributes = [];
+                        text = feed.author;
+                        children = [];
+                      },
+                      {
+                        name = "itunes:email";
+                        attributes = [];
+                        text = feed.email;
+                        children = [];
+                      },
+                    ];
+                  },
+                  {
+                    name = "itunes:explicit";
+                    attributes = [];
+                    //todo: use correct explicit
+                    text = "no";
+                    children = [];
+                  },
+                  {
+                    name = "itunes:image";
+                    attributes = [("href", feed.imageUrl)];
+                    text = "";
+                    children = [];
+                  },
+                  {
+                    name = "itunes:category";
+                    // todo: use correct category
+                    attributes = [("text", "Arts")];
+                    text = "";
+                    children = [];
+                  },
+                ]),
                 List.map<Episode, Element>(
                   episodeListNewestToOldest,
                   func(episode : Episode) : Element {
@@ -218,7 +216,7 @@ module {
                     );
                   },
                 ),
-              ),
+              )
             );
           },
         ];

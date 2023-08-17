@@ -30,6 +30,18 @@ abstract class ClonerTaskArgs
   static Serializer<ClonerTaskArgs> get serializer =>
       _$clonerTaskArgsSerializer;
 
+  // Returns whether or not a vaue for the argument exists in the args
+  bool has(String name) {
+    final index = args.indexOf(name);
+    if (index == -1) {
+      return false;
+    }
+    if (index + 1 == args.length) {
+      return false;
+    }
+    return true;
+  }
+
   // Gets the argument directly after the first argument that exactly matches
   // `name`
   String get(String name) {

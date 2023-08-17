@@ -3,7 +3,7 @@
 // feeds, but that functaionality has moved to the Internet Computer under the
 // "credits" project
 import 'dart:async';
-import 'dart:convert';
+import 'package:dotenv/dotenv.dart';
 import 'package:vidlib/vidlib.dart' hide Platform;
 import 'dart:io';
 import 'package:args/args.dart';
@@ -11,9 +11,6 @@ import 'package:http_server/http_server.dart';
 import 'feed_formatters/feed_formatter.dart';
 import 'localhost_exposer.dart' as LocalhostExposer;
 import 'package:path/path.dart' as path;
-import 'feed_formatters/rss_2_0_feed_formatter.dart';
-import 'package:dotenv/dotenv.dart' show load, env;
-import 'package:path/path.dart' as p;
 
 final home = Platform.environment['HOME'];
 final mediaBaseDirectoryPath = '$home/web/media';
@@ -29,7 +26,7 @@ serve(Feed feed, FeedFormatter feedFormatter, HttpResponse response) {
 
 Future main(List<String> args) async {
   // Load environment variables from local .env file
-  load();
+  var env = DotEnv(includePlatformEnvironment: true)..load();
   final vidcastBaseUrl = getEnvVar('VIDCAST_BASE_URL', env);
   final cdn77VidtechBaseUrl = getEnvVar('CDN77_VIDTECH_BASE_URL', env);
   final cdn77BaseUrl = getEnvVar('CDN77_BASE_URL', env);

@@ -42,14 +42,14 @@ module {
   public type Resource = {
     // Another Episode that was integral to the creation of the associated Media,
     // for example: a video that was used as part of a compilation video
-    #episode: {
-      feedKey: Text;
-      episodeId: EpisodeID;
+    #episode : {
+      feedKey : Text;
+      episodeId : EpisodeID;
     };
 
     // An individual that was integral to the creation of the associated Media,
     // for example: the editor of a video
-    #individual: Principal;
+    #individual : Principal;
   };
 
   public type WeightedResource = {
@@ -57,10 +57,10 @@ module {
     // Media's income should go to this Resource. The portion that goes to this
     // Resource is calculated by dividing this weight by the sum of all weights
     // for the given Episode.
-    weight: Nat;
-    
+    weight : Nat;
+
     // The Resource that gets paid when the associated Media earns income
-    resource: Resource;
+    resource : Resource;
   };
 
   public type MediaData = {
@@ -70,7 +70,7 @@ module {
 
     // All resources that this Media depended on for its creation. This
     // determines who gets paid, and how much, when this Media earns income.
-    resources: [WeightedResource];
+    resources : [WeightedResource];
 
     // The duration of the media in microseconds
     durationInMicroseconds : Nat;
@@ -122,6 +122,26 @@ module {
     // that no NFT for this Episode has yet been minted.
     nftTokenId : ?Nat64;
   };
+
+<<<<<<< HEAD
+  public type PutEpisodeData = {
+    #add : {
+      episodeData : EpisodeData;
+    };
+    #update : {
+      episode : Episode;
+    };
+  };
+=======
+  // Add putEpisode and putMediaAndEpisode in credits.mo to make use of this
+  // type
+  //
+  // public type PutEpisodeData = { #add : { episodeData : EpisodeData;
+  //   };
+  //   #update : { episode : Episode;
+  //   };
+  // };
+>>>>>>> 0dcfd11 (rebase)
 
   public type FeedKey = Text;
 

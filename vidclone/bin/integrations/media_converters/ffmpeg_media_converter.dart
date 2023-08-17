@@ -1,4 +1,5 @@
 import 'package:vidlib/vidlib.dart';
+import 'package:file/file.dart' as f;
 import '../../media_converter.dart';
 
 class FfmpegMediaConverter extends MediaConverter {
@@ -9,14 +10,14 @@ class FfmpegMediaConverter extends MediaConverter {
 
   @override
   Future<MediaFile> convertMedia(MediaFile mediaFile,
-      [Function(double progress) callback]) async {
+      [Function(double progress)? callback]) async {
     final vcodec = conversionArgs.get('vcodec');
     final height = int.parse(conversionArgs.get('height'));
     final crf = int.parse(conversionArgs.get('crf'));
 
     var converter = FfmpegVideoConverter(processStarter: processStarter);
     final convertedFile = await converter.convert(
-      mediaFile.file,
+      mediaFile.file as f.File,
       vcodec: vcodec,
       height: height,
       crf: crf,

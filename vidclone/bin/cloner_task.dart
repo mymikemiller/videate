@@ -7,8 +7,7 @@ abstract class ClonerTask {
   dynamic processRunner;
   dynamic processStarter;
 
-  ClonerTask() {
-    client = Client();
+  ClonerTask() : client = Client() {
     processRunner = Process.run;
     processStarter = Process.start;
   }

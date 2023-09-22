@@ -216,12 +216,8 @@ module {
       // are actually in the Feed.
       let episodeIds : [EpisodeID] = switch (getFeed(key)) {
         case null {
-<<<<<<< HEAD
           Debug.print("getEpisodes feed not found");
           return null; // Feed not found, return null
-=======
-          return null; // Feed not found
->>>>>>> 0dcfd11 (rebase)
         };
         case (?feed) feed.episodeIds;
       };

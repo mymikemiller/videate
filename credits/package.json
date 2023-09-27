@@ -18,14 +18,15 @@
     "mint": "read -p \"Enter a principal you want to mint tokens to. By default 1000 ckBTC will be minted to your current dfx identity.\n\" recipient && if [ -z \"$recipient\" ]; then echo \"No recipient specified, skipping minting.\"; else dfx canister call ckbtc_ledger icrc1_transfer \"(record {to = record {owner = principal \\\"$recipient\\\"};amount=100_000_000_000},)\"; fi"
   },
   "devDependencies": {
-    "@dfinity/agent": "0.14.1",
-    "@dfinity/candid": "0.14.1",
-    "@dfinity/principal": "0.14.1",
+    "@dfinity/agent": "^0.15.4",
+    "@dfinity/candid": "^0.15.4",
+    "@dfinity/principal": "^0.15.4",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@svgr/webpack": "^5.5.0",
     "@types/react": "^17.0.18",
     "@types/react-dom": "^17.0.9",
     "@types/styled-components": "^5.1.12",
+    "agent-js-file-upload": "^0.3.2",
     "assert": "2.0.0",
     "buffer": "6.0.3",
     "copy-webpack-plugin": "^9.0.1",
@@ -55,16 +56,18 @@
   ],
   "dependencies": {
     "@adobe/react-spectrum": "^3.23.0",
-    "@dfinity/auth-client": "0.14.1",
-    "@dfinity/authentication": "0.14.1",
-    "@dfinity/identity": "0.14.1",
+    "@dfinity/auth-client": "^0.15.4",
+    "@dfinity/identity": "^0.15.4",
     "@spectrum-icons/workflow": "^4.0.3",
     "@types/react-router-dom": "^5.1.8",
+    "agent-js-file-upload": "^0.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.34.0",
     "react-hot-toast": "^2.1.0",
     "react-router-dom": "^6.2.2",
-    "styled-components": "^5.3.0"
+    "static-components": "^0.4.2",
+    "styled-components": "^5.3.0",
+    "use-file-picker": "^2.0.0"
   }
 }

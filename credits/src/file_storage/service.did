@@ -1,0 +1,80 @@
+type Asset = record {
+  id : text;
+  url : text;
+  created : int;
+  content : opt vec vec nat8;
+  owner : text;
+  chunks_size : nat;
+  canister_id : text;
+  content_size : nat;
+  content_type : text;
+  filename : text;
+  content_encoding : ContentEncoding;
+};
+type AssetProperties = record {
+  content_type : text;
+  filename : text;
+  checksum : nat;
+  content_encoding : ContentEncoding;
+};
+type Asset_ID = text;
+type ContentEncoding = variant { GZIP; Identity };
+type ErrCommitBatch = variant {
+  ChecksumInvalid : bool;
+  ChunkNotFound : bool;
+  ChunkOwnerInvalid : bool;
+};
+type ErrDeleteAsset = variant { AssetNotFound : bool; NotAuthorized : bool };
+type FileStorage = service {
+  chunks_size : () -> (nat) query;
+  commit_batch : (vec nat, AssetProperties) -> (Result_2);
+  create_chunk : (vec nat8, nat) -> (nat);
+  delete_asset : (Asset_ID) -> (Result_1);
+  get : (Asset_ID) -> (Result) query;
+  get_all_assets : () -> (vec Asset) query;
+  get_health : () -> (Health) query;
+  http_request : (HttpRequest) -> (HttpResponse) query;
+  http_request_streaming_callback : (StreamingCallbackToken) -> (
+      StreamingCallbackHttpResponse,
+    ) query;
+  is_full : () -> (bool) query;
+  version : () -> (nat) query;
+};
+type HeaderField = record { text; text };
+type Health = record {
+  assets_size : int;
+  heap_mb : int;
+  memory_mb : int;
+  cycles : int;
+};
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : vec nat8;
+  headers : vec HeaderField;
+};
+type HttpResponse = record {
+  body : vec nat8;
+  headers : vec HeaderField;
+  streaming_strategy : opt StreamingStrategy;
+  status_code : nat16;
+};
+type Result = variant { ok : Asset; err : text };
+type Result_1 = variant { ok : text; err : ErrDeleteAsset };
+type Result_2 = variant { ok : Asset_ID; err : ErrCommitBatch };
+type StreamingCallbackHttpResponse = record {
+  token : opt StreamingCallbackToken;
+  body : vec nat8;
+};
+type StreamingCallbackToken = record {
+  chunk_index : nat;
+  asset_id : text;
+  content_encoding : text;
+};
+type StreamingStrategy = variant {
+  Callback : record {
+    token : StreamingCallbackToken;
+    callback : func () -> ();
+  };
+};
+service : (bool) -> FileStorage

@@ -1,0 +1,21 @@
+type CanisterInfo = record {
+  id : text;
+  created : int;
+  name : text;
+  parent_name : text;
+  health : opt Health;
+};
+type FileScalingManager = service {
+  get_canister_records : () -> (vec CanisterInfo) query;
+  get_current_canister : () -> (opt CanisterInfo) query;
+  get_file_storage_canister_id : () -> (text) query;
+  init : () -> (text);
+  version : () -> (nat) query;
+};
+type Health = record {
+  assets_size : int;
+  heap_mb : int;
+  memory_mb : int;
+  cycles : int;
+};
+service : (bool) -> FileScalingManager

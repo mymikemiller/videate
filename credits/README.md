@@ -25,11 +25,21 @@ dfx canister install --all
 dfx deploy
 ```
 3. If this is the first deploy to a replica (e.g. after using `dfx start
-   --clean` or `npm run reset`), also initialize the 'serve' canister:
+   --clean` or `npm run reset`), also do the following:
+3.1 Build the file hosting canisters
+```
+./scripts/deploy.sh
+```
+3.3 Generate did files
+```
+dfx generate file_scaling_manager
+dfx generate file_storage
+```
+3.2 Initialize the 'serve' canister:
 ```
 dfx canister call serve initialize
 ```
-And use the private did file when deploying the icrc1 ledger for the first time
+3.3 Use the private did file when deploying the icrc1 ledger for the first time
 (the ck_btc canister) so it doesn't complain about "No more values on the
 wire":
 ```

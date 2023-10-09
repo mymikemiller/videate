@@ -24,9 +24,11 @@ import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton
 import DataAdd from "@spectrum-icons/workflow/DataAdd";
 import RemoveCircle from "@spectrum-icons/workflow/RemoveCircle";
 import AddCircle from "@spectrum-icons/workflow/AddCircle";
+import DataUpload from "@spectrum-icons/workflow/DataUpload";
 import { Principal } from "@dfinity/principal";
 import { AssetManager } from 'agent-js-file-upload';
 import { createActor, file_scaling_manager } from "../../../declarations/file_scaling_manager";
+import ProgressBar from "@ramonak/react-progress-bar";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 let assets = [];
@@ -64,6 +66,7 @@ const PutEpisodeForm = (): JSX.Element => {
   const [fileScalingManagerActor, setFileScalingManagerActor] = useState<ActorSubclass<_FILE_SCALING_MANAGER_SERVICE>>();
   const [assetManager, setAssetManager] = useState<AssetManager>();
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState(0.0);
 
   const { openFilePicker, filesContent, loading } = useFilePicker({
     accept: "video/*",
@@ -462,10 +465,16 @@ const PutEpisodeForm = (): JSX.Element => {
 
     try {
       const uint8Array = new Uint8Array(fileArrayBuffer);
-      const storeResult = await assetManager!.store(uint8Array, {
-        filename: fileName,
-        content_type: fileType
-      });
+      setUploadProgress(0);
+      const storeResult = await assetManager!.store(
+        uint8Array,
+        {
+          filename: fileName,
+          content_type: fileType
+        },
+        (progress: number) => {
+          setUploadProgress(progress);
+        });
       const asset_id = storeResult.ok!;
       const asset_response = await assetManager!.getAsset(asset_id);
       const asset = asset_response.ok!;
@@ -521,25 +530,27 @@ const PutEpisodeForm = (): JSX.Element => {
         {/* todo: Add Summary and Content Encoded so they can be set separately from the Description */}
 
         <Label>
-          Upload Media
-          {isUploading ?
-            (<div>Uploading...</div>) :
-            (
-              loading ?
-                (<div>Loading...</div>) :
-                (<div>
-                  <ActionButton onPress={openFilePicker}>Select media file</ActionButton>
-                  <br />
-                </div>)
-            )
-          }
+          Media:
+          <div hidden={!isUploading} style={{ marginTop: "10px" }}><ProgressBar bgColor="#337035" completed={Math.ceil(uploadProgress * 100)} /></div>
+          <div hidden={isUploading}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <ActionButton
+                isQuiet
+                width={"120px"}
+                onPress={openFilePicker}
+              >
+                <DataUpload></DataUpload>
+                Upload
+              </ActionButton>
+              <span style={{ marginLeft: "20px", marginRight: "20px" }}>or</span>
+              <Input
+                id="mediaUrl"
+                {...register("uri", { required: "Media URL is required" })}
+                placeholder="www.example.com/test.mp4" style={{ flexGrow: 1 }} />
+            </div>
+          </div>
         </Label>
         <Label>
-          Media URL:
-          <Input
-            id="mediaUrl"
-            {...register("uri", { required: "Media URL is required" })}
-            placeholder="www.example.com/test.mp4" />
           <ValidationError>{errors.uri?.message}</ValidationError>
         </Label>
 

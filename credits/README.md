@@ -4,9 +4,15 @@ A set of Internet Computer canisters (see https://dfinity.org/) that act as a
 sort of database to handle and track users` media requests.
 
 # Running Locally
-
 ```
 cd credits
+npm install
+```
+Currently, a modified local copy of agent-js-file-upload is used to allow uploads, so cd into that directory and fetch dependencies and build:
+```
+cd node_modules/agent-js-file-upload
+npm install
+npm run build
 ```
 In one terminal:
 ```

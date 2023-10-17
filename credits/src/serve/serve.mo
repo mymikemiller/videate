@@ -154,7 +154,7 @@ actor class Serve() = Self {
       };
     };
 
-    let requestorPrincipal : Principal = _parsePrincipal(request);
+    let requestorPrincipal : ?Principal = _parsePrincipal(request);
     let episodeId : ?Nat = _parseEpisodeId(request);
     let frontendUri : Text = _parseFrontendUri(request);
     var feedUri : Text = _parseHost(request) # "/" # feed.key;
@@ -188,7 +188,7 @@ actor class Serve() = Self {
     if (not _isMediaRequest(request)) {
       Debug.trap("Error: non-media request was upgraded to an update call");
     };
-    let requestorPrincipal : Principal = _parsePrincipal(request);
+    let requestorPrincipal : ?Principal = _parsePrincipal(request);
     let feed : Feed = _parseFeed(request);
     let episodeId : Nat = switch (_parseEpisodeId(request)) {
       case null Debug.trap("Media request did not specify episode");
@@ -219,17 +219,24 @@ actor class Serve() = Self {
     ];
     let transformedMediaUri = transformUri(media.uri, uriTransformers);
 
-    Debug.print("Logging user download");
-    // Record the user's download
-    let download : Download = {
-      time = Time.now();
-      feedKey = feed.key;
-      episodeId = episodeId;
+    switch (requestorPrincipal) {
+      case (null) {
+        Debug.print("No requestor principal specified, not logging download");
+      };
+      case (?requestorPrincipal) {
+        Debug.print("Logging user download");
+        // Record the user's download
+        let download : Download = {
+          time = Time.now();
+          feedKey = feed.key;
+          episodeId = episodeId;
+        };
+        let logResult = contributors.logDownload(requestorPrincipal, download);
+        Debug.print("logResult:");
+        Debug.print(debug_show (logResult));
+        if (logResult == null) Debug.trap("Failed to log download");
+      };
     };
-    let logResult = contributors.logDownload(requestorPrincipal, download);
-    Debug.print("logResult:");
-    Debug.print(debug_show (logResult));
-    if (logResult == null) Debug.trap("Failed to log download");
 
     // Redirect to the actual media file location
     return {
@@ -313,11 +320,15 @@ actor class Serve() = Self {
     };
   };
 
-  func _parsePrincipal(request : HttpRequest) : Principal {
+  func _parsePrincipal(request : HttpRequest) : ?Principal {
     switch (Utils.getQueryParam("principal", request.url)) {
-      case null Debug.trap("Request did not specify principal");
+      // For now, allow requests to not specify the principal. Eventually this
+      // might return a partial feed with the final episode explaining how to
+      // do the necessary step of creating an account, receiving a principal
+      // and updating the subscribed url.
+      case null null; // Debug.trap("Request did not specify principal");
       case (?principalAsText) {
-        Principal.fromText(principalAsText);
+        Option.make(Principal.fromText(principalAsText));
       };
     };
   };
@@ -839,7 +850,7 @@ actor class Serve() = Self {
   func getFeedXml(
     feed : Feed,
     episodeId : ?EpisodeID,
-    requestorPrincipal : Principal,
+    requestorPrincipal : ?Principal,
     frontendUri : Text,
     feedUri : Text,
     contributors : Contributors.Contributors,

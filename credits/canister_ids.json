@@ -1,4 +1,10 @@
 {
+  "file_scaling_manager": {
+    "ic": "encqu-iaaaa-aaaal-qcc6a-cai"
+  },
+  "file_storage": {
+    "ic": "zcuiy-tqaaa-aaaap-abk5q-cai"
+  },
   "frontend": {
     "ic": "44ejt-7yaaa-aaaao-aabqa-cai"
   },

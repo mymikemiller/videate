@@ -123,25 +123,16 @@ module {
     nftTokenId : ?Nat64;
   };
 
-<<<<<<< HEAD
-  public type PutEpisodeData = {
-    #add : {
-      episodeData : EpisodeData;
-    };
-    #update : {
-      episode : Episode;
-    };
-  };
-=======
   // Add putEpisode and putMediaAndEpisode in credits.mo to make use of this
   // type
-  //
-  // public type PutEpisodeData = { #add : { episodeData : EpisodeData;
+  // public type PutEpisodeData = {
+  //   #add : {
+  //     episodeData : EpisodeData;
   //   };
-  //   #update : { episode : Episode;
+  //   #update : {
+  //     episode : Episode;
   //   };
   // };
->>>>>>> 0dcfd11 (rebase)
 
   public type FeedKey = Text;
 

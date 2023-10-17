@@ -42,6 +42,16 @@
           "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
         }
       }
+    },
+    "file_scaling_manager": {
+      "type": "custom",
+      "candid": "src/file_scaling_manager/service.did",
+      "wasm": "src/file_scaling_manager/file_scaling_manager.wasm"
+    },
+    "file_storage": {
+      "type": "custom",
+      "candid": "src/file_storage/service.did",
+      "wasm": "src/file_storage/file_storage.wasm"
     }
   },
   "defaults": {
@@ -49,7 +59,7 @@
       "packtool": ""
     }
   },
-  "dfx": "0.14.1",
+  "dfx": "0.15.1",
   "networks": {
     "ic": {
       "providers": [

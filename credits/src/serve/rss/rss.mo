@@ -35,7 +35,7 @@ module {
     credits : Credits.Credits,
     feed : Feed,
     episodeId : ?EpisodeID,
-    requestorPrincipal : Principal,
+    requestorPrincipal : ?Principal,
     frontendUri : Text,
     feedUri : Text,
     contributors : Contributors.Contributors,
@@ -227,7 +227,7 @@ module {
   func getEpisodeElement(
     credits : Credits.Credits,
     episode : Episode,
-    requestorPrincipal : Principal,
+    requestorPrincipal : ?Principal,
     frontendUri : Text,
     feedUri : Text,
     contributors : Contributors.Contributors,
@@ -248,19 +248,27 @@ module {
             "Error retrieving NFT owner. See NFT details here: ";
           };
           case (#ok(nftOwnerPrincipal : Principal)) {
-            let msg = if (requestorPrincipal == nftOwnerPrincipal) {
-              "You own the NFT for this episode! See details here: ";
-            } else {
+            var msg = switch (requestorPrincipal) {
+              case (null) "";
+              case (?requestorPrincipal) {
+                if (requestorPrincipal == nftOwnerPrincipal) {
+                  "You own the NFT for this episode! See details here: ";
+                } else "";
+              };
+            };
+
+            if (msg == "") {
               let nftOwnerName = contributors.getName(nftOwnerPrincipal);
               switch (nftOwnerName) {
                 case (null) {
-                  "Error retrieving NFT owner name. See NFT details here: ";
+                  msg := "Error retrieving NFT owner name. See NFT details here: ";
                 };
                 case (?name) {
-                  name # " owns the NFT for this video. Click here to buy it: ";
+                  msg := name # " owns the NFT for this video. Click here to buy it from them: ";
                 };
               };
             };
+
             msg;
           };
         };
@@ -292,8 +300,13 @@ module {
       "?";
     };
 
+    let principalParam = switch (requestorPrincipal) {
+      case (null) "";
+      case (?v) "&principal=" # Principal.toText(v);
+    };
+
     let episodeUri = feedUri # queryParamStart # "episode=" # Nat.toText(episode.id);
-    let mediaUri = episodeUri # "&principal=" # Principal.toText(requestorPrincipal) # "&media=true";
+    let mediaUri = episodeUri # principalParam # "&media=true";
 
     // Episode ID is unique per Episode in the Feed and can be used as the guid
     let guid = Nat.toText(episode.id);

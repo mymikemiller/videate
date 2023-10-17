@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useFilePicker } from 'use-file-picker';
 import {
   _SERVICE,
   Episode,
@@ -11,6 +12,8 @@ import {
   WeightedResource,
   FeedKey,
 } from "../../../declarations/serve/serve.did";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE as _FILE_SCALING_MANAGER_SERVICE } from "../../../declarations/file_scaling_manager/file_scaling_manager.did";
 import { jsonStringify } from "../utils";
 import Loop from "../../assets/loop.svg";
 import { useForm, useFieldArray, Controller, useWatch, Control } from "react-hook-form";
@@ -21,7 +24,15 @@ import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton
 import DataAdd from "@spectrum-icons/workflow/DataAdd";
 import RemoveCircle from "@spectrum-icons/workflow/RemoveCircle";
 import AddCircle from "@spectrum-icons/workflow/AddCircle";
+import DataUpload from "@spectrum-icons/workflow/DataUpload";
 import { Principal } from "@dfinity/principal";
+import { AssetManager } from 'agent-js-file-upload';
+import { createActor, file_scaling_manager } from "../../../declarations/file_scaling_manager";
+import ProgressBar from "@ramonak/react-progress-bar";
+
+const isDevelopment = process.env.NODE_ENV !== "production";
+let assets = [];
+
 
 // We'll use dummy information for some fields for now, so we just ask for the
 // ones we support right now
@@ -52,6 +63,21 @@ const PutEpisodeForm = (): JSX.Element => {
   const { feed: incomingFeed, episode } = state as PutEpisodeFormProps || {};
   const [feed, setFeed] = useState(incomingFeed);
   const navigate = useNavigate();
+  const [fileScalingManagerActor, setFileScalingManagerActor] = useState<ActorSubclass<_FILE_SCALING_MANAGER_SERVICE>>();
+  const [assetManager, setAssetManager] = useState<AssetManager>();
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState(0.0);
+
+  const { openFilePicker, filesContent, loading } = useFilePicker({
+    accept: "video/*",
+    multiple: false,
+    readAs: "ArrayBuffer",
+    onFilesSelected: ({ plainFiles, filesContent, errors }) => {
+      // this callback is always called, even if there are errors
+      console.log('onFilesSelected', plainFiles, filesContent, errors);
+      handleFileSelected(plainFiles, filesContent);
+    }
+  });
 
   // If we were not given an episode to edit, specify defaultValues to pre-fill
   // the form with actual values (not just placeholders). Typescript makes us
@@ -166,6 +192,26 @@ const PutEpisodeForm = (): JSX.Element => {
   };
 
   useEffect(() => {
+    (async () => {
+
+      const ii_url = process.env.II_URL;
+      console.log("ii_url: ");
+      console.log(ii_url);
+
+
+
+      console.log("getting file scaling manager cid:");
+      const canisterId = process.env.FILE_SCALING_MANAGER_CANISTER_ID;
+      console.log(canisterId);
+      const fileScalingManagerActor = createActor(canisterId as string, {
+        agentOptions: {
+          identity: authClient?.getIdentity(),
+        },
+      });
+      console.log("Created file scaling actor");
+      setFileScalingManagerActor(fileScalingManagerActor);
+    })();
+
     if (episode) {
       populate(episode);
     };
@@ -187,6 +233,30 @@ const PutEpisodeForm = (): JSX.Element => {
       }
     }
   }, [actor]);
+
+  useEffect(() => {
+    if (fileScalingManagerActor) {
+      (async () => {
+        let canister_id = await fileScalingManagerActor.get_file_storage_canister_id();
+        const host = isDevelopment ? `http://localhost:4943` : `https://${canister_id}.icp0.io/`;
+
+        const am = new AssetManager({
+          actor_config: {
+            canister_id: canister_id,
+            identity: null,
+            host: host,
+            is_prod: !isDevelopment
+          }
+        })
+        setAssetManager(am);
+
+        // Update all URLs to use the correct port (see https://github.com/cybrowl/upload-file/issues/1)
+        const assets_ = await am.getAllAssets();
+        assets_.forEach((asset: any, _i: any) => (asset.url = asset.url.replace('8080', '4943')));
+        assets = assets_;
+      })();
+    }
+  }, [fileScalingManagerActor]);
 
   // todo: break this out into a reusable component
   if (authClient == null || actor == null) {
@@ -383,6 +453,42 @@ const PutEpisodeForm = (): JSX.Element => {
     return resourceError[1].message;
   };
 
+  async function handleFileSelected(plainFiles: any, filesContent: any) {
+    setIsUploading(true);
+
+    const file = plainFiles[0];
+    const fileName = file.name;
+    const fileType = file.type;
+
+    const fileContent = filesContent[0];
+    const fileArrayBuffer = fileContent.content;
+
+    try {
+      const uint8Array = new Uint8Array(fileArrayBuffer);
+      setUploadProgress(0);
+      const storeResult = await assetManager!.store(
+        uint8Array,
+        {
+          filename: fileName,
+          content_type: fileType
+        },
+        (progress: number) => {
+          setUploadProgress(progress);
+        });
+      const asset_id = storeResult.ok!;
+      const asset_response = await assetManager!.getAsset(asset_id);
+      const asset = asset_response.ok!;
+      const url = asset.url.replace('8080', '4943');
+
+      (document.getElementById("mediaUrl")! as HTMLInputElement).value = url;
+
+      setIsUploading(false);
+    } catch (error) {
+      console.log("error:");
+      console.error(error);
+    }
+  }
+
   return (
     <FormContainer>
       <div style={{ display: 'flex' }}>
@@ -424,10 +530,27 @@ const PutEpisodeForm = (): JSX.Element => {
         {/* todo: Add Summary and Content Encoded so they can be set separately from the Description */}
 
         <Label>
-          Media URL:
-          <Input
-            {...register("uri", { required: "Media URL is required" })}
-            placeholder="www.example.com/test.mp4" />
+          Media:
+          <div hidden={!isUploading} style={{ marginTop: "10px" }}><ProgressBar bgColor="#337035" completed={Math.ceil(uploadProgress * 100)} /></div>
+          <div hidden={isUploading}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <ActionButton
+                isQuiet
+                width={"120px"}
+                onPress={openFilePicker}
+              >
+                <DataUpload></DataUpload>
+                Upload
+              </ActionButton>
+              <span style={{ marginLeft: "20px", marginRight: "20px" }}>or</span>
+              <Input
+                id="mediaUrl"
+                {...register("uri", { required: "Media URL is required" })}
+                placeholder="www.example.com/test.mp4" style={{ flexGrow: 1 }} />
+            </div>
+          </div>
+        </Label>
+        <Label>
           <ValidationError>{errors.uri?.message}</ValidationError>
         </Label>
 

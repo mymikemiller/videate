@@ -114,8 +114,9 @@ module.exports = {
       NODE_ENV: "development",
       FRONTEND_CANISTER_ID: canisters["frontend"],
       SERVE_CANISTER_ID: canisters["serve"],
+      FILE_SCALING_MANAGER_CANISTER_ID: canisters["file_scaling_manager"],
       II_URL: isDevelopment
-        ? "http://bw4dl-smaaa-aaaaa-qaacq-cai.localhost:4943/"
+        ? "http://avqkn-guaaa-aaaaa-qaaea-cai.localhost:4943/"
         : "https://identity.ic0.app/#authorize",
     }),
     new webpack.ProvidePlugin({

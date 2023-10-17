@@ -32,7 +32,13 @@ dfx deploy
 ```
 3. If this is the first deploy to a replica (e.g. after using `dfx start
    --clean` or `npm run reset`), also do the following:
-3.1 Build the file hosting canisters
+3.1 Use the private did file when deploying the icrc1 ledger for the first time
+(the ck_btc canister) so it doesn't complain about "No more values on the
+wire":
+```
+npm run private-dids ; npm run deploy
+```
+3.2 Build the file hosting canisters
 ```
 ./scripts/deploy.sh
 ```
@@ -41,16 +47,16 @@ dfx deploy
 dfx generate file_scaling_manager
 dfx generate file_storage
 ```
-3.2 Initialize the 'serve' canister:
+3.4 Initialize the 'serve' canister:
 ```
 dfx canister call serve initialize
 ```
-3.3 Use the private did file when deploying the icrc1 ledger for the first time
-(the ck_btc canister) so it doesn't complain about "No more values on the
-wire":
+3.5 Deploy local Internet Identity canister and make note of the CID
 ```
-npm run private-dids ; npm run deploy
+dfx deploy internet_identity
 ```
+3.6 Ensure webpack.config.js uses the printed CID for the development II_URL
+
 4. Run the frontend on port 3000 with hot reload capability in Chromium browsers
 ```
 npm start
@@ -143,7 +149,7 @@ Navigate to a feed!
 Use an existing feed key and the correct local canisterIds for the `serve` and
 `frontend` canister)
 
-http://r7inp-6aaaa-aaaaa-aaabq-cai.localhost:4943/test?frontendCid=rrkah-fqaaa-aaaaa-aaaaq-cai&port=3000&principal=pato7-ox3im-uiosj-vsthj-lmb35-q44gg-cn5p7-w6tmd-hyxhw-wsaxy-eae
+http://be2us-64aaa-aaaaa-qaabq-cai.localhost:4943/test?frontendCid=b77ix-eeaaa-aaaaa-qaada-cai&port=3000&principal=pato7-ox3im-uiosj-vsthj-lmb35-q44gg-cn5p7-w6tmd-hyxhw-wsaxy-eae
 
 To test locally hosted feeds on a phone, use localhost.run to expose the feed
 to outside networks:

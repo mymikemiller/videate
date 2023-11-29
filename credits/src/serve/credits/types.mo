@@ -139,7 +139,8 @@ module {
   public type Feed = {
     // A string that uniquely identifies this Feed among all Videate Feeds. As
     // this is part of the URL for the feed, creators get to choose their
-    // FeedKey and it must be unique among all Feeds on Videate.
+    // FeedKey and it must be unique among all Feeds on Videate. FeedKeys must
+    // only contain lower case letters, numbers and dashes.
     key : FeedKey;
 
     title : Text;

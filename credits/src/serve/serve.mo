@@ -734,37 +734,17 @@ actor class Serve() = Self {
       Debug.print("Credits module is uninitialized. Please execute `dfx canister call serve initialize` after initial deploy.");
       return #err(#CreditsError(#Uninitialized("Credits module is uninitialized. Please execute `dfx canister call serve initialize` after initial deploy.")));
     };
-    let putFeedResult = credits.putFeed(msg.caller, feed);
+    let putFeedResult = credits.putFeed(msg.caller, feed, contributors);
 
-    switch (putFeedResult) {
+    return switch (putFeedResult) {
       case (#ok(actionPerformed)) {
-        // Update the profile so they can find the feed they created (if they
-        // already own this feed [i.e. this was an update], this will move the
-        // feed to the top of their list)
-        //
-        // Note that, for now, we use the owner specified in the feed, not the
-        // caller. The two should always match, except in the case of the
-        // cloner for which the caller is dfx which is why we go with the
-        // feed's owner here.
-        //
-        // todo: Use the caller as the owner, not the owner specified in the
-        // feed. Make sure this works with the cloner.
-        let addOwnedFeedKeyResult = contributors.addOwnedFeedKey(
-          feed.owner,
-          feed.key,
-        );
-        //(msg.caller, key);
-        switch (addOwnedFeedKeyResult) {
-          case (#ok(profile : Profile)) {
-            return #ok(actionPerformed);
-          };
-          case (#err(e : ContributorsError)) {
-            return #err(#ContributorsError(e));
-          };
+        switch (actionPerformed) {
+          case (#Added) #ok(#Added);
+          case (#Updated) #ok(#Updated);
         };
       };
       case (#err(e : CreditsError)) {
-        return #err(#CreditsError(e));
+        #err(#CreditsError(e));
       };
     };
   };
@@ -793,10 +773,6 @@ actor class Serve() = Self {
 
   public query func getAllFeeds() : async [(Text, Feed)] {
     credits.getAllFeeds();
-  };
-
-  public query func getAllEpisodes(feedKey : Text) : async [Episode] {
-    credits.getAllEpisodes(feedKey);
   };
 
   public query func getFeed(key : Text) : async ?Feed {

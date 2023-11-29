@@ -25,6 +25,7 @@ module {
   public type BuyNftResult = Types.BuyNftResult;
   public type StableContributors = Types.StableContributors;
   public type Download = Types.Download;
+  public type FeedKey = Types.FeedKey;
 
   private func key(x : Principal) : Trie.Key<Principal> {
     return { key = x; hash = Principal.hash(x) };
@@ -43,7 +44,7 @@ module {
               profile,
             );
           },
-        ),
+        )
       ),
       0,
     );
@@ -132,18 +133,8 @@ module {
         case (?existingProfile) {
           // Update the profile with the new feedKeys since we can't make
           // feedKeys mutable (it needs to be transfered via candid)
-          let feedKeysBuffer = Buffer.Buffer<Text>(existingProfile.feedKeys.size());
-          feedKeysBuffer.add(feedKey); // Add the new feedKey to the top of the list
-          Iter.iterate(
-            existingProfile.feedKeys.vals(),
-            func(f : Text, _index : Nat) {
-              if (f != feedKey) {
-                // Skip the new feedKey so we don't store it twice
-                feedKeysBuffer.add(f);
-              };
-            },
-          );
-          let newFeedKeys = Utils.bufferToArray(feedKeysBuffer);
+          let feedKeyLowerCase = Utils.toLowercase(feedKey);
+          let newFeedKeys = Utils.pushOrMoveToTop(existingProfile.feedKeys, feedKeyLowerCase);
 
           let profileUpdate : ProfileUpdate = {
             bio = existingProfile.bio;
@@ -159,7 +150,7 @@ module {
     };
 
     // Add a feed key to the list of feeds this user owns
-    public func addOwnedFeedKey(caller : Principal, feedKey : Text) : ProfileResult {
+    public func addOwnedFeedKey(caller : Principal, feedKey : FeedKey) : ProfileResult {
       // Reject the AnonymousIdentity
       if (Principal.toText(caller) == "2vxsx-fae") {
         return #err(#NotAuthorized);
@@ -172,18 +163,7 @@ module {
         case (?existingProfile) {
           // Update the profile with the new ownedFeedKeys since we can't make
           // ownedFeedKeys mutable (it needs to be transfered via candid)
-          let ownedFeedKeysBuffer = Buffer.Buffer<Text>(existingProfile.ownedFeedKeys.size());
-          ownedFeedKeysBuffer.add(feedKey); // Add the new feed key to the top of the list
-          Iter.iterate(
-            existingProfile.ownedFeedKeys.vals(),
-            func(f : Text, _index : Nat) {
-              if (f != feedKey) {
-                // Skip the new feedKey so we don't store it twice
-                ownedFeedKeysBuffer.add(f);
-              };
-            },
-          );
-          let newOwnedFeedKeys = Utils.bufferToArray(ownedFeedKeysBuffer);
+          let newOwnedFeedKeys = Utils.pushOrMoveToTop(existingProfile.ownedFeedKeys, feedKey);
 
           let profileUpdate : ProfileUpdate = {
             bio = existingProfile.bio;
@@ -224,20 +204,9 @@ module {
         case (?existingProfile) {
           // Update the profile with feedKey removed from ownedFeedKeys (we
           // can't make ownedFeedKeys mutable since it needs to be transfered
-          // via candid). When creating the buffer, use the full size of the
-          // existing profile's owned feedKeys since it's possible we won't
-          // remove anything (if we don't own feedKey)
-          let ownedFeedKeysBuffer = Buffer.Buffer<Text>(existingProfile.ownedFeedKeys.size());
-          Iter.iterate(
-            existingProfile.ownedFeedKeys.vals(),
-            func(f : Text, _index : Nat) {
-              if (f != feedKey) {
-                // Skip adding the feedKey to accomplish removing it
-                ownedFeedKeysBuffer.add(f);
-              };
-            },
-          );
-          let newOwnedFeedKeys = Utils.bufferToArray(ownedFeedKeysBuffer);
+          // via candid)
+          let feedKeyLowerCase = Utils.toLowercase(feedKey);
+          let newOwnedFeedKeys = Utils.pushOrMoveToTop(existingProfile.ownedFeedKeys, feedKeyLowerCase);
 
           let profileUpdate : ProfileUpdate = {
             bio = existingProfile.bio;
@@ -293,7 +262,7 @@ module {
             },
           );
           downloadsBuffer.add(download); // Add the new download to the end of the buffer
-          let newDownloads = Utils.bufferToArray(downloadsBuffer);
+          let newDownloads = Buffer.toArray(downloadsBuffer);
 
           let profileUpdate : ProfileUpdate = {
             bio = profile.bio;

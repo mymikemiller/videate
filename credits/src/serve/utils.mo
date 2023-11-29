@@ -89,28 +89,6 @@ module {
     return Option.make(n);
   };
 
-  // Buffer.fromArray is documented and should exist, but errors are produced
-  // so the function is duplicated here. See
-  // https://forum.dfinity.org/t/buffer-fromarray-missing-from-motoko-base-lib/13746/7?u=mymikemiller
-  public func bufferFromArray<X>(array : [X]) : Buffer.Buffer<X> {
-    let newBuffer = Buffer.Buffer<X>(array.size());
-
-    for (element in array.vals()) {
-      newBuffer.add(element);
-    };
-
-    newBuffer;
-  };
-
-  // Similar to bufferFromArray, this function is also duplicated here to avoid
-  // errors
-  public func bufferToArray<X>(buffer : Buffer.Buffer<X>) : [X] =
-  // immutable clone of array
-  Array.tabulate<X>(
-    buffer.size(),
-    func(i : Nat) : X { buffer.get(i) },
-  );
-
   public func addValueToEntry(map : HashMap.HashMap<Principal, Float>, key : Principal, value : Float) : HashMap.HashMap<Principal, Float> {
     let currentValue = Option.get(map.get(key), 0.0);
     map.put(key, currentValue + value);
@@ -176,4 +154,47 @@ module {
       subaccount = ?toSubaccount(caller);
     };
   };
+
+  public func toLowercase(str : Text) : Text {
+    return Text.map(
+      str,
+      func(char : Char) {
+        // Ascii difference between lower and upper case is 32
+        if (Char.isUppercase(char)) Char.fromNat32(Char.toNat32(char) + 32) else char;
+      },
+    );
+  };
+
+  public func pushOrMoveToTop(array : [Text], element : Text) : [Text] {
+    let buffer = Buffer.Buffer<Text>(array.size());
+    // Add the new element to the top of the list
+    buffer.add(element);
+    // Now add everything else, skipping the element we just added
+    Iter.iterate(
+      array.vals(),
+      func(e : Text, _index : Nat) {
+        // Skip the new item so we don't store it twice
+        if (e != element) {
+          buffer.add(e);
+        };
+      },
+    );
+    let newArray = Buffer.toArray<Text>(buffer);
+    return newArray;
+  };
+
+  // This function is necessary because motoko lacks support for regular
+  // expressions. When support is added, this RegExp can be used:
+  // /^[a-z0-9-]*$/
+  public func isValidFeedKey(str : Text) : Bool {
+    // Only lowercase characters, numbers and dashes are allowed
+    let allowed = "abcdefghijklmnopqrstuvwxyz0123456789-";
+    for (c in str.chars()) {
+      if (not Text.contains(allowed, #char c)) {
+        return false;
+      };
+    };
+    return true;
+  };
+
 };

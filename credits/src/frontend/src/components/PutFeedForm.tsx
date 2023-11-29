@@ -88,38 +88,38 @@ const PutFeedForm = (): JSX.Element => {
     );
   };
 
-  const onSubmit = (feed: Feed): void => {
+  const onSubmit = async (feed: Feed): Promise<void> => {
     feed.link = "http://www.test.com"; //todo: generate correct link using the key and the user's principal
     feed.episodeIds = episodeIds ?? [];
     feed.subtitle = "test subtitle";
     feed.owner = authClient.getIdentity().getPrincipal(); // Feeds are always owned by the user who created them.
 
     // Handle update async
-    actor!.putFeed(feed).then(async (result: PutFeedFullResult) => {
-      if ("ok" in result) {
-        if ("Created" in result.ok) {
-          toast.success("New feed created!");
-          if (profile) {
-            profile.ownedFeedKeys.push(feed.key);
-          } else {
-            console.error("Profile does not exist at the time of adding feed, so the UI won't know we own the new feed.")
-          }
-          navigate('/putEpisode?feed=' + feed.key, { state: { feed } })
-        } else if ("Updated" in result.ok) {
-          toast.success("Feed updated!");
-          navigate('/manageFeeds');
-        }
-        return result.ok;
-      } else {
-        if ("KeyExists" in result.err) {
-          toast.error("There is already a feed with this key. Key must be unique among all Videate feeds.");
-        } else {
-          toast.error("Error creating feed.");
-        }
-        console.error(result.err);
-        return;
+    let putFeedResult = await actor!.putFeed(feed);
+    if ("ok" in putFeedResult) {
+      // Fetch the newly updated profile so the page we navigate to will be correct
+      let newProfileResult = await actor!.readContributor();
+      if ("ok" in newProfileResult) {
+        await setProfile(newProfileResult.ok);
+      };
+
+      if ("Created" in putFeedResult.ok) {
+        toast.success("New feed created!");
+        navigate('/putEpisode?feed=' + feed.key, { state: { feed } });
+      } else if ("Updated" in putFeedResult.ok) {
+        toast.success("Feed updated!");
+        navigate('/manageFeeds');
       }
-    });
+      return;
+    } else {
+      if ("KeyExists" in putFeedResult.err) {
+        toast.error("There is already a feed with this key. Key must be unique among all feeds.");
+      } else {
+        toast.error("Error creating feed.");
+      }
+      console.error(putFeedResult.err);
+      return;
+    };
   };
 
   return (
@@ -132,10 +132,12 @@ const PutFeedForm = (): JSX.Element => {
           <Input
             {...register("key", {
               required: "Feed Key is required",
-              pattern: { value: /^[a-zA-Z0-9_-]*$/, message: "Feed Key must contain only letters, numbers, underscores (_) and dashes (-)" }
+              pattern: { value: /^[a-z0-9-]*$/, message: "Feed Key must contain only lower case letters, numbers and dashes (-)" }
             })}
             disabled={init?.key != null} // Disable this field if we're editing an existing feed (in which case we can't change the key since people may be subscribed to it)
-            placeholder="Unique Feed Key" />
+            placeholder="Unique Feed Key"
+            // Only allow lower case keys and replace spaces with dashes
+            onChange={event => setValue("key", event.target.value.toLowerCase().replace(' ', '-'))} />
           <ValidationError>{errors.key?.message}</ValidationError>
         </Label>
 

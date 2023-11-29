@@ -5,6 +5,8 @@ import NftTypes "../nft_db/types";
 import CreditsTypes "../credits/types";
 
 module {
+  public type FeedKey = CreditsTypes.FeedKey;
+
   // Used to store the contents of the Contributors "database" in stable types
   // between upgrades
   public type StableContributors = {
@@ -25,15 +27,15 @@ module {
     id : Principal;
 
     bio : Bio;
-    feedKeys : [Text]; // The feeds this user has indicated that they subscribe to
-    ownedFeedKeys : [Text]; // The feeds this user created (owns) and manages
+    feedKeys : [FeedKey]; // The feeds this user has indicated that they subscribe to. All keys in this array should be the lowercase version of feed.key.
+    ownedFeedKeys : [FeedKey]; // The feeds this user created (owns) and manages. All keys in this array should be the lowercase version of feed.key.
     downloads : [Download]; // Every download performed by the user (or user's podcast app), in order
   };
 
   public type ProfileUpdate = {
     bio : Bio;
-    feedKeys : [Text];
-    ownedFeedKeys : [Text];
+    feedKeys : [FeedKey];
+    ownedFeedKeys : [FeedKey];
     downloads : [Download];
   };
 

@@ -416,7 +416,7 @@ const PutEpisodeForm = (): JSX.Element => {
     return <h1>Fetching profile...</h1>
   };
 
-  if (!profile.ownedFeedKeys.includes(feedKey)) {
+  if (!profile.ownedFeedKeys.includes(feedKey.toLowerCase())) {
     return <h1>You do not own the "{feedKey}" feed. You can only edit episodes for feeds you own.</h1>
   };
 

@@ -16,8 +16,10 @@ import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Debug "mo:base/Debug";
 import Result "mo:base/Result";
+import Bool "mo:base/Bool";
 import Types "types";
 import Utils "../utils";
+import Contributors "../contributors/contributors";
 import Nft "../nft_db/nft_db";
 
 module {
@@ -49,7 +51,7 @@ module {
       Text.hash,
     );
 
-    let media : Buffer.Buffer<Media> = Utils.bufferFromArray<Media>(init.mediaEntries);
+    let media : Buffer.Buffer<Media> = Buffer.fromArray<Media>(init.mediaEntries);
 
     // Turn the stable array of all Episodes into a usable map from FeedKey to
     // a Buffer of Episodes in that Feed. Once an Episode is added to this map,
@@ -67,7 +69,7 @@ module {
         switch (map.get(episode.feedKey)) {
           case (null) {
             // Initialize with a Buffer containing only the current Episode
-            let newBuffer = Utils.bufferFromArray<Episode>(Array.make<Episode>(episode));
+            let newBuffer = Buffer.fromArray<Episode>(Array.make<Episode>(episode));
             map.put(episode.feedKey, newBuffer);
           };
           case (?episodeBuffer) {
@@ -82,7 +84,7 @@ module {
     var custodians = List.fromArray<Principal>(init.custodianEntries);
 
     public func asStable() : StableCredits = {
-      mediaEntries = Utils.bufferToArray(media);
+      mediaEntries = Buffer.toArray(media);
 
       // Flatten the values from the map of FeedKey->Buffer<Episode> into an
       // array of all Episodes on the platform
@@ -91,7 +93,7 @@ module {
           Iter.map<Buffer.Buffer<Episode>, [Episode]>(
             episodes.vals(),
             func(buffer : Buffer.Buffer<Episode>) : [Episode] {
-              Utils.bufferToArray(buffer);
+              Buffer.toArray(buffer);
             },
           )
         )
@@ -102,12 +104,15 @@ module {
     };
 
     // Feeds
-    public func putFeed(caller : Principal, feed : Feed) : PutResult {
+    public func putFeed(caller : Principal, feed : Feed, contributors : Contributors.Contributors) : PutResult {
+      if (not Utils.isValidFeedKey(feed.key)) {
+        return #err(#Other("Invalid feed key. Key must contain only lowercase letters, numbers and dashes."));
+      };
       let isCustodian = List.some(
         custodians,
         func(custodian : Principal) : Bool { custodian == caller },
       );
-      switch (feeds.get(feed.key)) {
+      let result = switch (getFeed(feed.key)) {
         case (?existingFeed) {
           if (existingFeed.owner != caller) {
             // The feed already exists and is owned by a user other than the
@@ -125,7 +130,7 @@ module {
             };
           };
           feeds.put(feed.key, feed);
-          return #ok(#Updated);
+          #Updated;
         };
         case (null) {
           if (feed.owner != caller and not isCustodian) {
@@ -136,13 +141,38 @@ module {
             return #err(#Unauthorized);
           };
           feeds.put(feed.key, feed);
-          return #ok(#Added);
+          #Added;
         };
       };
+
+      // Update the profile so they can find the feed they created (if they
+      // already own this feed [i.e. this was an update], this will move the
+      // feed to the top of their list)
+      //
+      // Note that, for now, we use the owner specified in the feed, not the
+      // caller. The two should always match, except in the case of the cloner
+      // for which the caller is dfx which is why we go with the feed's owner
+      // here.
+      let addOwnedFeedKeyResult = contributors.addOwnedFeedKey(
+        feed.owner,
+        feed.key,
+      );
+
+      switch (addOwnedFeedKeyResult) {
+        case (#ok(_profile)) {
+          return #ok(result);
+        };
+        case (#err(_e)) {
+          // This shouldn't happen based on the checks above
+          Debug.trap("Unable to add the new feed to owner");
+        };
+      };
+
+      return #ok(result);
     };
 
     public func deleteFeed(key : Text) {
-      feeds.delete(key);
+      feeds.delete(Utils.toLowercase(key));
       deleteAllEpisodes(key);
     };
 
@@ -150,18 +180,18 @@ module {
       Iter.toArray(feeds.entries());
     };
 
-    public func getAllEpisodes(feedKey : Text) : [Episode] {
-      let buffer = episodes.get(feedKey);
-      switch (buffer) {
-        case null [];
-        case (?buffer) {
-          Utils.bufferToArray(buffer);
-        };
-      };
-    };
+    // public func getAllEpisodes(feedKey : Text) : [Episode] {
+    //   let buffer = episodes.get(feedKey);
+    //   switch (buffer) {
+    //     case null [];
+    //     case (?buffer) {
+    //       Utils.bufferToArray(buffer);
+    //     };
+    //   };
+    // };
 
     public func deleteAllEpisodes(feedKey : Text) {
-      episodes.delete(feedKey);
+      episodes.delete(Utils.toLowercase(feedKey));
     };
 
     public func getAllFeedKeys() : [Text] {
@@ -174,7 +204,8 @@ module {
     };
 
     public func getFeed(key : FeedKey) : ?Feed {
-      feeds.get(key);
+      // All feeds are keyed on their feed key in lower case
+      feeds.get(Utils.toLowercase(key));
     };
 
     public func getMedia(id : MediaID) : ?Media {
@@ -183,7 +214,7 @@ module {
 
     public func getEpisode(key : FeedKey, id : EpisodeID) : ?Episode {
       Debug.print("in getEpisode");
-      let episodeBuffer = episodes.get(key);
+      let episodeBuffer = getEpisodes(key);
       Debug.print("getEpisode 1");
       switch (episodeBuffer) {
         case (null) {
@@ -211,7 +242,7 @@ module {
     // feed was found but does not contain any Episodes.
     public func getEpisodes(key : FeedKey) : ?[Episode] {
       Debug.print("in getEpisodes");
-      // We can't just use episodes.get(key) because the feed's list of
+      // We can't just use getEpisodes(key) because the feed's list of
       // EpisodeIDs into that array is the source of truth for what Episodes
       // are actually in the Feed.
       let episodeIds : [EpisodeID] = switch (getFeed(key)) {
@@ -226,14 +257,14 @@ module {
       if (episodeIds.size() == 0) {
         Debug.print("getEpisodes no episodes yet");
         // Not an error case (just no episodes yet). We special-case this here
-        // since episodes.get(key) will likely return null below
+        // since getEpisodes(key) will likely return null below
         return Option.make([]);
       };
 
       switch (episodes.get(key)) {
         case null {
-          // If a feed has EpisodeIDs in its episodeIds list, there shold
-          // be Episodes in its Episodes buffer
+          // If a feed has EpisodeIDs in its episodeIds list, there should be
+          // Episodes in its Episodes buffer
           Debug.print("getEpisodes no buffer");
           Debug.trap("No episodes buffer found for feed " # key);
         };
@@ -307,13 +338,13 @@ module {
 
       //todo: check msg caller for feed ownership
 
-      let episodeBuffer = switch (episodes.get(episodeData.feedKey)) {
+      let episodeBuffer = switch (getEpisodes(episodeData.feedKey)) {
         case (null) {
           // This is the feed's first episode, so create the buffer
-          Utils.bufferFromArray<Episode>([]);
+          Buffer.fromArray<Episode>([]);
         };
-        case (?episodeBuffer) {
-          episodeBuffer;
+        case (?episodeArray) {
+          Buffer.fromArray<Episode>(episodeArray);
         };
       };
 
@@ -331,16 +362,16 @@ module {
 
       // Add the Episode
       episodeBuffer.add(episode);
-      let _ = episodes.replace(feed.key, episodeBuffer);
+      let _ = episodes.replace(Utils.toLowercase(feed.key), episodeBuffer);
 
       // Get the new list of episodeIds for the feed
-      let buffer = Utils.bufferFromArray<EpisodeID>(feed.episodeIds);
+      let buffer = Buffer.fromArray<EpisodeID>(feed.episodeIds);
       buffer.add(episode.id);
-      let newEpisodeIds : [EpisodeID] = Utils.bufferToArray(buffer);
+      let newEpisodeIds : [EpisodeID] = Buffer.toArray(buffer);
 
       // The following should work to modify the feed's episode list, but gives "unexpected token 'and'" or "unexpected token 'with'"
       // let updatedFeed : Feed = {
-      //   episode.feed with episodes = episodesUtils.bufferToArray();
+      //   episode.feed with episodeIds = Buffer.toArray(buffer);
       // }
 
       // Why doesn't this work? See https://internetcomputer.org/docs/current/developer-docs/build/cdks/motoko-dfinity/language-manual#object-combinationextension and https://github.com/dfinity/motoko/pull/3084
@@ -360,7 +391,7 @@ module {
         owner = feed.owner;
         episodeIds = newEpisodeIds;
       };
-      let _ = feeds.replace(feed.key, updatedFeed);
+      let _ = feeds.replace(Utils.toLowercase(feed.key), updatedFeed);
       return #ok(episode);
     };
 
@@ -379,14 +410,14 @@ module {
 
       //todo: check msg caller for feed ownership
 
-      let episodeBuffer = switch (episodes.get(feedKey)) {
+      let episodeBuffer = switch (getEpisodes(feedKey)) {
         case (null) {
           // Since we're updating not adding, we expect to find the episode
           // buffer in the episodes array
           return #err(#EpisodeNotFound);
         };
-        case (?episodeBuffer) {
-          episodeBuffer;
+        case (?episodeArray) {
+          Buffer.fromArray<Episode>(episodeArray);
         };
       };
 
@@ -442,7 +473,7 @@ module {
         let summary = getFeedSummary(key);
         buffer.add(summary);
       };
-      Utils.bufferToArray(buffer);
+      Buffer.toArray(buffer);
       // Not sure why this doesn't work instead of the above:
       // Array.map(keys, func(key: Text) : (Text, Text)
       //     {getFeedSummary(key);

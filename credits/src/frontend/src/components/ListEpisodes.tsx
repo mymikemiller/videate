@@ -53,7 +53,7 @@ const ListEpisodes = (): JSX.Element => {
   useEffect(() => {
     // If we weren't initialized with a feed, fetch the one at feedKey
     if (!feed) {
-      if (actor && feedKey && profile?.ownedFeedKeys.includes(feedKey)) {
+      if (actor && feedKey && profile?.ownedFeedKeys.includes(feedKey.toLowerCase())) {
         (async () => {
           const feed = await actor.getFeed(feedKey!);
           // If we got a feed back, set it. Note that feed.length does not

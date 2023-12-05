@@ -232,7 +232,7 @@ const App = () => {
                 </Routes>
               )}
             </Header>
-            <h2 style={{ textAlign: 'center', margin: 0 }}>Videate</h2>
+            <h2 style={{ textAlign: 'center', margin: 0 }}>Cureate</h2>
             <Main>
               <Flex direction="column" justifyContent="start" maxWidth={700} id="main-container">
                 {!isAuthenticated ? (

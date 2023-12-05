@@ -539,8 +539,8 @@ module {
             nftTokenId = null;
             source = {
               platform = {
-                uri = "http://videate.org/";
-                id = "videate";
+                uri = "http://cureate.art/";
+                id = "cureate";
               };
               uri = "https://www.learningcontainer.com/mp4-sample-video-files-download/#Sample_MP4_File";
               id = "test";

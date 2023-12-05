@@ -1,4 +1,4 @@
-# Videate
+# Cureate
 
 ## root_symlinks folder
 

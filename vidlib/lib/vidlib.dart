@@ -1,4 +1,4 @@
-/// Support for Videate projects
+/// Support for Cureate projects
 export 'src/models/media.dart';
 export 'src/models/cloner_task_args.dart';
 export 'src/models/cloner_configuration.dart';

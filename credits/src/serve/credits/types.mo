@@ -83,7 +83,7 @@ module {
   public type MediaID = Nat;
 
   // A full-fledged Media is created once the MediaData has been inserted into
-  // the list of all Videate Media and is given an ID
+  // the list of all Cureate Media and is given an ID
   public type Media = MediaData and {
     // A serial, 0-based ID that also corresponds to the index into credits's
     // array of all Media on the platform.
@@ -137,9 +137,9 @@ module {
   public type FeedKey = Text;
 
   public type Feed = {
-    // A string that uniquely identifies this Feed among all Videate Feeds. As
+    // A string that uniquely identifies this Feed among all Cureate Feeds. As
     // this is part of the URL for the feed, creators get to choose their
-    // FeedKey and it must be unique among all Feeds on Videate. FeedKeys must
+    // FeedKey and it must be unique among all Feeds on Cureate. FeedKeys must
     // only contain lower case letters, numbers and dashes.
     key : FeedKey;
 

@@ -62,7 +62,7 @@ void updateProgressBar(ProgressBar progressBar, double progress) {
 }
 
 f.Directory createTempDirectory(f.FileSystem filesystem) {
-  final root = filesystem.systemTempDirectory.childDirectory('videate');
+  final root = filesystem.systemTempDirectory.childDirectory('cureate');
   root.createSync();
   final newTempFolder = root.createTempSync();
   return newTempFolder;

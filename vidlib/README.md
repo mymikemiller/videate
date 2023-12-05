@@ -1,4 +1,4 @@
-A library common to Videate applications
+A library common to Cureate applications
 
 ## Usage
 

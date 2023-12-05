@@ -1,7 +1,6 @@
 name: vidcast
 description: Hosts an rss (xml) feed of media files
-# version: 1.0.0
-# homepage: https://www.videate.org
+# version: 1.0.0 homepage: https://www.cureate.art
 
 environment:
   sdk: '>=2.10.0 <3.0.0'

@@ -1,4 +1,4 @@
-// The "database" of Videate Nfts. Implements the Dip721 standard.
+// The "database" of Cureate Nfts. Implements the Dip721 standard.
 
 // This file is set up like many in the Motoko base library, where the
 // functions accept an Nft object instead of operating on the module's data.
@@ -53,7 +53,7 @@ module {
       logo_type = "image/png";
       data = "";
     };
-    public var name : Text = "Videate NFTs";
+    public var name : Text = "Cureate NFTs";
     public var symbol : Text = "VNFT";
     public var maxLimit : Nat16 = 0; // infinite
 

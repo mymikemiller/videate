@@ -1,7 +1,7 @@
 name: vidlib
-description: A library for use in multiple Videate apps.
+description: A library for use in multiple Cureate apps.
 # version: 1.0.0
-# homepage: https://www.videate.org
+# homepage: https://www.cureate.art
 
 environment:
   sdk: '>=2.18.6 <3.0.0'

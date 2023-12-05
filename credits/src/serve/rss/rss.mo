@@ -113,7 +113,7 @@ module {
                     name = "atom:link";
                     attributes = [
                       //todo: use correct link, probably with all the user-specific metadata
-                      ("href", "http://videate.org/link-to-self.xml"),
+                      ("href", "http://cureate.art/link-to-self.xml"),
                       ("rel", "self"),
                       ("type", "application/rss+xml"),
                     ];
@@ -233,10 +233,10 @@ module {
     contributors : Contributors.Contributors,
     nftDb : NftDb.NftDb,
   ) : Element {
-    let videateSettingsUri = frontendUri # "?feed=" # episode.feedKey;
+    let cureateSettingsUri = frontendUri # "?feed=" # episode.feedKey;
     let nftPurchaseUri = frontendUri # "/nft?feed=" # episode.feedKey # "&episode=" # debug_show (episode.id);
 
-    let videateSettingsMessage : Text = episode.description # "\n\nManage your Videate settings:\n\n" # videateSettingsUri # "\n\n";
+    let cureateSettingsMessage : Text = episode.description # "\n\nManage your Cureate settings:\n\n" # cureateSettingsUri # "\n\n";
 
     let nftOwnerMessage = switch (episode.nftTokenId) {
       case (null) {
@@ -276,7 +276,7 @@ module {
     };
     let nftDescription = nftOwnerMessage # "\n\n" # nftPurchaseUri;
 
-    let episodeDescription = videateSettingsMessage # nftDescription;
+    let episodeDescription = cureateSettingsMessage # nftDescription;
 
     let media : Media = switch (credits.getMedia(episode.mediaId)) {
       case (null) {

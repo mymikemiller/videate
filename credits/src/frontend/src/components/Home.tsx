@@ -6,7 +6,7 @@ import ImageProfile from "@spectrum-icons/workflow/ImageProfile";
 function Home() {
   return (
     <section>
-      <h2>Welcome to your Videate Contributor Settings page!</h2>
+      <h2>Welcome to your Cureate Contributor Settings page!</h2>
       <p>
         Here you can manage your contributions to the creators you help support.
       </p>

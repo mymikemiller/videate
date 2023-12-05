@@ -164,7 +164,7 @@ tls termination", e.g.:
 https://8d0116fb626db2.lhr.life/example_feed_key?canisterId=r7inp-6aaaa-aaaaa-aaabq-cai&frontendCid=ryjl3-tyaaa-aaaaa-aaaba-cai&principal=TEST_PRINCIPAL
 
 Make sure to specify the current cid for frontend from
-.dfx/local/canister_ids.json so the generated videate settings links will work
+.dfx/local/canister_ids.json so the generated cureate settings links will work
 properly, e.g.:
 
 # Adding ckBTC to an account for testing purposes

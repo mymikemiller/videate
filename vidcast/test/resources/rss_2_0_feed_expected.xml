@@ -2,7 +2,7 @@
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
   <channel>
     <title>Test Feed</title>
-    <link>http://videate.org</link>
+    <link>http://cureate.art</link>
     <language>en-us</language>
     <itunes:subtitle>A feed for testing</itunes:subtitle>
     <itunes:author>John Doe</itunes:author>

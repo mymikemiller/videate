@@ -46,7 +46,7 @@ dotenv package and put the environment variables in a local .env file.
 
 Variable | Definition | Examples
 --- | --- | ---
-*VIDCAST_BASE_URL* | The base address at which the running server can be found | http://localhost:8080, http://videate.org
+*VIDCAST_BASE_URL* | The base address at which the running server can be found | http://localhost:8080, http://cureate.art
 
 ## Development (VSCode)
 Open the videate/videate.code-workspace workspace in VSCode

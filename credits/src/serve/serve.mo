@@ -123,6 +123,14 @@ actor class Serve() = Self {
         body = Text.encodeUtf8(""); // Send empty icon
         streaming_strategy = null;
       };
+    } else if (request.url == "/.well-known/ic-domains") {
+      return {
+        upgrade = false;
+        status_code = Nat16.fromNat(200);
+        headers = [("content-type", "text/text")];
+        body = "rss.cureate.art"; // Newline-separated list of all domains and subdomains that
+        streaming_strategy = null;
+      };
     } else if (request.url == "/fast") {
       // https://www.textfixer.com/tools/remove-line-breaks.php
       // https://onlinestringtools.com/escape-string
@@ -263,7 +271,7 @@ actor class Serve() = Self {
 
   private func _parseFrontendUri(request : HttpRequest) : Text {
     // If this 'serve' canister is hosted on the IC, use the hard-coded IC
-    // frontend canister as the host for the videate settings page. Otherwise,
+    // frontend canister as the host for the Cureate settings page. Otherwise,
     // use the same host as in the request, since that host should also work
     // for the frontend canister (i.e. when dfx is running locally, even when
     // accessed through localhost.run)
@@ -673,7 +681,7 @@ actor class Serve() = Self {
             key_val_data = [
               {
                 key = "description";
-                val = #TextContent("Videate Episode");
+                val = #TextContent("Cureate Episode");
               },
               {
                 key = "tag";

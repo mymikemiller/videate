@@ -45,7 +45,7 @@ dfx deploy --argument "(
       logo_type = \"image/png\";
       data = \"\";
     };
-    name = \"Videate NFTs\";
+    name = \"Cureate NFTs\";
     symbol = \"VNFT\";
     maxLimit = 0;
   }
@@ -63,7 +63,7 @@ dfx canister call nft mintDip721 \
       purpose = variant{Rendered};
       data = blob\"https://rss.videate.org/dfinity/https://1928422091.rsc.cdn77.org/media/youtube/dfinity/M_cO-Fmh8ZI.mp4\";
       key_val_data = vec {
-        record { key = \"description\"; val = variant{TextContent=\"Episode of a Videate podcast\"}; };
+        record { key = \"description\"; val = variant{TextContent=\"Episode of a Cureate podcast\"}; };
         record { key = \"tag\"; val = variant{TextContent=\"episode\"}; };
         record { key = \"contentType\"; val = variant{TextContent=\"text/plain\"}; };
         record { key = \"locationType\"; val = variant{Nat8Content=4:nat8} };

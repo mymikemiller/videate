@@ -183,7 +183,7 @@ function ManageProfile() {
             Hello
             {fallbackDisplayName[0] ? `, ${fallbackDisplayName[0]}` : ""}. Here are the feeds you subscribe to:
           </Heading>
-          {feedKeys.length == 0 && <Text>No feed keys found. Please click the Videate link in the shownotes to populate.</Text>}
+          {feedKeys.length == 0 && <Text>No feed keys found. Please click the Cureate link in the shownotes to populate.</Text>}
           <ul style={{ padding: 0 }} >
             {feedKeys.map((feedKey, index) => {
               return (

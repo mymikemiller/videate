@@ -225,14 +225,12 @@ module {
           null;
         };
         case (?episodeBuffer) {
-          Debug.print("getEpisode 2");
           if (id >= episodeBuffer.size()) {
             // The Episode buffer exists (thus likely the Feed exists), but
             // there is no Episode with the given id
             Debug.print("getEpisode no episode with id " # debug_show (id) # " in episodeBuffer");
             return null;
           };
-          Debug.print("getEpisode returning episode");
           return Option.make(episodeBuffer.get(id));
         };
       };
@@ -358,6 +356,7 @@ module {
         feedKey = episodeData.feedKey;
         id = episodeBuffer.size(); // EpisodeIDs are 0-based and always match the index into episodeBuffer
         nftTokenId = null;
+        hidden = episodeData.hidden;
       };
 
       // Add the Episode
@@ -426,8 +425,9 @@ module {
         return #err(#EpisodeNotFound);
       };
 
-      // Modify the Episode
+      // Modify the Episode by replacing the episodes buffer with the new one
       episodeBuffer.put(episode.id, episode);
+      ignore episodes.replace(Utils.toLowercase(feed.key), episodeBuffer);
 
       return #ok();
     };
@@ -448,6 +448,7 @@ module {
         mediaId = episode.mediaId;
         feedKey = episode.feedKey;
         id = episode.id;
+        hidden = episode.hidden;
 
         nftTokenId = Option.make(tokenId);
       };

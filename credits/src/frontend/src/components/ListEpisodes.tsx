@@ -27,7 +27,7 @@ import toast from "react-hot-toast";
 import { Button, Icon } from "@adobe/react-spectrum";
 import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton, LargeBorder, LargeBorderWrap, ValidationError } from "./styles/styles";
 
-// If feed is not provided when navigating to the ListEpiosode page, the feed at
+// If feed is not provided when navigating to the ListEpisode page, the feed at
 // the 'feedKey' search param will be fetched.
 interface ListEpisodeProps {
   feed?: Feed;
@@ -100,7 +100,7 @@ const ListEpisodes = (): JSX.Element => {
   };
 
   if (!feedKey) {
-    return <h1>feed must be specified as a search param so we know which feed's Episode to list.</h1>
+    return <h1>feed must be specified as a search param so we know which feed's episodes to list.</h1>
   };
 
   if (!feed) return <h1>Loading feed...</h1>;
@@ -111,14 +111,20 @@ const ListEpisodes = (): JSX.Element => {
     <>
       <Title>{"Episodes for \"" + feedKey + "\" Feed"}</Title>
       {episodes.length == 0 && "No episodes yet. Add an episode by clicking below:"}
-      {episodes.map((episode: Episode) =>
-        <div key={Number(episode.id)}>
-          {episode.title}&nbsp;&nbsp;
-          <Link to={'/putEpisode?feed=' + feedKey} state={{ feedKey, feed, episode }}>
-            Edit
-          </Link>
-        </div>)
+      {episodes.map((episode: Episode) => 
+      {
+        const style: React.CSSProperties = { opacity: episode.hidden ? 0.5 : 1.0 };
+        return (
+          <div key={Number(episode.id)}>
+            <span style={style}>{episode.title}&nbsp;&nbsp;</span>
+            <Link to={'/putEpisode?feed=' + feedKey} state={{ feedKey, feed, episode }}>
+              Edit
+            </Link>
+          </div >
+        )
+      })
       }
+
       <br></br>
       &nbsp;
       <ButtonGroup>

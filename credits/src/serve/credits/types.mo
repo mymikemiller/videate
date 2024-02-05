@@ -1,5 +1,6 @@
 import Result "mo:base/Result";
 import Buffer "mo:base/Buffer";
+import Bool "mo:base/Bool";
 
 module {
   // Used to store the contents of the Credits canister in stable types
@@ -99,6 +100,14 @@ module {
     title : Text;
     description : Text;
     mediaId : MediaID;
+
+    // An Episode can be hidden so it can doesn't show up in the feed, but can
+    // still be edited and unhidden at a later date. An Episode can also be
+    // "hidden" by being removed from the Feed's episodeIds list, but then it
+    // wouldn't know where to show up in the list of episodes to edit, or to
+    // toggle it back to unhidden at a later date, so using this property is
+    // the proper way to hide episodes
+    hidden : Bool;
   };
 
   public type EpisodeID = Nat;
@@ -152,8 +161,10 @@ module {
     imageUrl : Text;
     owner : Principal;
 
-    // Usually this will look like [0, 1, 2, 3, ...] but if Episodes are
-    // removed from the feed, numbers will be omitted from this array
+    // Usually this will look like [0, 1, 2, 3, ...] but Episodes can be
+    // reordered or removed from the feed. Note: to hide an episode from the
+    // feed but remember where it was in the feed before it was hidden, toggle
+    // episode.hidden instead of removing the id from this array.
     episodeIds : [EpisodeID];
   };
 

@@ -52,38 +52,58 @@ module {
       };
     };
 
-    // Use mapResult to return early with an error when an Episode isn't found
-    let episodesResult = Array.mapResult<EpisodeID, Episode, Text>(
-      episodeIds,
-      func(id : EpisodeID) : Result.Result<Episode, Text> {
-        switch (credits.getEpisode(feed.key, id)) {
-          case (null) #err("Episode with ID " # Nat.toText(id) # " not found in " # feed.key # " feed");
-          case (?episode) #ok(episode);
+    let episodes = Buffer.Buffer<Episode>(Array.size(episodeIds));
+    var error: ?Text = null;
+    label episodeLoop for (id in episodeIds.vals()) {
+      switch (credits.getEpisode(feed.key, id)) {
+        case (null) {
+          error := Option.make("Episode with ID " # Nat.toText(id) # " not found in " # feed.key # " feed");
+          break episodeLoop;
         };
-      },
-    );
-
-    let episodes = switch (episodesResult) {
-      case (#ok(episodes)) {
-        // All Episodes were found
-        episodes;
+        case (?episode) {
+          if (not episode.hidden) {
+            // Normal case
+            episodes.add(episode);
+          } else {
+            // This isn't an error, as episodes are allowed to be hidden from
+            // feeds. But if the user was requesting a specific episode (i.e.
+            // episodeId was provided as a parameter), we let them know it's
+            // not showing up because that episode is hidden.
+            switch (episodeId) {
+              case null {
+                // Episode hidden, continue loop without adding episode
+              };
+              case (?episodeId) {
+                if (episode.hidden) {
+                  error := Option.make("The requested episode (id " # Nat.toText(id) # ") is marked as hidden");
+                }
+              }
+            }
+          }
+        };
       };
-      case (#err(msg : Text)) {
-        // There was an Episode not found. Notify the user.
+    };
+
+    switch(error) {
+      case null ();
+      case (?error) {
+        // There was an error finding episodes. Notify the user.
         return {
           prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
           root = {
             name = "Error";
             attributes = [];
-            text = msg;
+            text = error;
             children = [];
           };
         };
       };
     };
 
-    let episodeList : List.List<Episode> = List.fromArray<Episode>(episodes);
-    let episodeListNewestToOldest : List.List<Episode> = List.reverse(episodeList);
+    // Arrange episodes from newest to oldest and create a List
+    Buffer.reverse(episodes);
+    let episodeArray = Buffer.toArray(episodes);
+    let episodeList : List.List<Episode> = List.fromArray(episodeArray);
 
     // todo: Limit the episodes list to the most recent 3 episodes unless there
     // is a registered user making the request
@@ -203,7 +223,7 @@ module {
                   },
                 ]),
                 List.map<Episode, Element>(
-                  episodeListNewestToOldest,
+                  episodeList,
                   func(episode : Episode) : Element {
                     getEpisodeElement(
                       credits,

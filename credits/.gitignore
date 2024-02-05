@@ -10,6 +10,9 @@
 # dfx temporary files
 .dfx/
 
+# Mops files
+.mops/
+
 # Generated files
 src/declarations
 

@@ -41,6 +41,7 @@ type Submission = {
   title: string;
   description: string;
   uri: string;
+  hidden: boolean;
   individualResources: Array<[bigint, string]>; // Weight, Principal
   mediaResources: Array<[bigint, FeedKey, EpisodeID]>; // Weight, FeedKey, EpisodeID
 };
@@ -87,6 +88,7 @@ const PutEpisodeForm = (): JSX.Element => {
     title: "",
     description: "",
     uri: "",
+    hidden: false,
     mediaResources: [],
     feed: {
       key: '',
@@ -162,8 +164,9 @@ const PutEpisodeForm = (): JSX.Element => {
   }
 
   const populate = async (episode: Episode) => {
-    setValue('description', episode.description, { shouldValidate: true });
+    setValue('hidden', episode.hidden, { shouldValidate: false });
     setValue('title', episode.title, { shouldValidate: true });
+    setValue('description', episode.description, { shouldValidate: true });
     if (actor) {
       let mediaResult = await actor.getMedia(episode.mediaId);
       if (mediaResult.length == 1) {
@@ -368,6 +371,7 @@ const PutEpisodeForm = (): JSX.Element => {
 
     if (episode) {
       // We came into this page with an existing Episode to edit
+      episode.hidden = data.hidden;
       episode.title = data.title;
       episode.description = data.description;
       episode.mediaId = mediaId;
@@ -388,6 +392,7 @@ const PutEpisodeForm = (): JSX.Element => {
       // We came into this page intending to create a new Episode from scratch
       const episodeData: EpisodeData = {
         feedKey: feed.key,
+        hidden: false,
         title: data.title,
         description: data.description,
         mediaId: mediaId,
@@ -505,6 +510,12 @@ const PutEpisodeForm = (): JSX.Element => {
         }
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
+        <Label>
+          Hidden from feed:
+          <Input
+            type="checkbox"
+            {...register("hidden")} />
+        </Label>
         <Label>
           Title:
           <Input

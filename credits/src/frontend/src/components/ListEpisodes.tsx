@@ -26,6 +26,7 @@ import { AppContext } from "../App";
 import toast from "react-hot-toast";
 import { Button, Icon } from "@adobe/react-spectrum";
 import { Section, FormContainer, Title, Label, Input, GrowableInput, LargeButton, LargeBorder, LargeBorderWrap, ValidationError } from "./styles/styles";
+import { Console } from "console";
 
 // If feed is not provided when navigating to the ListEpisode page, the feed at
 // the 'feedKey' search param will be fetched.
@@ -99,6 +100,33 @@ const ListEpisodes = (): JSX.Element => {
     navigate('/putEpisode/?feed=' + feedKey, { state: { feed } });
   };
 
+  const moveEpisode = async (episode: Episode, amount: number) => {
+    if (feed == null) {
+      console.error("Cannot reorder episodes, feed is null");
+      return;
+    }
+
+    const currentIndex = feed.episodeIds.findIndex(id => id === episode.id);
+    if (currentIndex !== -1) {
+      const newIndex = currentIndex + amount;
+      if (newIndex >= 0 && newIndex < feed.episodeIds.length) {
+        const updatedEpisodeIds = [...feed.episodeIds];
+        const [movedEpisode] = updatedEpisodeIds.splice(currentIndex, 1);
+        updatedEpisodeIds.splice(newIndex, 0, movedEpisode);
+        // Update feed with new episode order
+        const updatedFeed = { ...feed, episodeIds: updatedEpisodeIds };
+
+        let putFeedResult = await actor!.putFeed(feed);
+        if ("ok" in putFeedResult) {
+          setFeed(updatedFeed);
+        } else if ("err" in putFeedResult) {
+          console.error(putFeedResult.err);
+          toast.error(`${putFeedResult.err}`);
+        };
+      }
+    }
+  }
+
   if (!feedKey) {
     return <h1>feed must be specified as a search param so we know which feed's episodes to list.</h1>
   };
@@ -111,15 +139,20 @@ const ListEpisodes = (): JSX.Element => {
     <>
       <Title>{"Episodes for \"" + feedKey + "\" Feed"}</Title>
       {episodes.length == 0 && "No episodes yet. Add an episode by clicking below:"}
-      {episodes.map((episode: Episode) => 
+      {episodes.map((episode: Episode, index: number) => 
       {
         const style: React.CSSProperties = { opacity: episode.hidden ? 0.5 : 1.0 };
         return (
           <div key={Number(episode.id)}>
-            <span style={style}>{episode.title}&nbsp;&nbsp;</span>
+            <button disabled={index == 0} onClick={() => moveEpisode(episode, -1)}>↑</button>
+            <button disabled={index == episodes.length - 1} onClick={() => moveEpisode(episode, 1)}>↓</button>
+            &nbsp;
             <Link to={'/putEpisode?feed=' + feedKey} state={{ feedKey, feed, episode }}>
-              Edit
+              <button>Edit</button>
             </Link>
+            &nbsp;&nbsp;
+            <span style={style}>{episode.title}</span>
+
           </div >
         )
       })

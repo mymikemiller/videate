@@ -44,6 +44,9 @@ const ListEpisodes = (): JSX.Element => {
   const [feed, setFeed] = useState<Feed>();
   const [episodes, setEpisodes] = useState<Episode[]>();
 
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     if (state) {
       const { feed: incomingFeed } = state as ListEpisodeProps;
@@ -56,6 +59,7 @@ const ListEpisodes = (): JSX.Element => {
     if (!feed) {
       if (actor && feedKey && profile?.ownedFeedKeys.includes(feedKey.toLowerCase())) {
         (async () => {
+          setLoading(true);
           const feed = await actor.getFeed(feedKey!);
           // If we got a feed back, set it. Note that feed.length does not
           // refer to the number of episodes in the feed. It refers to whether
@@ -71,6 +75,7 @@ const ListEpisodes = (): JSX.Element => {
   useEffect(() => {
     if (feed) {
       (async () => {
+        setLoading(true);
         let episodesResult = await actor!.getEpisodesForDisplay(feed.key, true);
         if (episodesResult.length == 1) {
           setEpisodes(episodesResult[0]);
@@ -80,6 +85,10 @@ const ListEpisodes = (): JSX.Element => {
       })();
     }
   }, [feed]);
+
+  useEffect(() => {
+    setLoading(false);
+  }, [episodes]);
 
   // todo: break this out into a reusable component
   if (authClient == null || actor == null) {
@@ -116,13 +125,15 @@ const ListEpisodes = (): JSX.Element => {
         // Update feed with new episode order
         const updatedFeed = { ...feed, episodeIds: updatedEpisodeIds };
 
+        setSubmitting(true);
         let putFeedResult = await actor!.putFeed(updatedFeed);
         if ("ok" in putFeedResult) {
-          setFeed(updatedFeed);
+          await setFeed(updatedFeed);
         } else if ("err" in putFeedResult) {
           console.error(putFeedResult.err);
           toast.error(`${putFeedResult.err}`);
         };
+        setSubmitting(false);
       }
     }
   }
@@ -144,11 +155,11 @@ const ListEpisodes = (): JSX.Element => {
         const style: React.CSSProperties = { opacity: episode.hidden ? 0.5 : 1.0 };
         return (
           <div key={Number(episode.id)}>
-            <button disabled={index == 0} onClick={() => moveEpisode(episode, -1)}>↑</button>
-            <button disabled={index == episodes.length - 1} onClick={() => moveEpisode(episode, 1)}>↓</button>
+            <button disabled={loading || submitting || index == 0} onClick={() => moveEpisode(episode, -1)}>↑</button>
+            <button disabled={loading || submitting || index == episodes.length - 1} onClick={() => moveEpisode(episode, 1)}>↓</button>
             &nbsp;
             <Link to={'/putEpisode?feed=' + feedKey} state={{ feedKey, feed, episode }}>
-              <button>Edit</button>
+              <button disabled={loading || submitting}>Edit</button>
             </Link>
             &nbsp;&nbsp;
             <span style={style}>{episode.title}</span>

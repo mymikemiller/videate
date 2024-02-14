@@ -71,7 +71,7 @@ const ListEpisodes = (): JSX.Element => {
   useEffect(() => {
     if (feed) {
       (async () => {
-        let episodesResult = await actor!.getEpisodes(feed.key);
+        let episodesResult = await actor!.getEpisodesForDisplay(feed.key, true);
         if (episodesResult.length == 1) {
           setEpisodes(episodesResult[0]);
         } else {
@@ -116,7 +116,7 @@ const ListEpisodes = (): JSX.Element => {
         // Update feed with new episode order
         const updatedFeed = { ...feed, episodeIds: updatedEpisodeIds };
 
-        let putFeedResult = await actor!.putFeed(feed);
+        let putFeedResult = await actor!.putFeed(updatedFeed);
         if ("ok" in putFeedResult) {
           setFeed(updatedFeed);
         } else if ("err" in putFeedResult) {

@@ -55,8 +55,9 @@ module {
 
     // Turn the stable array of all Episodes into a usable map from FeedKey to
     // a Buffer of Episodes in that Feed. Once an Episode is added to this map,
-    // it stays there even if its EpisodeID is removed from the feed's
-    // episodeIds list, thus removing the Episode from the feed.
+    // it stays there in the order it was added even if its EpisodeID is
+    // removed from the feed's episodeIds list, thus removing the Episode from
+    // the feed, or if its order is rearranged by modifying feed.episodeIds.
     let episodes : Map.HashMap<FeedKey, Buffer.Buffer<Episode>> = Array.foldLeft<Episode, Map.HashMap<FeedKey, Buffer.Buffer<Episode>>>(
       init.episodeEntries,
       Map.fromIter<FeedKey, Buffer.Buffer<Episode>>(
@@ -212,50 +213,44 @@ module {
       media.getOpt(id);
     };
 
+    // Gets the Episode in the specified Feed by its ID, which is assigned
+    // linearly when it's first added to the feed and doesn't change even when
+    // episodes are reordered, hidden or removed from the feed using
+    // feed.episodeIds
     public func getEpisode(key : FeedKey, id : EpisodeID) : ?Episode {
-      Debug.print("in getEpisode");
-      let episodeBuffer = getEpisodes(key);
-      Debug.print("getEpisode 1");
-      switch (episodeBuffer) {
-        case (null) {
-          Debug.print("getEpisode null buffer");
-          // Either the Feed does not exist, or it contains no Episodes yet.
-          // The caller can use getFeed() to determine which case resulted in
-          // null being returned.
-          null;
+      switch (episodes.get(key)) {
+        case null {
+          Debug.trap("No episodes buffer found for feed " # key);
         };
-        case (?episodeBuffer) {
-          if (id >= episodeBuffer.size()) {
+        case (?buffer) {
+          if (id >= buffer.size()) {
             // The Episode buffer exists (thus likely the Feed exists), but
             // there is no Episode with the given id
-            Debug.print("getEpisode no episode with id " # debug_show (id) # " in episodeBuffer");
             return null;
           };
-          return Option.make(episodeBuffer.get(id));
+          return Option.make(buffer.get(id));
         };
       };
     };
 
+    // Gets the Episodes in the specified Feed ordered and elided according to
+    // the feed.episodeIds array. To retrieve the buffer of all episodes that
+    // have ever been in the feed, without regard to feed.episodeIds or
+    // episode.hidden, use episodes.get(feedKey)
+    //
     // Null return value means the feed wasn't found, empty array means the
     // feed was found but does not contain any Episodes.
-    public func getEpisodes(key : FeedKey) : ?[Episode] {
-      Debug.print("in getEpisodes");
-      // We can't just use getEpisodes(key) because the feed's list of
-      // EpisodeIDs into that array is the source of truth for what Episodes
-      // are actually in the Feed.
+    public func getEpisodesForDisplay(key : FeedKey, includeHidden : Bool) : ?[Episode] {
       let episodeIds : [EpisodeID] = switch (getFeed(key)) {
         case null {
-          Debug.print("getEpisodes feed not found");
           return null; // Feed not found, return null
         };
         case (?feed) feed.episodeIds;
       };
-      Debug.print("getEpisodes 1");
 
       if (episodeIds.size() == 0) {
-        Debug.print("getEpisodes no episodes yet");
         // Not an error case (just no episodes yet). We special-case this here
-        // since getEpisodes(key) will likely return null below
+        // so we don't trap when episodes.get(key) returns null below
         return Option.make([]);
       };
 
@@ -263,28 +258,27 @@ module {
         case null {
           // If a feed has EpisodeIDs in its episodeIds list, there should be
           // Episodes in its Episodes buffer
-          Debug.print("getEpisodes no buffer");
           Debug.trap("No episodes buffer found for feed " # key);
         };
         case (?possibleEpisodes) {
-          Debug.print("getEpisodes has episodes");
-          let episodeArray = Array.tabulate<Episode>(
-            episodeIds.size(),
-            func(index : Nat) : Episode {
+          // Note that we can't initialize the buffer with a known size becuase
+          // we don't know how many Episodes are marked hidden
+          let displayEpisodes = Buffer.Buffer<Episode>(0);
 
-              Debug.print("getEpisodes getting episodeIds");
-              let episodeId : EpisodeID = episodeIds[index];
-              possibleEpisodes.get(episodeId);
-            },
-          );
-          Debug.print("getEpisodes returning episodeArray");
-          Option.make(episodeArray);
+          for(episodeId : EpisodeID in episodeIds.vals()) {
+            let episode: Episode = possibleEpisodes.get(episodeId);
+
+            if (includeHidden or not episode.hidden) {
+              displayEpisodes.add(episode);
+            }
+          };
+
+          return Option.make(Buffer.toArray(displayEpisodes));
         };
       };
     };
 
     public func addMedia(mediaData : MediaData) : Result.Result<Media, CreditsError> {
-      Debug.print("in addMedia");
       // Create the Media now that we know what the MediaID will be
       let newMedia : Media = {
         // MediaIDs increase linearly from 0, so we know the next available
@@ -336,13 +330,13 @@ module {
 
       //todo: check msg caller for feed ownership
 
-      let episodeBuffer = switch (getEpisodes(episodeData.feedKey)) {
+      let episodeBuffer = switch (episodes.get(episodeData.feedKey)) {
         case (null) {
           // This is the feed's first episode, so create the buffer
           Buffer.fromArray<Episode>([]);
         };
-        case (?episodeArray) {
-          Buffer.fromArray<Episode>(episodeArray);
+        case (?buffer) {
+          buffer;
         };
       };
 
@@ -409,14 +403,14 @@ module {
 
       //todo: check msg caller for feed ownership
 
-      let episodeBuffer = switch (getEpisodes(feedKey)) {
-        case (null) {
+      let episodeBuffer = switch (episodes.get(feedKey)) {
+        case null {
           // Since we're updating not adding, we expect to find the episode
           // buffer in the episodes array
-          return #err(#EpisodeNotFound);
+          Debug.trap("No episodes buffer found for feed " # feedKey);
         };
-        case (?episodeArray) {
-          Buffer.fromArray<Episode>(episodeArray);
+        case (?buffer) {
+          buffer
         };
       };
 

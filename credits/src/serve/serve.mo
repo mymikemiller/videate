@@ -795,8 +795,8 @@ actor class Serve() = Self {
     credits.getEpisode(key, id);
   };
 
-  public func getEpisodes(key : FeedKey) : async ?[Episode] {
-    credits.getEpisodes(key);
+  public func getEpisodesForDisplay(key : FeedKey, includeHidden : Bool) : async ?[Episode] {
+    credits.getEpisodesForDisplay(key, includeHidden);
   };
 
   public func getFeedSummary(key : Text) : async (Text, Text) {

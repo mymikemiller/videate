@@ -23,6 +23,18 @@ module {
   type Media = Credits.Media;
   type Episode = Credits.Episode;
 
+  func rssError(text: Text) : Document {
+    return {
+      prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+      root = {
+        name = "Error";
+        attributes = [];
+        text = text;
+        children = [];
+      };
+    };
+  };
+
   // todo: this can be significantly cleaned up using default values. See
   // https://forum.dfinity.org/t/initializing-an-object-with-optional-nullable-fields/1790
   //
@@ -41,70 +53,38 @@ module {
     contributors : Contributors.Contributors,
     nftDb : NftDb.NftDb,
   ) : Document {
-    let episodeIds : [EpisodeID] = switch (episodeId) {
+    let episodes : [Episode] = switch (episodeId) {
       case null {
         // Normal case. Caller did not specify an Episode, so use all Episodes
-        feed.episodeIds;
+        let e = credits.getEpisodesForDisplay(feed.key, false);
+        switch(e) {
+          case null { 
+            return rssError("Feed not found");
+          };
+          case (?episodes) {
+            if(episodes.size() == 0) {
+              return rssError("No unhidden episodes in feed");
+            };
+            episodes;
+          }
+        }
       };
       case (?episodeId) {
         // Use only the single Episode specified by the caller
-        [episodeId];
-      };
-    };
-
-    let episodes = Buffer.Buffer<Episode>(Array.size(episodeIds));
-    var error: ?Text = null;
-    label episodeLoop for (id in episodeIds.vals()) {
-      switch (credits.getEpisode(feed.key, id)) {
-        case (null) {
-          error := Option.make("Episode with ID " # Nat.toText(id) # " not found in " # feed.key # " feed");
-          break episodeLoop;
-        };
-        case (?episode) {
-          if (not episode.hidden) {
-            // Normal case
-            episodes.add(episode);
-          } else {
-            // This isn't an error, as episodes are allowed to be hidden from
-            // feeds. But if the user was requesting a specific episode (i.e.
-            // episodeId was provided as a parameter), we let them know it's
-            // not showing up because that episode is hidden.
-            switch (episodeId) {
-              case null {
-                // Episode hidden, continue loop without adding episode
-              };
-              case (?episodeId) {
-                if (episode.hidden) {
-                  error := Option.make("The requested episode (id " # Nat.toText(id) # ") is marked as hidden");
-                }
-              }
-            }
-          }
-        };
-      };
-    };
-
-    switch(error) {
-      case null ();
-      case (?error) {
-        // There was an error finding episodes. Notify the user.
-        return {
-          prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-          root = {
-            name = "Error";
-            attributes = [];
-            text = error;
-            children = [];
+        let episode = credits.getEpisode(feed.key, episodeId);
+        switch(episode) {
+          case null {
+            return rssError("Episode not found");
           };
-        };
+          case (?episode) {
+            if (episode.hidden) {
+              return rssError("Requested episode is hidden");
+            };
+            [episode];
+          }
+        }
       };
     };
-
-    // Arrange episodes from newest to oldest and create a List
-    Buffer.reverse(episodes);
-    let episodeArray = Buffer.toArray(episodes);
-    let episodeList : List.List<Episode> = List.fromArray(episodeArray);
-
     // todo: Limit the episodes list to the most recent 3 episodes unless there
     // is a registered user making the request
     // let splitEpisodeList = List.split(3, episodeistNewestToOldest);
@@ -223,7 +203,7 @@ module {
                   },
                 ]),
                 List.map<Episode, Element>(
-                  episodeList,
+                   List.fromArray(episodes),
                   func(episode : Episode) : Element {
                     getEpisodeElement(
                       credits,
